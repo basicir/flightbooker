@@ -2,7 +2,7 @@
 node_modules/
 out/
 dist/
-release/
+/release/
 *.tsbuildinfo
 
 # Valódi üzemi adatok helyi teszteléshez (pl. karbantartási táblázat fotói) – nem kerülnek a repóba
