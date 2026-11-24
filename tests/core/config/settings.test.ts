@@ -93,7 +93,7 @@ describe('kiírás és beolvasás (ALP-05)', () => {
     expect(parsed.ok).toBe(true)
     if (parsed.ok) expect(serializeSettings(parsed.settings)).toBe(text)
     expect(text.endsWith('\n')).toBe(true)
-    expect(text).toContain('\n  "formatVersion": 8,')
+    expect(text).toContain('\n  "formatVersion": 9,')
   })
 
   it('érvénytelen beállítást nem ír ki', () => {
@@ -153,9 +153,20 @@ describe('szigorú séma', () => {
 })
 
 describe('verziókezelés', () => {
+  it('a 8. formátum adatforrás-mezőjét elhagyja (a bemutató mód megszűnt)', () => {
+    for (const dataSource of ['live', 'demo']) {
+      const result = parseSettings({ ...structuredClone(createDefaultSettings()), formatVersion: 8, dataSource })
+      expect(result.ok).toBe(true)
+      if (result.ok) {
+        expect(result.migratedFrom).toBe(8)
+        expect(result.settings).not.toHaveProperty('dataSource')
+      }
+    }
+  })
+
   it('hiányzó verziót és újabb verziót elutasít', () => {
     expect(errorsOf(withChanges((s) => delete s['formatVersion']))[0]).toMatch(/formatVersion/)
-    expect(errorsOf(withChanges((s) => (s['formatVersion'] = 9)))[0]).toMatch(/újabb verziójával/)
+    expect(errorsOf(withChanges((s) => (s['formatVersion'] = 10)))[0]).toMatch(/újabb verziójával/)
   })
 
   it('az 1. formátumot a 2.-ra alakítja: géptípus a kategória helyett, több preferált gép, nincs globális repülési idő és CAPE', () => {

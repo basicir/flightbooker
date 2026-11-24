@@ -1,3 +1,4 @@
+import { z } from 'zod'
 import { assertReadOnlyRequestBody } from './readOnlyGuard'
 import { RELEASE_REPO } from './releaseRepo'
 
@@ -12,6 +13,9 @@ import { RELEASE_REPO } from './releaseRepo'
  * - api.github.com: csak GET, csak a program saját repójának kiadáslistája (FRS-02).
  * - github.com: csak GET, csak a saját repó egy kiadási fájlja; innen egyetlen átirányítás
  *   engedett a GitHub fájltárhelyére (`allowedDownload`). Személyes adat egyik felé sem megy.
+ * - Csak a fejlesztői (DEV) változatban, külön belépési ponton (`createDevPromoteFetch`): a saját repó
+ *   „Kiadás: dev → main” munkafolyamatának indítása és utolsó futásai, a fejlesztő GitHub-tokenjével
+ *   (FRS-09). A fő változatban ez a kérés nem indulhat el.
  * Más átirányítást nem követünk, mert az kivezethetne a listáról.
  */
 
@@ -190,6 +194,56 @@ export function createAllowedDownload(fetchImpl: FetchImpl): AllowedDownload {
     return fetchImpl(target.toString(), { ...base, redirect: 'error' })
   }
 }
+
+/** A „Kiadás: dev → main” munkafolyamat (promote.yml) a saját repóban (FRS-09). */
+export const PROMOTE_WORKFLOW_PATH = `/repos/${RELEASE_REPO.owner}/${RELEASE_REPO.name}/actions/workflows/promote.yml`
+export const PROMOTE_DISPATCH_PATH = `${PROMOTE_WORKFLOW_PATH}/dispatches`
+export const PROMOTE_RUNS_PATH = `${PROMOTE_WORKFLOW_PATH}/runs`
+
+/** Az indítás törzse: csak a dev ág és a kiadandó (a DEV-ben kipróbált) commit. */
+const PromoteDispatchBody = z.strictObject({ ref: z.literal('dev'), inputs: z.strictObject({ commit: z.string().regex(/^[0-9a-f]{40}$/) }) })
+
+/** A DEV-gomb kérése: POST az indításra (rögzített törzzsel), vagy GET az utolsó futásokra. */
+export function assertPromoteRequestAllowed(rawUrl: string, init: AllowedRequestInit): URL {
+  const url = parseHttpsUrl(rawUrl)
+  if (url.hostname !== GITHUB_API_HOST) throw new NetworkPolicyError(`A kiadás indítása csak a(z) ${GITHUB_API_HOST} felé mehet.`)
+  if (init.method === 'POST') {
+    if (url.pathname !== PROMOTE_DISPATCH_PATH || url.search !== '') throw new NetworkPolicyError('Csak a „Kiadás: dev → main” munkafolyamat indítható.')
+    let body: unknown
+    try {
+      body = JSON.parse(init.body ?? '')
+    } catch {
+      throw new NetworkPolicyError('A kiadás indításának törzse érvénytelen.')
+    }
+    if (!PromoteDispatchBody.safeParse(body).success) throw new NetworkPolicyError('A kiadás indításának törzse csak a dev ág és egy commit-azonosító lehet.')
+    return url
+  }
+  if (url.pathname !== PROMOTE_RUNS_PATH) throw new NetworkPolicyError('Csak a „Kiadás: dev → main” futásai kérdezhetők le.')
+  for (const [key, value] of url.searchParams) {
+    const ok = (key === 'per_page' && /^\d{1,2}$/.test(value)) || (key === 'event' && value === 'workflow_dispatch')
+    if (!ok) throw new NetworkPolicyError(`A kérésben nem engedett paraméter: ${key}.`)
+  }
+  noBody(GITHUB_API_HOST)(init.body)
+  return url
+}
+
+/**
+ * A DEV-gomb hálózati belépési pontja (FRS-09). Csak a fejlesztői csatornán hozható létre: a fő
+ * változatban (és helyi buildben) kivételt dob, így ott ez a kérés el sem indulhat.
+ */
+export function createPromoteFetch(fetchImpl: FetchImpl, channel: string | null): AllowedFetch {
+  if (channel !== 'dev') throw new NetworkPolicyError('A kiadás indítása csak a fejlesztői (DEV) változatban engedett.')
+  return async (rawUrl, init) => {
+    const url = assertPromoteRequestAllowed(rawUrl, init)
+    const requestInit: RequestInit = { method: init.method, redirect: 'error', credentials: 'omit' }
+    if (init.headers) requestInit.headers = { ...init.headers }
+    if (init.body !== undefined) requestInit.body = init.body
+    if (init.signal) requestInit.signal = init.signal
+    return fetchImpl(url.toString(), requestInit)
+  }
+}
+
+export const createDevPromoteFetch = (channel: string | null): AllowedFetch => createPromoteFetch((input, init) => globalThis.fetch(input, init), channel)
 
 /** Az alkalmazás egyetlen éles hálózati belépési pontja. */
 export const allowedFetch: AllowedFetch = createAllowedFetch((input, init) => globalThis.fetch(input, init))

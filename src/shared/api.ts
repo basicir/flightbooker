@@ -100,12 +100,12 @@ export interface FlightbookerApi {
   loadCachedData(weekStart: string): Promise<DataBundle | null>
   /**
    * Az útvonalas igények repülőtereinek előrejelzése a hétre (K27, SZB-19). Csak a
-   * koordináta és az időablak megy ki; bemutató módban szintetikus.
+   * koordináta és az időablak megy ki.
    */
   fetchRouteWeather(weekStart: string, icaos: readonly string[], settings: Settings): Promise<RouteWeatherResult>
   /**
    * A bázis előrejelzése az Open-Meteo összes összevetett modelljéből (indítópult,
-   * időjárás-ellenőrzés). Csak koordináta, időablak és modellnév megy ki; bemutató módban szintetikus.
+   * időjárás-ellenőrzés). Csak koordináta, időablak és modellnév megy ki.
    */
   fetchWeatherCheck(weekStart: string, settings: Settings): Promise<WeatherCheckResult>
   /** A folyamatban lévő frissítés megszakítása (H24). */
@@ -119,8 +119,7 @@ export interface FlightbookerApi {
   copyText(text: string): Promise<void>
   /**
    * A FlightLogger programlistája az elméleti foglaláshoz (FLI-11): programok, revíziók, tárgyak,
-   * csak olvasó lekérdezéssel. Gyorsítótárból jön, amíg friss; `force`: újratöltés. Bemutató
-   * módban szintetikus.
+   * csak olvasó lekérdezéssel. Gyorsítótárból jön, amíg friss; `force`: újratöltés.
    */
   loadTheoryCatalog(settings: Settings, options?: { readonly force?: boolean }): Promise<TheoryCatalog>
   /**
@@ -156,6 +155,56 @@ export interface FlightbookerApi {
   skipUpdate(): Promise<void>
   /** Az automatikus frissítés be- és kikapcsolása (FRS-06). */
   setAutoUpdate(enabled: boolean): Promise<UpdateState>
+  /**
+   * A fejlesztői (DEV) változat eszközei (FRS-09, FRS-10). A fő változatban a főfolyamat ezeket
+   * nem regisztrálja, így ott minden hívásuk hibával tér vissza; a felület meg sem jeleníti őket.
+   */
+  readonly dev: DevApi
+}
+
+/** Mi jött át a fő változatból (FRS-10). Az API-kulcs nem: azt a DEV-ben külön kell megadni (ALP-06). */
+export interface StableImportSummary {
+  /** A mentett heti tervek száma. */
+  readonly plans: number
+  /** A saját feladatsor-fájlok száma. */
+  readonly syllabi: number
+  /** A modellpontosság mérése (időjárás-ellenőrzés) is átjött-e. */
+  readonly weatherLog: boolean
+  readonly students: number
+}
+
+/** A „Kiadás: dev → main” munkafolyamat egy futása a GitHubon (FRS-09). */
+export interface PromotionRun {
+  /** queued, in_progress, completed … (a GitHub értéke). */
+  readonly status: string
+  /** success, failure, cancelled … (befejezett futásnál). */
+  readonly conclusion: string | null
+  readonly url: string
+  readonly createdAt: string
+}
+
+export interface PromotionState {
+  /** Van-e mentett GitHub-token (a token maga sosem jut a felületre). */
+  readonly tokenSaved: boolean
+  readonly buildVersion: string
+  /** A futó DEV-csomag commitja; ezt adja ki a gomb. Helyi buildnél nincs. */
+  readonly buildCommit: string | null
+  readonly lastRun: PromotionRun | null
+  /** Ha a legutóbbi futás nem kérdezhető le (nincs hálózat, rossz token). */
+  readonly error?: string
+}
+
+export interface DevApi {
+  /** A fő változat beállításainak, terveinek és feladatsorainak átvétele (felülírja a DEV-éit). */
+  importFromStable(): Promise<StableImportSummary>
+  /** A program újraindítása (az átvétel után). */
+  relaunch(): Promise<void>
+  getPromotionState(): Promise<PromotionState>
+  /** A GitHub-token mentése a rendszer titoktárolójába, kipróbálás után. */
+  saveGithubToken(token: string): Promise<ConnectionTest>
+  clearGithubToken(): Promise<void>
+  /** A futó DEV-verzió kiadása fő kiadásként (dev → main). */
+  startPromotion(): Promise<PromotionState>
 }
 
 export const IPC = {
@@ -187,4 +236,10 @@ export const IPC = {
   installUpdate: 'update:install',
   skipUpdate: 'update:skip',
   setAutoUpdate: 'update:set-auto',
+  devImportFromStable: 'dev:import-from-stable',
+  devRelaunch: 'dev:relaunch',
+  devPromotionState: 'dev:promotion-state',
+  devSaveGithubToken: 'dev:github-token-save',
+  devClearGithubToken: 'dev:github-token-clear',
+  devStartPromotion: 'dev:promotion-start',
 } as const

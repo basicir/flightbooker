@@ -4,11 +4,13 @@
  *
  *   npx tsx tools/release/next-version.ts --channel dev --tags-file tags.txt --repository owner/name
  *
- * Kimenet (GITHUB_OUTPUT formátum): version=…, tag=…, previous_tag=…
+ * Kimenet (GITHUB_OUTPUT formátum): version=…, tag=…, previous_tag=…, matrix=… (a csatorna
+ * csomagolási feladatai JSON-ban, a build lépés mátrixa).
  */
 import { readFileSync } from 'node:fs'
 import { parseArgs } from 'node:util'
 import { releaseRepoSlug } from '../../src/main/net/releaseRepo'
+import { RELEASE_TARGETS } from './channels'
 import { nextReleaseVersion } from './versioning'
 
 const { values } = parseArgs({
@@ -35,4 +37,4 @@ const tags = values['tags-file']
 const packageVersion = (JSON.parse(readFileSync('package.json', 'utf8')) as { version: string }).version
 const next = nextReleaseVersion({ packageVersion, tags, channel })
 if (tags.includes(next.tag)) throw new Error(`A(z) ${next.tag} címke már létezik.`)
-process.stdout.write(`version=${next.version}\ntag=${next.tag}\nprevious_tag=${next.previousTag ?? ''}\n`)
+process.stdout.write(`version=${next.version}\ntag=${next.tag}\nprevious_tag=${next.previousTag ?? ''}\nmatrix=${JSON.stringify(RELEASE_TARGETS[channel])}\n`)

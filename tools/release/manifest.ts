@@ -14,7 +14,7 @@ import { parseArgs } from 'node:util'
 import { MANIFEST_APP, MANIFEST_ASSET, ManifestSchema, type Manifest, type ManifestAsset } from '../../src/core/update/manifest'
 import { parseVersion } from '../../src/core/update/version'
 import publicKeys from '../../src/main/update/update-public-keys.json'
-import { classifyAsset } from './channels'
+import { classifyAsset, requiredAssets } from './channels'
 
 const { values } = parseArgs({
   options: {
@@ -40,11 +40,7 @@ for (const name of readdirSync(dir).sort()) {
   const data = readFileSync(join(dir, name))
   assets.push({ ...role, name, size: statSync(join(dir, name)).size, sha512: createHash('sha512').update(data).digest('base64') })
 }
-for (const required of [
-  { platform: 'darwin', arch: 'arm64', kind: 'zip' },
-  { platform: 'darwin', arch: 'x64', kind: 'zip' },
-  { platform: 'win32', arch: 'x64', kind: 'nsis' },
-] as const) {
+for (const required of requiredAssets(channel)) {
   if (!assets.some((a) => a.platform === required.platform && a.arch === required.arch && a.kind === required.kind)) {
     throw new Error(`Hiányzik a kiadásból: ${required.platform} ${required.arch} ${required.kind}`)
   }

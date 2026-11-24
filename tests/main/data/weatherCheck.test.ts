@@ -37,12 +37,9 @@ describe('időjárás-ellenőrzés: modellek lekérése (ADT-07, ALP-02)', () =>
     expect(byId['icon_eu']!.error).toBeUndefined()
   })
 
-  it('bemutató módban nincs hálózat; repülőtér nélkül hiba', async () => {
+  it('repülőtér nélkül hiba, hálózat nélkül', async () => {
     const fetchForecast = vi.fn()
-    const demo = vi.fn(() => [{ model: 'icon_eu', hours: [] }])
-    const result = await fetchWeatherCheck({ fetchForecast, now: new Date(PLANNED_AT), demo }, baseSettings(), WEEK_START)
-    expect(fetchForecast).not.toHaveBeenCalled()
-    expect(result.models).toEqual([{ model: 'icon_eu', hours: [] }])
     await expect(fetchWeatherCheck({ fetchForecast, now: new Date(PLANNED_AT) }, { ...baseSettings(), airport: null }, WEEK_START)).rejects.toThrow('Nincs megadva a repülőtér.')
+    expect(fetchForecast).not.toHaveBeenCalled()
   })
 })

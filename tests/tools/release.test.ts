@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { assetBaseName, classifyAsset } from '../../tools/release/channels'
+import { APP_DISPLAY_NAME } from '../../src/core/update/appNames'
+import { assetBaseName, CHANNELS, classifyAsset, RELEASE_TARGETS, requiredAssets } from '../../tools/release/channels'
 import { nextReleaseVersion } from '../../tools/release/versioning'
 
 describe('a következő kiadás verziója (FRS-05)', () => {
@@ -41,5 +42,23 @@ describe('kiadási fájlok', () => {
     expect(classifyAsset(`${assetBaseName('dev', v, 'win', 'x64')}-setup.exe`, 'dev', v)).toEqual({ platform: 'win32', arch: 'x64', kind: 'nsis' })
     expect(classifyAsset(`${assetBaseName('stable', v, 'mac', 'arm64')}.zip`, 'dev', v)).toBeNull()
     expect(classifyAsset(`${assetBaseName('dev', v, 'mac', 'arm64')}.zip.blockmap`, 'dev', v)).toBeNull()
+  })
+})
+
+describe('csatornánkénti csomagok', () => {
+  it('a DEV csak macOS-re készül, a fő kiadás Windowsra is', () => {
+    expect(RELEASE_TARGETS.dev.map((t) => t.platform)).toEqual(['mac', 'mac'])
+    expect(RELEASE_TARGETS.stable.some((t) => t.platform === 'win')).toBe(true)
+    expect(requiredAssets('dev')).toEqual([
+      { platform: 'darwin', arch: 'arm64', kind: 'zip' },
+      { platform: 'darwin', arch: 'x64', kind: 'zip' },
+    ])
+    expect(requiredAssets('stable')).toContainEqual({ platform: 'win32', arch: 'x64', kind: 'nsis' })
+  })
+
+  it('a programnév (és így az adatmappa) egy helyről jön; a DEV ebből találja a fő változatot', () => {
+    expect(CHANNELS.stable.displayName).toBe(APP_DISPLAY_NAME.stable)
+    expect(CHANNELS.dev.displayName).toBe(APP_DISPLAY_NAME.dev)
+    expect(APP_DISPLAY_NAME.stable).toBe('Foglalástervező')
   })
 })

@@ -1,8 +1,6 @@
 import type { Settings } from '../../core/config/schema'
 import type { LocalDate } from '../../core/model/time'
 import { addDays, daysBetween, localParts } from '../../core/time/zoned'
-import type { ModelForecast } from '../../core/weather/forecastCheck'
-import type { VerificationLogHour } from '../../core/weather/skill'
 import type { WeatherCheckResult } from '../../shared/api'
 import type { ForecastRequest, ForecastResponse } from '../net/openMeteo'
 import { fetchModelForecasts, modelSkill, type SkillSource } from './blendedWeather'
@@ -18,20 +16,11 @@ export interface WeatherCheckDeps {
   readonly now: Date
   /** A METAR-mérés; nélküle (teszt) az induló súlyok. */
   readonly skill?: SkillSource
-  /** Bemutató módban nincs hálózat: a szintetikus modellek jönnek. */
-  readonly demo?: (weekStart: LocalDate) => ModelForecast[]
-  /** Bemutató módban a szintetikus mérési napló. */
-  readonly demoLog?: (now: Date) => VerificationLogHour[]
 }
 
 export async function fetchWeatherCheck(deps: WeatherCheckDeps, settings: Settings, weekStart: LocalDate): Promise<WeatherCheckResult> {
   const fetchedAt = deps.now.toISOString()
   const airport = settings.airport
-  if (deps.demo) {
-    const models = deps.demo(weekStart)
-    const place = { latitude: airport?.latitude ?? 0, longitude: airport?.longitude ?? 0, timezone: airport?.timezone ?? 'UTC' }
-    return { fetchedAt, models, skill: { ...(await modelSkill(undefined, deps.now, place, models)), ...(deps.demoLog ? { log: deps.demoLog(deps.now) } : {}) } }
-  }
   if (!airport) throw new Error('Nincs megadva a repülőtér.')
   const tz = airport.timezone
   const today = localParts(deps.now.getTime(), tz).date

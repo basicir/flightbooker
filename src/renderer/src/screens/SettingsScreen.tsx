@@ -189,13 +189,8 @@ export function SettingsScreen() {
         {tab === 'Adatforrás' && (
           <div className="stack">
             <p>
-              Jelenlegi adatforrás: <strong>{draft.dataSource === 'demo' ? 'bemutató mód (szintetikus adat)' : 'élő FlightLogger'}</strong>
+              Adatforrás: <strong>FlightLogger</strong>, az API-kulcsoddal, csak olvasva.
             </p>
-            <div className="row">
-              <Button onClick={() => change({ ...draft, dataSource: draft.dataSource === 'demo' ? 'live' : 'demo' })}>
-                Váltás erre: {draft.dataSource === 'demo' ? 'élő FlightLogger' : 'bemutató mód'}
-              </Button>
-            </div>
             {!isBrowserDemo && (
               <Field label="API-kulcs" hint={hasKey ? 'Van tárolt kulcs. A kulcs maga soha nem jelenik meg.' : 'Nincs tárolt kulcs.'}>
                 <div className="row">
@@ -258,7 +253,7 @@ export function SettingsScreen() {
                 <Button
                   variant="danger"
                   onClick={async () => {
-                    if (window.confirm('Biztosan törlöd a beállításokat és a terveket?\n\nA tárolt API-kulcs megmarad, így az első beállításnál egy kattintással tovább tudsz lépni az élő adatokkal.')) {
+                    if (window.confirm('Biztosan törlöd a beállításokat és a terveket?\n\nA tárolt API-kulcs megmarad, így az első beállításnál egy kattintással tovább tudsz lépni.')) {
                       await app.resetApp({ clearApiKey: false })
                     }
                   }}

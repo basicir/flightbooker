@@ -90,7 +90,7 @@ export function WeatherForecastCard(props: { settings: Settings; bundle: DataBun
     return result
   }, [firstDay, weekEnd])
 
-  const key = airport ? `${settings.dataSource}|${airport.latitude},${airport.longitude}|${weekStart}` : ''
+  const key = airport ? `${airport.latitude},${airport.longitude}|${weekStart}` : ''
   const active = airport !== null && days.length > 0
   const fetchCheck = useCallback(
     (): Promise<void> =>

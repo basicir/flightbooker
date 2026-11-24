@@ -2,6 +2,7 @@ import { join } from 'node:path'
 import { app, BrowserWindow, dialog, session, shell } from 'electron'
 import { IPC } from '../shared/api'
 import { createElectronConfigStore } from './configStore'
+import { createDevTools } from './dev/devTools'
 import { registerIpc } from './ipc'
 import { createElectronPlanStore } from './planStore'
 import { isRendererRequestAllowed } from './rendererNetworkPolicy'
@@ -108,6 +109,8 @@ void app.whenReady().then(async () => {
     // Csak a saját ablakunk keretéből érkező IPC-hívás számít (B3).
     isTrustedSender: (url) => isRendererRequestAllowed(url, devServerUrl, appFileRoot),
     updater,
+    // A fejlesztői eszközök (beállítás-átvétel, kiadás gomb) csak a DEV-ben (FRS-09, FRS-10).
+    ...(readUpdateChannel() === 'dev' ? { devTools: createDevTools('dev') } : {}),
   })
   createWindow()
   // Minden indításkor (FRS-01); a felület az ellenőrzés végéig nem tölt be adatot.

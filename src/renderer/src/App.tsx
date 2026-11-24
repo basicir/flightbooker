@@ -66,14 +66,18 @@ export function App() {
     <>
     <div className="shell" inert={app.dataLoading && !app.dataBackground}>
       <nav className="sidebar" aria-label="Fő navigáció">
-        {(app.settings?.dataSource === 'demo' || isBrowserDemo || update?.channel === 'dev') && (
+        {(isBrowserDemo || update?.channel === 'dev') && (
           <div className="brand">
             {update?.channel === 'dev' && (
               <span className="dev-flag" title={`Fejlesztői változat (${update.currentVersion})`}>
                 DEV
               </span>
             )}
-            {(app.settings?.dataSource === 'demo' || isBrowserDemo) && <span className="demo-flag">bemutató</span>}
+            {isBrowserDemo && (
+              <span className="demo-flag" title="Böngészős fejlesztői előnézet, szintetikus adattal">
+                előnézet
+              </span>
+            )}
           </div>
         )}
         {NAV_GROUPS.map((g, gi) => (

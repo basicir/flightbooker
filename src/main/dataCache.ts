@@ -4,6 +4,9 @@ import { z } from 'zod'
 import type { DataBundle } from '../core/model/dataBundle'
 import type { HistoryCache, HistoryCacheStore } from './data/refresh'
 
+/** A törölhető gyorsítótár mappája a felhasználói adatmappában. */
+export const CACHE_DIR_NAME = 'gyorsitotar'
+
 /**
  * Törölhető gyorsítótár a felhasználói adatmappa `gyorsitotar` mappájában (koncepció 3.: a név
  * és a foglalás memóriában vagy törölhető gyorsítótárban marad). Csak a gépen él, a repóba
@@ -87,7 +90,7 @@ const KEEP_WEEKS = 4
 
 /**
  * Az utolsó letöltött heti adat hetenként: indításkor ezzel azonnal lehet dolgozni, amíg a
- * háttérben a friss letöltődik. Bemutató adatot nem tárolunk.
+ * háttérben a friss letöltődik. Csak élő FlightLogger-adatot tárolunk.
  */
 export interface BundleCacheStore {
   load(weekStart: string): Promise<DataBundle | undefined>

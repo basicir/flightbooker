@@ -293,10 +293,8 @@ export function AppProvider(props: { children: ReactNode }) {
         return
       }
       // Az utoljára letöltött adat azonnal megjelenik; a friss a háttérben jön.
-      if (s.dataSource === 'live') {
-        const cached = await api.loadCachedData(ws).catch(() => null)
-        if (cached) showBundle(cached)
-      }
+      const cached = await api.loadCachedData(ws).catch(() => null)
+      if (cached) showBundle(cached)
       await loadData(ws, s)
     },
     [loadData, showBundle, persist],
@@ -743,5 +741,5 @@ export function AppProvider(props: { children: ReactNode }) {
 
 /** A beállítások azon része, amelynek változása új adatletöltést kíván (H16). */
 function dataAffecting(s: Settings): string {
-  return JSON.stringify([s.dataSource, s.airport, s.students.map((st) => [st.userId, st.syllabusId ?? null]).sort(), s.resources])
+  return JSON.stringify([s.airport, s.students.map((st) => [st.userId, st.syllabusId ?? null]).sort(), s.resources])
 }

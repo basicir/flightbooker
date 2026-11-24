@@ -7,7 +7,6 @@ import { formatIssues, migrateRaw } from './settings'
  *
  * A fájl egy borítékban a beállítási fájl tartalma. Mindig kimarad belőle, ami ehhez a
  * géphez tartozik, nem a beállításhoz:
- *  - `dataSource`: élő vagy bemutató adat;
  *  - `lastSeen`: a gép- és teremlista-változás jelzésének viszonyítási alapja (ADT-06);
  *  - `aircraftHours`: a napi kirepülhető óraállás, amely gyorsan elavul.
  * A növendékek (csak FlightLogger-azonosító és beállítás, név nem) választhatóan kerülnek bele.
@@ -18,7 +17,7 @@ export const SETTINGS_EXPORT_KIND = 'foglalastervezo-beallitasok'
 export const SETTINGS_EXPORT_VERSION = 1
 
 /** Az exportból mindig kimaradó, ehhez a géphez tartozó mezők. */
-const MACHINE_KEYS = ['dataSource', 'lastSeen', 'aircraftHours'] as const
+const MACHINE_KEYS = ['lastSeen', 'aircraftHours'] as const
 
 export interface SettingsExportOptions {
   readonly includeStudents: boolean
@@ -30,7 +29,7 @@ export interface SettingsExportOptions {
 export function buildSettingsExport(settings: Settings, options: SettingsExportOptions): string {
   const valid = SettingsSchema.safeParse(settings)
   if (!valid.success) throw new Error(`A beállítás érvénytelen, nem exportálható:\n${formatIssues(valid.error.issues).join('\n')}`)
-  const { dataSource: _d, lastSeen: _l, aircraftHours: _h, students, ...rest } = valid.data
+  const { lastSeen: _l, aircraftHours: _h, students, ...rest } = valid.data
   const body = options.includeStudents ? { ...rest, students } : rest
   const envelope = {
     kind: SETTINGS_EXPORT_KIND,
@@ -97,7 +96,7 @@ export function readSettingsImport(text: string): SettingsImportFile {
 
   // A kimaradt mezők helyére semleges érték kerül, hogy a migráció és az ellenőrzés lefusson;
   // alkalmazáskor ezek a mostani beállításból jönnek.
-  const filled = { dataSource: 'live', lastSeen: null, aircraftHours: {}, ...body, students: includesStudents ? body['students'] : [] }
+  const filled = { lastSeen: null, aircraftHours: {}, ...body, students: includesStudents ? body['students'] : [] }
   const migrated = migrateRaw(filled)
   if ('error' in migrated) return { ok: false, errors: [migrated.error] }
   const parsed = SettingsSchema.safeParse(migrated.raw)
@@ -124,7 +123,6 @@ export function applySettingsImport(current: Settings, file: Extract<SettingsImp
   const takeStudents = options.importStudents && file.includesStudents
   const next = {
     ...file.raw,
-    dataSource: current.dataSource,
     lastSeen: current.lastSeen,
     aircraftHours: current.aircraftHours,
     students: takeStudents ? file.raw['students'] : current.students,

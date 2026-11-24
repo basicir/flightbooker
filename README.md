@@ -7,7 +7,7 @@ a foglalásokat mindig az oktató rögzíti.
 ## Telepítés
 
 A telepítők a [Releases](../../releases) oldalon vannak. A **Latest** jelölésű kiadás a fő
-változat; a „Pre-release” jelölésűek a fejlesztői (DEV) változathoz tartoznak.
+változat; a „Pre-release” jelölésűek a fejlesztői (DEV) változathoz tartoznak (csak macOS).
 
 **macOS**
 
@@ -44,11 +44,12 @@ verziót.
 ```bash
 npm ci
 npm run dev        # Electron, fejlesztői módban
-npm run dev:web    # csak a felület, böngészőben, szintetikus adattal
+npm run dev:web    # csak a felület, böngészőben, szintetikus adattal (fejlesztői előnézet)
 npm run typecheck && npm run lint && npm test
 ```
 
 A követelmények a `docs/koncepcio.md`-ben, a kiadás és a frissítés működése a
 `docs/kiadas-es-frissites.md`-ben van. A fejlesztés a `dev` ágon folyik: minden push fejlesztői
-kiadást készít a **Foglalástervező DEV** programnak; a fő kiadás a GitHub Actions **Kiadás: dev →
-main** gombjával készül.
+kiadást készít a **Foglalástervező DEV** programnak (csak macOS); a fő kiadás a DEV-ben a
+**Beállítások → Frissítés → Kiadás: dev → main** gombbal (vagy a GitHub Actions azonos nevű
+munkafolyamatával) készül.

@@ -8,7 +8,11 @@
       "DOM.Iterable"
     ],
     "jsx": "react-jsx",
-    "types": []
+    "types": [],
+    "paths": {
+      "@core/*": ["./src/core/*"],
+      "@browser-demo": ["./src/renderer/src/browserDemo/browserDemoApi.ts"]
+    }
   },
   "include": [
     "src/renderer/**/*",

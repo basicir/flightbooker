@@ -28,6 +28,7 @@ export const MIGRATIONS: Readonly<Record<number, (raw: RawSettings) => RawSettin
   5: migrateV5toV6,
   6: migrateV6toV7,
   7: migrateV7toV8,
+  8: migrateV8toV9,
 }
 
 /**
@@ -126,6 +127,12 @@ function migrateV7toV8(raw: RawSettings): RawSettings {
   const defaults = raw['defaults']
   if (typeof defaults !== 'object' || defaults === null || Array.isArray(defaults)) return raw
   return { ...raw, defaults: { requestPriority: DEFAULT_REQUEST_PRIORITY, fillRequestPriority: DEFAULT_FILL_REQUEST_PRIORITY, ...(defaults as Record<string, unknown>) } }
+}
+
+/** 8 → 9: a bemutató mód megszűnt, a program mindig a FlightLoggerből dolgozik; az adatforrás mező kikerül. */
+function migrateV8toV9(raw: RawSettings): RawSettings {
+  const { dataSource: _removed, ...rest } = raw
+  return rest
 }
 
 export function formatIssues(issues: readonly z.core.$ZodIssue[]): string[] {

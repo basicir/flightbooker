@@ -13,6 +13,7 @@
  * próbapéldány a package.json verziójával (pl. 0.1.0) minden dev-kiadásnál „újabb” lenne, és
  * sosem frissülne.
  */
+import { execFileSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 import { parseArgs } from 'node:util'
 import { Arch, build, Platform, type Configuration } from 'electron-builder'
@@ -43,12 +44,23 @@ if (!parsed || versionChannel(parsed) !== channel) {
 }
 const c = CHANNELS[channel]
 const base = assetBaseName(channel, version, platform, arch)
+/** A csomag commitja: a DEV-ből indított fő kiadás pontosan ezt adja ki (FRS-09). */
+const buildCommit = gitHead()
+
+function gitHead(): string | undefined {
+  try {
+    const sha = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim()
+    return /^[0-9a-f]{40}$/.test(sha) ? sha : undefined
+  } catch {
+    return undefined
+  }
+}
 
 const config: Configuration = {
   appId: c.appId,
   productName: c.productName,
   // A csomag package.json-jába: a program neve (ebből az adatmappa és a kulcstár bejegyzése) és a csatorna.
-  extraMetadata: { productName: c.displayName, updateChannel: channel, version },
+  extraMetadata: { productName: c.displayName, updateChannel: channel, version, ...(buildCommit ? { buildCommit } : {}) },
   directories: { output: `release/${channel}/${platform}-${arch}` },
   mac: {
     icon: c.icon,

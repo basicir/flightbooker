@@ -1,6 +1,6 @@
 # Kiadás és frissítés
 
-Állapot (2026-11-24): **elkészült.** A követelmények (FRS-01–FRS-08) a koncepciódokumentum 5.11
+Állapot (2026-11-25): **elkészült.** A követelmények (FRS-01–FRS-10) a koncepciódokumentum 5.11
 részében vannak (`docs/koncepcio.md`); a Claude Docs-beli koncepcióba még át kell vezetni.
 
 ## Röviden
@@ -13,6 +13,7 @@ részében vannak (`docs/koncepcio.md`); a Claude Docs-beli koncepcióba még á
 | Azonosító | `local.flightbooker.planner` | `local.flightbooker.planner.dev` |
 | Adatmappa | `…/Foglalástervező` | `…/Foglalástervező DEV` |
 | Ikon | `build/icon.png` | `build/icon-dev.png` (narancs, „DEV”) |
+| Platform | macOS (Apple Silicon, Intel), Windows | csak macOS |
 | Ki kapja | minden felhasználó | a fejlesztő |
 
 A két program egymás mellett fut, külön beállításokkal és külön API-kulccsal: egy kísérleti
@@ -20,14 +21,17 @@ DEV-verzió nem rontja el a fő verzió adatait.
 
 ## A fejlesztő munkamenete
 
-1. A változás a `dev` ágra kerül (`git push origin dev`). A GitHub Actions („Kiadás”) lefuttatja a
-   típusellenőrzést, a lintet és a teszteket, megépíti a macOS- (Apple Silicon és Intel) és a
-   Windows-csomagot, és közzéteszi a fejlesztői kiadást. Kb. 10–15 perc.
+1. Minden feladat végén a változás a `dev` ágra kerül (`git push origin dev`; a szabály a CLAUDE.md
+   „Munkamenet” részében). A GitHub Actions („Kiadás”) lefuttatja a típusellenőrzést, a lintet és a
+   teszteket, megépíti a macOS-csomagot (Apple Silicon és Intel; a DEV-hez Windows-csomag nem készül), és
+   közzéteszi a fejlesztői kiadást. Kb. 5 perc.
 2. A **Foglalástervező DEV** a következő indításkor frissül rá.
-3. Ha megfelel: GitHub → **Actions** → **Kiadás: dev → main** → **Run workflow**. Ez a `main`-t a
-   `dev`-re pörgeti (csak előre, összefésülés nélkül), és fő kiadást készít. Ugyanezt egy
-   dev → main pull request összefésülése is elindítja. Ha a `dev` a `.github/workflows` fájljait is
-   módosítja, a gomb nem küldheti (a GitHub-token korlátja), ilyenkor a pull request kell.
+3. Ha megfelel: a DEV-ben **Beállítások → Frissítés → Kiadás: dev → main**. A gomb pontosan a futó
+   DEV-verzió commitját adja ki: a `main`-t arra pörgeti (csak előre, összefésülés nélkül), és fő kiadást
+   készít (macOS és Windows). Ugyanez a GitHubon is indítható (**Actions → Kiadás: dev → main → Run
+   workflow**, ilyenkor a `dev` ág vége megy ki), és egy dev → main pull request összefésülése is fő
+   kiadást indít. Ha a `dev` a `.github/workflows` fájljait is módosítja, a gomb nem küldheti (a
+   GitHub-token korlátja), ilyenkor a pull request kell.
 4. Minden **Foglalástervező** a következő indításkor frissül.
 
 Csak dokumentációt érintő push (`docs/**`, `*.md`) nem indít kiadást.
@@ -63,15 +67,42 @@ egyetlen átirányítás a GitHub fájltárhelyére (`release-assets.githubuserc
 A gépenkénti beállítás (automatikus frissítés be/ki) a felhasználói adatmappa `frissites.json`
 fájljában van, az exportba nem kerül.
 
+## A DEV eszközei
+
+Csak a Foglalástervező DEV-ben, a **Beállítások → Frissítés** fül alján (`src/main/dev/`,
+`src/renderer/src/components/devTools.tsx`). A fő változatban a felület nem mutatja őket, és a
+főfolyamat a hozzájuk tartozó hívásokat sem kezeli (FRS-09, FRS-10).
+
+- **Beállítások átvétele a Foglalástervezőből.** A fő változat beállítása (a növendékekkel), mentett heti
+  tervei, saját feladatsorai és a modellpontosság mérése átkerül a DEV-be; a DEV-é felülíródik, a fő
+  változaté nem változik, a DEV gyorsítótára törlődik, és a program újraindul. Az API-kulcs nem jön át
+  (ALP-06): a DEV-ben a Beállítások → Adatforrás fülön kell megadni.
+- **Kiadás: dev → main.** Első használatkor egy GitHub-token kell:
+  1. GitHub → Settings → Developer settings → **Fine-grained tokens → Generate new token**
+     (közvetlenül: `https://github.com/settings/personal-access-tokens/new`).
+  2. Repository access: **Only select repositories → flightbooker**.
+  3. Permissions → Repository permissions → **Actions: Read and write** (más nem kell).
+  4. A tokent a DEV-ben a „GitHub-token” mezőbe kell másolni → **Mentés és próba**. A program
+     kipróbálja, és a Kulcskarikába menti (külön fájl: `github-kiado-token.secret`, a DEV adatmappájában);
+     a token csevegésbe, naplóba, fájlba nem kerül.
+
+  A gomb megerősítés után indítja a `promote.yml`-t a futó csomag commitjával (a csomagba a kiadási
+  folyamat írja: `buildCommit`), és 10 másodpercenként mutatja a futás állapotát, linkkel. A hálózati
+  kérés külön, csak DEV-csatornán létrehozható belépési ponton megy (`createDevPromoteFetch`): csak a
+  `promote.yml` indítása (törzs: a `dev` ág és egy 40 jegyű commit-azonosító) és a futásai engedettek.
+
 ## A kiadási folyamat
 
 `.github/workflows/`:
 
 - `release.yml` – push a `main`/`dev` ágra → `build-release.yml` a megfelelő csatornával.
-- `promote.yml` – „Kiadás: dev → main” gomb.
+- `promote.yml` – „Kiadás: dev → main”: a DEV gombja (a kipróbált commit, `commit` bemenet) vagy az
+  Actions oldala (a `dev` ág vége) indítja; ha a `main` már tartalmazza, nem ad ki újra.
 - `build-release.yml` – közös: ellenőrzés és verzió (`tools/release/next-version.ts`, egyben
-  ellenőrzi, hogy a programba épített repónév egyezik a GitHub-repóval) → csomagolás
-  (`tools/release/package.ts`, három gépen párhuzamosan) → aláírt leírás
+  ellenőrzi, hogy a programba épített repónév egyezik a GitHub-repóval, és kiadja a csatorna
+  csomagolási mátrixát a `tools/release/channels.ts` `RELEASE_TARGETS`-éből) → csomagolás
+  (`tools/release/package.ts`, párhuzamosan; fő kiadás: macOS arm64, x64 és Windows, DEV: macOS arm64
+  és x64) → aláírt leírás
   (`tools/release/manifest.ts`) → vázlatként feltöltött, a végén közzétett GitHub-kiadás → a
   10-nél régebbi fejlesztői kiadások törlése.
 - `ci.yml` – pull requestnél csak ellenőrzés.

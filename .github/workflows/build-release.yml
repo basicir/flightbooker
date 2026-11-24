@@ -1,5 +1,6 @@
-# Közös kiadási folyamat (FRS-05): ellenőrzés → csomagolás macOS-re (arm64, x64) és Windowsra →
-# aláírt leírás → GitHub-kiadás. A release.yml (push a main/dev ágra) és a promote.yml hívja.
+# Közös kiadási folyamat (FRS-05): ellenőrzés → csomagolás (fő kiadás: macOS arm64, x64 és Windows;
+# DEV: csak macOS – tools/release/channels.ts) → aláírt leírás → GitHub-kiadás. A release.yml (push a
+# main/dev ágra) és a promote.yml hívja.
 name: Kiadás (közös)
 
 on:
@@ -25,6 +26,7 @@ jobs:
       version: ${{ steps.version.outputs.version }}
       tag: ${{ steps.version.outputs.tag }}
       previous_tag: ${{ steps.version.outputs.previous_tag }}
+      matrix: ${{ steps.version.outputs.matrix }}
     steps:
       - uses: actions/checkout@v5
         with:
@@ -56,10 +58,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        include:
-          - { os: macos-latest, platform: mac, arch: arm64 }
-          - { os: macos-latest, platform: mac, arch: x64 }
-          - { os: windows-latest, platform: win, arch: x64 }
+        include: ${{ fromJSON(needs.prepare.outputs.matrix) }}
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v5
@@ -128,7 +127,11 @@ jobs:
               echo "Fő kiadás a \`main\` ágról – minden telepített **Foglalástervező** frissül rá."
             fi
             echo
-            echo "Első telepítés: macOS-en a \`mac-arm64.dmg\` (Apple Silicon) vagy a \`mac-x64.dmg\` (Intel), Windowson a \`win-x64-setup.exe\`. Részletek a README-ben."
+            if [ "$CHANNEL" = "dev" ]; then
+              echo "Első telepítés: a \`mac-arm64.dmg\` (Apple Silicon) vagy a \`mac-x64.dmg\` (Intel). A DEV csak macOS-re készül."
+            else
+              echo "Első telepítés: macOS-en a \`mac-arm64.dmg\` (Apple Silicon) vagy a \`mac-x64.dmg\` (Intel), Windowson a \`win-x64-setup.exe\`. Részletek a README-ben."
+            fi
             echo
             echo "### Változások"
             if [ -n "$PREVIOUS_TAG" ] && git rev-parse -q --verify "refs/tags/$PREVIOUS_TAG" >/dev/null; then

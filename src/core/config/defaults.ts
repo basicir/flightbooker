@@ -99,7 +99,6 @@ const openDay = { start: '07:00', end: '19:00' } as const
 export function createDefaultSettings(): Settings {
   return {
     formatVersion: SETTINGS_FORMAT_VERSION,
-    dataSource: 'live',
     airport: null,
     instructor: {
       workWindows: { mon: workday, tue: workday, wed: workday, thu: workday, fri: workday, sat: null, sun: null },

@@ -55,6 +55,9 @@ const fileSchema = z.object({
     .optional(),
 })
 
+/** A modellpontosság mérésének fájlja a felhasználói adatmappában (ADT-07). */
+export const SKILL_FILE_NAME = 'idojaras-pontossag.json'
+
 export function createSkillStore(path: string): SkillStore {
   return {
     async load(): Promise<SkillState | undefined> {

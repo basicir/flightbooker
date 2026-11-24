@@ -7,7 +7,7 @@ import { createDemoSettings } from '../../../src/core/demo/demoData'
 
 // Szintetikus beállítás (bemutató adat): kitalált azonosítók, nincs benne személyes adat.
 const NOW = '2026-11-12T10:00:00.000Z'
-const source: Settings = { ...createDemoSettings('2026-11-12', NOW), dataSource: 'live', lastSeen: { at: NOW, aircraftIds: ['demo-p1'], classroomIds: [] } }
+const source: Settings = { ...createDemoSettings('2026-11-12', NOW), lastSeen: { at: NOW, aircraftIds: ['demo-p1'], classroomIds: [] } }
 const exportOf = (includeStudents: boolean): string => buildSettingsExport(source, { includeStudents, exportedAt: NOW, appVersion: '0.1.0' })
 const ok = (text: string) => {
   const file = readSettingsImport(text)
@@ -15,10 +15,9 @@ const ok = (text: string) => {
   return file
 }
 
-/** A célgép: más növendékkel, saját adatforrással és óraállással. */
+/** A célgép: más növendékkel és saját óraállással. */
 const target: Settings = {
   ...createDefaultSettings(),
-  dataSource: 'demo',
   students: [{ userId: 'masik-novendek', allowedResources: [] }],
   aircraftHours: { 'demo-p1': { date: '2026-11-12', hoursUntilMaintenance: 1, maintenanceType: 50, enteredAt: NOW } },
   lastSeen: null,
@@ -30,7 +29,7 @@ describe('beállítások exportja', () => {
     expect(without.kind).toBe('foglalastervezo-beallitasok')
     expect(without.includesStudents).toBe(false)
     expect(without.settings).not.toHaveProperty('students')
-    for (const key of ['dataSource', 'lastSeen', 'aircraftHours']) expect(without.settings).not.toHaveProperty(key)
+    for (const key of ['lastSeen', 'aircraftHours']) expect(without.settings).not.toHaveProperty(key)
 
     const withStudents = JSON.parse(exportOf(true))
     expect(withStudents.includesStudents).toBe(true)
@@ -55,7 +54,6 @@ describe('beállítások importja', () => {
     expect(file.includesStudents).toBe(false)
     const next = applySettingsImport(target, file, { importStudents: true })
     expect(next.students).toEqual(target.students)
-    expect(next.dataSource).toBe('demo')
     expect(next.aircraftHours).toEqual(target.aircraftHours)
     expect(next.lastSeen).toBeNull()
     expect(next.airport).toEqual(source.airport)
@@ -76,7 +74,16 @@ describe('beállítások importja', () => {
     expect(file.includesStudents).toBe(true)
     const next = applySettingsImport(target, file, { importStudents: true })
     expect(next.students).toEqual(source.students)
-    expect(next.dataSource).toBe('demo')
+  })
+
+  it('a bemutató mód idejéből való fájl adatforrás-mezője kimarad (8. → 9. formátum)', () => {
+    const old = JSON.parse(serializeSettings(source))
+    old.formatVersion = 8
+    old.dataSource = 'demo'
+    const file = ok(JSON.stringify(old))
+    expect(file.migratedFrom).toBe(8)
+    expect(file.raw).not.toHaveProperty('dataSource')
+    expect(applySettingsImport(target, file, { importStudents: true })).not.toHaveProperty('dataSource')
   })
 
   it('régebbi formátumot migrál', () => {

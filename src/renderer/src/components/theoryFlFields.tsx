@@ -62,7 +62,7 @@ export function CatalogStatus(props: { state: CatalogState; timezoneLabel?: stri
           : error
             ? `A programlista nem töltődött be: ${error}`
             : catalog
-              ? `FlightLogger programlista: ${catalog.programs.length} program, ${catalog.subjects.length} tárgy${catalog.source === 'cache' ? ' (gyorsítótárból)' : catalog.source === 'demo' ? ' (bemutató)' : ''}.`
+              ? `FlightLogger programlista: ${catalog.programs.length} program, ${catalog.subjects.length} tárgy${catalog.source === 'cache' ? ' (gyorsítótárból)' : catalog.source === 'demo' ? ' (szintetikus előnézet)' : ''}.`
               : ''}
       </span>
       {catalog?.errors.map((e) => (

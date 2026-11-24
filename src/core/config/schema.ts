@@ -11,7 +11,7 @@ import { WEEKDAYS, localTimeToMinutes } from '../model/time'
 
 z.config(z.locales.hu())
 
-export const SETTINGS_FORMAT_VERSION = 8
+export const SETTINGS_FORMAT_VERSION = 9
 
 const id = z.string().min(1).max(200)
 const localTime = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, { error: 'ÓÓ:PP alakú idő kell, például 07:30' })
@@ -179,8 +179,6 @@ const weights = z.strictObject(
 export const SettingsSchema = z
   .strictObject({
     formatVersion: z.literal(SETTINGS_FORMAT_VERSION),
-    /** Adatforrás: élő FlightLogger, vagy bemutató mód szintetikus adattal. */
-    dataSource: z.enum(['live', 'demo']),
     /** Első beállításig üres (10. fejezet: Első beállítás). */
     airport: airport.nullable(),
     instructor: z.strictObject({

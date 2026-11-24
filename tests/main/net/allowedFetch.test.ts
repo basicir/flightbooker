@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { createAllowedDownload, createAllowedFetch, NetworkPolicyError } from '../../../src/main/net/allowedFetch'
+import { createAllowedDownload, createAllowedFetch, createPromoteFetch, NetworkPolicyError } from '../../../src/main/net/allowedFetch'
 import { RELEASE_REPO } from '../../../src/main/net/releaseRepo'
 import { ReadOnlyViolationError } from '../../../src/main/net/readOnlyGuard'
 
@@ -148,5 +148,58 @@ describe('allowedFetch (ALP-02, ALP-03)', () => {
       await expect(createAllowedDownload(impl)(`https://api.github.com/repos/${repo}/releases`)).rejects.toThrow(NetworkPolicyError)
       expect(impl).not.toHaveBeenCalled()
     })
+  })
+})
+
+describe('a DEV kiadás gombjának kérései (FRS-09)', () => {
+  const repo = `${RELEASE_REPO.owner}/${RELEASE_REPO.name}`
+  const DISPATCH = `https://api.github.com/repos/${repo}/actions/workflows/promote.yml/dispatches`
+  const RUNS = `https://api.github.com/repos/${repo}/actions/workflows/promote.yml/runs`
+  const SHA = 'a'.repeat(40)
+  const body = (value: unknown): string => JSON.stringify(value)
+  const impl = () => vi.fn(async (_input: string, _init: RequestInit) => new Response(null, { status: 204 }))
+
+  it('a fő változatban és helyi buildben létre sem hozható', () => {
+    expect(() => createPromoteFetch(impl(), 'stable')).toThrow(NetworkPolicyError)
+    expect(() => createPromoteFetch(impl(), null)).toThrow(NetworkPolicyError)
+  })
+
+  it('a DEV-ben csak a promote.yml indítása mehet, a dev ággal és egy commit-azonosítóval', async () => {
+    const fake = impl()
+    const fetch = createPromoteFetch(fake, 'dev')
+    await fetch(DISPATCH, { method: 'POST', headers: { Authorization: 'Bearer x' }, body: body({ ref: 'dev', inputs: { commit: SHA } }) })
+    expect(fake).toHaveBeenCalledOnce()
+    expect(fake.mock.calls[0]![1]).toMatchObject({ method: 'POST', redirect: 'error', credentials: 'omit' })
+    for (const bad of [
+      { ref: 'main', inputs: { commit: SHA } },
+      { ref: 'dev', inputs: { commit: 'abc' } },
+      { ref: 'dev', inputs: { commit: SHA, extra: '1' } },
+      { ref: 'dev', inputs: { commit: SHA }, other: true },
+    ]) {
+      await expect(fetch(DISPATCH, { method: 'POST', body: body(bad) })).rejects.toThrow(NetworkPolicyError)
+    }
+    await expect(fetch(DISPATCH, { method: 'POST', body: 'nem json' })).rejects.toThrow(NetworkPolicyError)
+    await expect(fetch(DISPATCH.replace('promote.yml', 'release.yml'), { method: 'POST', body: body({ ref: 'dev', inputs: { commit: SHA } }) })).rejects.toThrow(NetworkPolicyError)
+    await expect(fetch(`https://api.github.com/repos/${repo}/releases`, { method: 'POST', body: body({ ref: 'dev', inputs: { commit: SHA } }) })).rejects.toThrow(NetworkPolicyError)
+    expect(fake).toHaveBeenCalledOnce()
+  })
+
+  it('a futások lekérése csak a promote.yml-re, csak engedett paraméterrel', async () => {
+    const fake = impl()
+    const fetch = createPromoteFetch(fake, 'dev')
+    await fetch(`${RUNS}?per_page=1&event=workflow_dispatch`, { method: 'GET' })
+    expect(fake).toHaveBeenCalledOnce()
+    for (const url of [`${RUNS}?branch=main`, `${RUNS}?per_page=500`, `https://api.github.com/repos/masik/repo/actions/workflows/promote.yml/runs`, 'https://github.com/' + repo]) {
+      await expect(fetch(url, { method: 'GET' })).rejects.toThrow(NetworkPolicyError)
+    }
+    await expect(fetch(RUNS, { method: 'GET', body: '{}' })).rejects.toThrow(NetworkPolicyError)
+    expect(fake).toHaveBeenCalledOnce()
+  })
+
+  it('az általános engedélyezési lista a kiadás indítását nem engedi', async () => {
+    const { impl: fake, fetch } = setup()
+    await expect(fetch(DISPATCH, { method: 'POST', body: body({ ref: 'dev', inputs: { commit: SHA } }) })).rejects.toThrow(NetworkPolicyError)
+    await expect(fetch(RUNS, { method: 'GET' })).rejects.toThrow(NetworkPolicyError)
+    expect(fake).not.toHaveBeenCalled()
   })
 })

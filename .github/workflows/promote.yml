@@ -1,10 +1,17 @@
 # Egy gombos kiadás: a kipróbált dev ág a main-re kerül (csak előrepörgetéssel), és fő kiadás
 # készül belőle – minden telepített Foglalástervező a következő indításkor frissül rá.
-# Indítás: GitHub → Actions → „Kiadás: dev → main” → Run workflow.
+# Indítás: a Foglalástervező DEV „Kiadás: dev → main” gombja (FRS-09; a kipróbált DEV-verzió
+# commitjával), vagy GitHub → Actions → „Kiadás: dev → main” → Run workflow (a dev ág vége).
 name: 'Kiadás: dev → main'
 
 on:
   workflow_dispatch:
+    inputs:
+      commit:
+        description: 'A kiadandó commit (a dev ágon); üresen a dev ág vége'
+        required: false
+        type: string
+        default: ''
 
 permissions:
   contents: write
@@ -26,9 +33,23 @@ jobs:
           fetch-depth: 0
       - name: Előrepörgetés a dev-re
         id: merge
+        env:
+          COMMIT: ${{ inputs.commit }}
         run: |
           git fetch origin dev
-          if ! git merge --ff-only origin/dev; then
+          TARGET=origin/dev
+          if [ -n "$COMMIT" ]; then
+            if ! [[ "$COMMIT" =~ ^[0-9a-f]{40}$ ]] || ! git merge-base --is-ancestor "$COMMIT" origin/dev; then
+              echo "::error::A megadott commit ($COMMIT) nincs a dev ágon."
+              exit 1
+            fi
+            TARGET="$COMMIT"
+          fi
+          if [ "$(git rev-parse HEAD)" = "$(git rev-parse "$TARGET")" ] || git merge-base --is-ancestor "$TARGET" HEAD; then
+            echo "::error::A main már tartalmazza ezt a változatot; nincs mit kiadni."
+            exit 1
+          fi
+          if ! git merge --ff-only "$TARGET"; then
             echo "::error::A main olyan változást is tartalmaz, ami a dev-en nincs. Előbb fésüld össze a main-t a dev-be."
             exit 1
           fi

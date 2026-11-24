@@ -29,7 +29,8 @@ export default defineConfig({
   },
   preload: {},
   renderer: {
-    resolve: { alias: { '@core': resolve('src/core') } },
+    // A böngészős előnézet (szintetikus adat) helyén egy üres modul: a programba nem kerül.
+    resolve: { alias: { '@core': resolve('src/core'), '@browser-demo': resolve('src/renderer/src/browserDemo/unavailable.ts') } },
     plugins: [react(), rendererCsp()],
   },
 })

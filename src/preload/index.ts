@@ -55,6 +55,15 @@ const api: FlightbookerApi = {
   installUpdate: () => ipcRenderer.invoke(IPC.installUpdate),
   skipUpdate: () => ipcRenderer.invoke(IPC.skipUpdate),
   setAutoUpdate: (enabled) => ipcRenderer.invoke(IPC.setAutoUpdate, enabled),
+  // A fő változatban a főfolyamat ezeket nem kezeli: a hívás ott hibával tér vissza.
+  dev: {
+    importFromStable: () => ipcRenderer.invoke(IPC.devImportFromStable),
+    relaunch: () => ipcRenderer.invoke(IPC.devRelaunch),
+    getPromotionState: () => ipcRenderer.invoke(IPC.devPromotionState),
+    saveGithubToken: (token) => ipcRenderer.invoke(IPC.devSaveGithubToken, token),
+    clearGithubToken: () => ipcRenderer.invoke(IPC.devClearGithubToken),
+    startPromotion: () => ipcRenderer.invoke(IPC.devStartPromotion),
+  },
 }
 
 contextBridge.exposeInMainWorld('flightbooker', api)

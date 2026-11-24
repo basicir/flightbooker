@@ -2,11 +2,10 @@ import type { Settings } from '@core/config/schema'
 import { SettingsSchema } from '@core/config/schema'
 import { prefillClassrooms } from '@core/config/operations'
 import { formatIssues } from '@core/config/settings'
-import { createDemoSettings } from '@core/demo/demoData'
 import { defaultWeekStart } from '@core/draft/weekPlan'
 import type { DataBundle } from '@core/model/dataBundle'
 import { useEffect, useState } from 'react'
-import { api, isBrowserDemo } from '../bridge'
+import { api } from '../bridge'
 import { AirportEditor, ClassroomsEditor, LimitsEditor, ResourcesEditor, StudentsEditor, WeatherMinimaEditor, WorkTimeEditor } from '../components/settingsEditors'
 import type { RefreshProgress } from '../../../shared/api'
 import { Button, Card, ErrorList, Field, LoadingOverlay, TextInput } from '../components/ui'
@@ -71,14 +70,6 @@ export function FirstSetup(props: { initial: Settings }) {
     }
   }
 
-  const chooseDemo = (): void => {
-    const now = new Date()
-    const s = createDemoSettings(todayIn('Europe/Budapest'), now.toISOString())
-    setSettings(s)
-    void loadData(s)
-    setStep(1)
-  }
-
   const saveKey = async (): Promise<void> => {
     setBusy(true)
     const result = await api.saveApiKey(apiKey)
@@ -87,18 +78,14 @@ export function FirstSetup(props: { initial: Settings }) {
     setBusy(false)
     if (result.ok) {
       setHasStoredKey(true)
-      const s = { ...settings, dataSource: 'live' as const }
-      setSettings(s)
-      void loadData(s)
+      void loadData(settings)
     }
   }
 
   const continueWithLive = async (): Promise<void> => {
-    const s = { ...settings, dataSource: 'live' as const }
-    setSettings(s)
     setStep(1)
     if (!bundle) {
-      void loadData(s)
+      void loadData(settings)
     }
   }
 
@@ -126,7 +113,7 @@ export function FirstSetup(props: { initial: Settings }) {
         <ol className="steps">
           {STEPS.map((s, i) => (
             <li key={s} className={i === step ? 'current' : i < step ? 'done' : undefined}>
-              <button type="button" className="step" aria-current={i === step ? 'step' : undefined} onClick={() => setStep(i)} disabled={i > 0 && !settings.dataSource}>
+              <button type="button" className="step" aria-current={i === step ? 'step' : undefined} onClick={() => setStep(i)} disabled={i > 0 && !(keyMessage?.ok || hasStoredKey)}>
                 <span className="nav-step">{i < step ? '✓' : i + 1}</span>
                 {s}
               </button>
@@ -149,28 +136,22 @@ export function FirstSetup(props: { initial: Settings }) {
             <p>
               A program csak olvassa a FlightLoggert. Az API-kulcs a rendszer titoktárolójába kerül (macOS Kulcskarika, Windows DPAPI), a beállítási fájlba nem.
             </p>
-            {!isBrowserDemo && (
-              <Field label="FlightLogger API-kulcs" hint="A kulcsot csak ide írd be; a program elmenti és kipróbálja.">
-                <div className="row">
-                  <TextInput type="password" value={apiKey} onChange={setApiKey} ariaLabel="API-kulcs" placeholder="kulcs" />
-                  <Button variant="primary" onClick={() => void saveKey()} disabled={busy || apiKey.trim().length < 8}>
-                    Mentés és próba
-                  </Button>
-                </div>
-              </Field>
-            )}
-            {keyMessage && <p className={keyMessage.ok ? 'ok-text' : 'error-text'}>{keyMessage.message}</p>}
-            <div className="row">
-              {/* A böngészős bemutatóban ez az egyetlen út, ezért ott ez a fő gomb. */}
-              <Button variant={isBrowserDemo ? 'primary' : 'secondary'} onClick={chooseDemo}>
-                Bemutató mód szintetikus adattal
-              </Button>
-              {(keyMessage?.ok || hasStoredKey) && (
-                <Button variant="primary" onClick={() => void continueWithLive()}>
-                  Tovább élő adatokkal
+            <Field label="FlightLogger API-kulcs" hint="A kulcsot csak ide írd be; a program elmenti és kipróbálja.">
+              <div className="row">
+                <TextInput type="password" value={apiKey} onChange={setApiKey} ariaLabel="API-kulcs" placeholder="kulcs" />
+                <Button variant="primary" onClick={() => void saveKey()} disabled={busy || apiKey.trim().length < 8}>
+                  Mentés és próba
                 </Button>
-              )}
-            </div>
+              </div>
+            </Field>
+            {keyMessage && <p className={keyMessage.ok ? 'ok-text' : 'error-text'}>{keyMessage.message}</p>}
+            {(keyMessage?.ok || hasStoredKey) && (
+              <div className="row">
+                <Button variant="primary" onClick={() => void continueWithLive()}>
+                  Tovább
+                </Button>
+              </div>
+            )}
           </div>
         )}
         {step === 1 && <AirportEditor settings={settings} onChange={setSettings} />}

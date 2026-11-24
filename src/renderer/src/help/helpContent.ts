@@ -123,7 +123,7 @@ export const HELP: readonly HelpChapter[] = [
           ),
           table(
             ['Lépés', 'Mit adsz meg?'],
-            ['1. [Adatforrás](#beallitas-adatforras)', 'API-kulcs vagy bemutató mód'],
+            ['1. [Adatforrás](#beallitas-adatforras)', 'FlightLogger API-kulcs'],
             ['2. [Repülőtér](#beallitas-repuloter)', 'ICAO-kód, koordináta, pályairányok, nyitvatartás'],
             ['3. [Limitek és időjárás](#beallitas-limitek)', 'Iskolai időjárási minimum, repülési/szolgálati limitek'],
             ['4. [Gépek](#beallitas-gepek)', 'Besorolás, motorpróba, fordulóidő, puffer'],
@@ -143,16 +143,11 @@ export const HELP: readonly HelpChapter[] = [
           h('Élő adatok: FlightLogger API-kulcs'),
           steps(
             'Írd be a kulcsot a **FlightLogger API-kulcs** mezőbe, majd **Mentés és próba**.',
-            'Sikeres próba után megjelenik a **Tovább élő adatokkal** gomb, és betöltődnek a gépek, termek és felhasználók.',
+            'Sikeres próba után megjelenik a **Tovább** gomb, és betöltődnek a gépek, termek és felhasználók.',
           ),
           important(
             'A kulcsot csak ebbe a mezőbe írd be. A program a rendszer titoktárolójába menti (macOS Kulcskarika, Windows DPAPI) – a beállítási fájlba, naplóba vagy jelentésbe soha nem kerül.',
           ),
-          h('Kipróbálás: bemutató mód'),
-          p(
-            'A **Bemutató mód szintetikus adattal** gomb kitalált növendékekkel, gépekkel és időjárással tölti fel a programot, hálózat nélkül. Kockázat nélkül kipróbálható benne a teljes heti folyamat.',
-          ),
-          tip('Bemutató módból később a [Beállítások → Adatforrás](#b-adatforras) fülön válthatsz élő adatokra.'),
         ],
       },
       {
@@ -254,7 +249,6 @@ export const HELP: readonly HelpChapter[] = [
             '**Tovább gomb.** Mindig a munkafolyamat következő lépésére visz.',
             '**Adatok frissessége.** Az oldalsáv alján mutatja, milyen régi a letöltött adat; az **Adatok frissítése** gomb friss foglalásokat és előrejelzést kér. Frissítés közben megszakítható.',
           ),
-          tip('Bemutató módban az oldalsáv tetején „bemutató” címke látszik – így mindig tudod, hogy nem éles adattal dolgozol.'),
           info('A súgót bármelyik képernyőről megnyithatod az oldalsáv **Súgó** gombjával vagy az [[F1]] billentyűvel; mindig az épp nyitott képernyőhöz tartozó részt mutatja.'),
         ],
       },
@@ -273,7 +267,7 @@ export const HELP: readonly HelpChapter[] = [
             'Ez a nyitóképernyő: egy pillantással látod, friss-e az adat, hol tart a heti tervezés, milyen idő várható, és mennyit repülhetnek még a gépek.',
           ),
           list(
-            '**Adatok.** A forrás (élő vagy bemutató), az utolsó frissítés ideje, valamint a betöltött erőforrások, foglalások és előrejelzett órák száma. Ha a frissítés közben hiba történt, itt jelenik meg.',
+            '**Adatok.** A forrás, az utolsó frissítés ideje, valamint a betöltött erőforrások, foglalások és előrejelzett órák száma. Ha a frissítés közben hiba történt, itt jelenik meg.',
             '**Tervezés állapota.** Négy szám: igények, javaslatok, nyitott dilemmák, foglalatlanul maradt igények. Alatta egyetlen fő gomb mindig a soron következő teendőre visz: igények felvétele → dilemmák eldöntése → tervezet átnézése → rögzítési lista.',
             '**Hét közbeni figyelés.** A már megtervezett héten ez a kártya foglalja össze, ha a friss adatok alapján változtatás javasolt (lásd [Hét közben](#het-kozben)).',
             '**Változott a gépek vagy termek listája** – ha a FlightLoggerben új erőforrás jelent meg vagy egy eltűnt; a **Tudomásul vettem** gombbal nyugtázod.',
@@ -353,7 +347,7 @@ export const HELP: readonly HelpChapter[] = [
             'Mentés előtt mindig vesd össze a felismert számokat a fotóval; a program ezt minden beolvasásnál külön kéri. Ha a táblázaton lévő dátum nem a mai, az értékek azzal a dátummal mentődnek, és a mai értéket a program továbbra is kéri.',
           ),
           p(
-            'Ha minden repülőgépnél megvan a mai érték, a kártya ezt jelzi. A fotóbeolvasás csak az asztali programban érhető el; a böngészős bemutatóban a gomb nem aktív.',
+            'Ha minden repülőgépnél megvan a mai érték, a kártya ezt jelzi.',
           ),
         ],
       },
@@ -685,7 +679,7 @@ export const HELP: readonly HelpChapter[] = [
             ['[Repülőtér](#beallitas-repuloter)', 'ICAO-kód, koordináta, pályák, nyitvatartás'],
             ['[Tervezés](#b-tervezes)', 'Dilemma-küszöb, alapidők, feladatválasztás módja'],
             ['[Súlyok](#b-sulyok)', 'A rangsorolási szempontok fontossága'],
-            ['[Adatforrás](#b-adatforras)', 'Élő/bemutató váltás, gyorsítótár, alaphelyzet'],
+            ['[Adatforrás](#b-adatforras)', 'API-kulcs, gyorsítótár, alaphelyzet'],
             ['[Frissítés](#b-frissites)', 'Verzió, automatikus frissítés, kézi ellenőrzés'],
           ),
           h('Mentés'),
@@ -814,7 +808,7 @@ export const HELP: readonly HelpChapter[] = [
         open: { screen: 'settings', settingsTab: 'Adatforrás' },
         blocks: [
           list(
-            '**Váltás.** Élő FlightLogger és bemutató mód között. Élő módhoz mentett API-kulcs kell.',
+            '**API-kulcs.** Csere és próba, vagy törlés. A kulcs a rendszer titoktárolójában van, és soha nem jelenik meg.',
             '**Gyorsítótár.** A legutóbb letöltött heti adatok titkosítva a gépen maradnak, hogy indításkor azonnal legyen mit mutatni. Törlés után a következő frissítés mindent újra letölt.',
             '**Alaphelyzet.** Törli a beállítási fájlt, a mentett heti terveket és a gyorsítótárat, majd újraindítja az első beállítást. Választhatsz: a kulcs megtartásával, vagy teljes törlés az API-kulccsal együtt.',
           ),

@@ -1,3 +1,4 @@
+import { APP_DISPLAY_NAME } from '../../src/core/update/appNames'
 import type { UpdateChannel } from '../../src/core/update/version'
 
 /**
@@ -16,12 +17,41 @@ export interface ChannelPackaging {
 }
 
 export const CHANNELS: Readonly<Record<UpdateChannel, ChannelPackaging>> = {
-  stable: { appId: 'local.flightbooker.planner', productName: 'Foglalastervezo', displayName: 'Foglalástervező', icon: 'build/icon.png' },
-  dev: { appId: 'local.flightbooker.planner.dev', productName: 'FoglalastervezoDev', displayName: 'Foglalástervező DEV', icon: 'build/icon-dev.png' },
+  stable: { appId: 'local.flightbooker.planner', productName: 'Foglalastervezo', displayName: APP_DISPLAY_NAME.stable, icon: 'build/icon.png' },
+  dev: { appId: 'local.flightbooker.planner.dev', productName: 'FoglalastervezoDev', displayName: APP_DISPLAY_NAME.dev, icon: 'build/icon-dev.png' },
 }
 
 export type ReleasePlatform = 'mac' | 'win'
 export type ReleaseArch = 'arm64' | 'x64'
+
+/** Egy csomagolási feladat a GitHub Actions mátrixában. */
+export interface ReleaseTarget {
+  readonly platform: ReleasePlatform
+  readonly arch: ReleaseArch
+  /** A GitHub Actions gépe. */
+  readonly os: string
+}
+
+/**
+ * Csatornánként ezek a csomagok készülnek. A fejlesztői (DEV) változat csak a fejlesztő Macjére
+ * kerül, ezért ahhoz nem készül Windows-telepítő (gyorsabb kiadás); a fő kiadás minden platformra.
+ */
+export const RELEASE_TARGETS: Readonly<Record<UpdateChannel, readonly ReleaseTarget[]>> = {
+  stable: [
+    { platform: 'mac', arch: 'arm64', os: 'macos-latest' },
+    { platform: 'mac', arch: 'x64', os: 'macos-latest' },
+    { platform: 'win', arch: 'x64', os: 'windows-latest' },
+  ],
+  dev: [
+    { platform: 'mac', arch: 'arm64', os: 'macos-latest' },
+    { platform: 'mac', arch: 'x64', os: 'macos-latest' },
+  ],
+}
+
+/** A frissítőnek kötelező fájlok: macOS-en a zip, Windowson az NSIS-telepítő (FRS-03). */
+export function requiredAssets(channel: UpdateChannel): readonly ClassifiedAsset[] {
+  return RELEASE_TARGETS[channel].map((t): ClassifiedAsset => (t.platform === 'mac' ? { platform: 'darwin', arch: t.arch, kind: 'zip' } : { platform: 'win32', arch: t.arch, kind: 'nsis' }))
+}
 
 /** A kiadási fájlok nevének eleje, pl. `Foglalastervezo-0.1.3-mac-arm64`. */
 export const assetBaseName = (channel: UpdateChannel, version: string, platform: ReleasePlatform, arch: ReleaseArch): string =>

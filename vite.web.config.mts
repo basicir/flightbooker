@@ -3,8 +3,9 @@ import react from '@vitejs/plugin-react'
 import { defineConfig, type Plugin } from 'vite'
 
 /**
- * Böngészős bemutató a felület fejlesztéséhez: csak a renderert szolgálja ki, a
- * memóriabeli bemutató-híddal (szintetikus adat, hálózat nélkül). Csak helyi gépen fut.
+ * Böngészős előnézet a felület fejlesztéséhez: csak a renderert szolgálja ki, a memóriabeli
+ * híddal (`@browser-demo`: szintetikus adat, hálózat nélkül). Csak helyi gépen fut, a programba
+ * nem kerül.
  */
 function devCsp(): Plugin {
   return {
@@ -16,7 +17,7 @@ function devCsp(): Plugin {
 
 export default defineConfig({
   root: resolve('src/renderer'),
-  resolve: { alias: { '@core': resolve('src/core') } },
+  resolve: { alias: { '@core': resolve('src/core'), '@browser-demo': resolve('src/renderer/src/browserDemo/browserDemoApi.ts') } },
   plugins: [react(), devCsp()],
   server: { host: 'localhost', port: 5199, strictPort: true },
 })

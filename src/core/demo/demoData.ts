@@ -299,13 +299,12 @@ export function createDemoBundle(now: Date, weekStart: LocalDate): DataBundle {
   }
 }
 
-/** A bemutató mód kitöltött beállításai, hogy az első beállítás gyorsan végigjárható legyen. */
+/** Kitöltött szintetikus beállítás a böngészős fejlesztői előnézethez és a tesztekhez (a programba nem kerül). */
 export function createDemoSettings(today: LocalDate, nowIso: string): Settings {
   const s = createDefaultSettings()
   const hours = (n: number, maintenanceType: MaintenanceType) => ({ date: today, hoursUntilMaintenance: n, maintenanceType, enteredAt: nowIso })
   return {
     ...s,
-    dataSource: 'demo',
     airport: {
       icaoCode: 'ZZZZ',
       latitude: 47.5,

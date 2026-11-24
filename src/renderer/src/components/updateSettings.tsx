@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { api } from '../bridge'
 import { channelLabel, useUpdateState } from '../update/UpdateGate'
+import { DevTools } from './devTools'
 import { Badge, Button, Checkbox } from './ui'
 
 /** Beállítások → Frissítés (FRS-06): verzió, csatorna, automatikus frissítés, kézi ellenőrzés. */
@@ -54,6 +55,8 @@ export function UpdateSettings() {
         </>
       )}
       {error && <p className="con-text">{error}</p>}
+      {/* Csak a fejlesztői változatban (FRS-09, FRS-10); a fő változatban nem jelenik meg. */}
+      {state.channel === 'dev' && <DevTools />}
     </div>
   )
 }

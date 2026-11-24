@@ -31,11 +31,4 @@ describe('útvonal-repülőterek előrejelzése (K27, SZB-19, ALP-02)', () => {
     expect(Object.keys(result.weather)).toEqual(['ZZZZ'])
     expect(result.weather['ZZZZ']).toMatchObject({ latitude: 47.25, hours: [] })
   })
-
-  it('bemutató módban nem hív hálózatot', async () => {
-    const fetchForecast = vi.fn()
-    const result = await fetchRouteWeather({ fetchForecast, now: new Date(PLANNED_AT), lookup, demoHours: () => [] }, baseSettings(), WEEK_START, ['YYYY'])
-    expect(fetchForecast).not.toHaveBeenCalled()
-    expect(result.weather['YYYY']?.hours).toEqual([])
-  })
 })

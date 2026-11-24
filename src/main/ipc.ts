@@ -6,14 +6,13 @@ import { SettingsSchema, type Settings } from '../core/config/schema'
 import { formatIssues } from '../core/config/settings'
 import { buildSettingsExport, settingsExportFileName } from '../core/config/transfer'
 import { localParts } from '../core/time/zoned'
-import { createDemoBundle, demoModelForecasts, demoRouteWeather, demoTheoryCatalog, demoVerificationLog } from '../core/demo/demoData'
 import { WeekPlanSchema } from '../core/draft/weekPlan'
 import type { DataBundle } from '../core/model/dataBundle'
 import type { TheoryCatalog } from '../core/model/theoryCatalog'
 import { IPC, type ConnectionTest, type RefreshProgress, type RouteWeatherResult, type SettingsLoad, type UpdateState, type WeatherCheckResult } from '../shared/api'
 import type { ConfigStore } from './configStoreCore'
 import { createCatalogCacheStore } from './catalogCache'
-import { createBundleCacheStore, createHistoryCacheStore, type CacheCipher } from './dataCache'
+import { CACHE_DIR_NAME, createBundleCacheStore, createHistoryCacheStore, type CacheCipher } from './dataCache'
 import { refreshLive, type UserDirectoryCache } from './data/refresh'
 import { createTheoryCatalogCacheStore, loadTheoryCatalog } from './data/theoryCatalog'
 import { fetchRouteWeather, MAX_ROUTE_AIRPORTS } from './data/routeWeather'
@@ -25,12 +24,13 @@ import { FlightLoggerAbortedError, FlightLoggerClient } from './net/flightLogger
 import { ViewerQuery } from './net/flightLogger/queries'
 import { fetchForecast } from './net/openMeteo'
 import { fetchMetars } from './net/metar'
-import { createSkillStore } from './skillStore'
+import { createSkillStore, SKILL_FILE_NAME } from './skillStore'
 import type { SkillSource } from './data/blendedWeather'
 import type { PlanStore } from './planStoreCore'
 import type { SecretStore } from './secretStore'
 import { loadSyllabi } from './syllabusStore'
 import type { Updater } from './update/updaterCore'
+import { registerDevIpc, type DevTools } from './dev/devTools'
 
 /** A programmal szállított feladatsorok: fejlesztéskor a projektben, telepítve az erőforrások között. */
 function bundledSyllabusDir(): string {
@@ -70,6 +70,8 @@ export interface IpcDeps {
   readonly isTrustedSender?: (url: string) => boolean
   /** A program frissítője (FRS-01); hiányában a frissítés ki van kapcsolva. */
   readonly updater?: Updater
+  /** Csak a fejlesztői (DEV) változatban: beállítás-átvétel és kiadás gomb (FRS-09, FRS-10). */
+  readonly devTools?: DevTools
 }
 
 /**
@@ -105,9 +107,9 @@ function parseSettings(value: unknown): Settings {
 const userCache: UserDirectoryCache = {}
 
 /** A törölhető gyorsítótár mappája a felhasználói adatmappában. */
-const cacheDir = (): string => join(app.getPath('userData'), 'gyorsitotar')
+const cacheDir = (): string => join(app.getPath('userData'), CACHE_DIR_NAME)
 /** A modellpontosság mérése (ADT-07): nem gyorsítótár, hetek alatt gyűlik. */
-const SKILL_FILE = 'idojaras-pontossag.json'
+const SKILL_FILE = SKILL_FILE_NAME
 let sharedSkillSource: SkillSource | undefined
 /** Egyetlen példány: a tároló zárja csak így választja szét a párhuzamos frissítéseket. */
 const skillSource = (): SkillSource =>
@@ -158,7 +160,6 @@ export function registerIpc(deps: IpcDeps): void {
     const settings = parseSettings(value)
     const scope = z.object({ scope: z.enum(['full', 'directory']).optional() }).optional().parse(opts)?.scope ?? 'full'
     const now = new Date()
-    if (settings.dataSource === 'demo') return createDemoBundle(now, weekStart)
     const apiKey = await deps.secretStore.loadApiKey()
     if (!apiKey) throw new Error('Nincs megadva API-kulcs. Add meg a Beállítások oldalon.')
     // Előrehaladás a felületnek: a rész neve, a kérések száma és a korlát miatti várakozás.
@@ -222,16 +223,13 @@ export function registerIpc(deps: IpcDeps): void {
     const weekStart = weekStartSchema.parse(week)
     const icaos = z.array(z.string().regex(/^[A-Z]{4}$/)).max(MAX_ROUTE_AIRPORTS).parse(codes)
     const settings = parseSettings(value)
-    const demo = settings.dataSource === 'demo'
-    return fetchRouteWeather({ fetchForecast: (r) => fetchForecast(r), now: new Date(), ...(demo ? { demoHours: () => demoRouteWeather(weekStart) } : {}) }, settings, weekStart, icaos)
+    return fetchRouteWeather({ fetchForecast: (r) => fetchForecast(r), now: new Date() }, settings, weekStart, icaos)
   })
 
   handle(IPC.fetchWeatherCheck, async (_e, week: unknown, value: unknown): Promise<WeatherCheckResult> => {
     const weekStart = weekStartSchema.parse(week)
     const settings = parseSettings(value)
-    const now = new Date()
-    const demo = settings.dataSource === 'demo'
-    return fetchWeatherCheck({ fetchForecast: (r) => fetchForecast(r), now, ...(demo ? {} : { skill: skillSource() }), ...(demo ? { demo: (w) => demoModelForecasts(now, w), demoLog: demoVerificationLog } : {}) }, settings, weekStart)
+    return fetchWeatherCheck({ fetchForecast: (r) => fetchForecast(r), now: new Date(), skill: skillSource() }, settings, weekStart)
   })
 
   handle(IPC.openSyllabusFolder, async () => {
@@ -256,10 +254,9 @@ export function registerIpc(deps: IpcDeps): void {
   // A FlightLogger programlistája az elméleti foglaláshoz (FLI-11): csak olvasó lekérdezések, az
   // oktató kulcsával; programnevek a gyorsítótárban (személyes adat nincs bennük).
   handle(IPC.loadTheoryCatalog, async (_e, value: unknown, opts: unknown): Promise<TheoryCatalog> => {
-    const settings = parseSettings(value)
+    parseSettings(value)
     const force = z.object({ force: z.boolean().optional() }).optional().parse(opts)?.force ?? false
     const now = new Date()
-    if (settings.dataSource === 'demo') return demoTheoryCatalog(now)
     const apiKey = await deps.secretStore.loadApiKey()
     if (!apiKey) throw new Error('Nincs megadva API-kulcs. Add meg a Beállítások oldalon.')
     const client = new FlightLoggerClient({ apiKey })
@@ -316,6 +313,9 @@ export function registerIpc(deps: IpcDeps): void {
     const enabled = z.boolean().parse(value)
     return updater ? updater.setAutoUpdate(enabled) : disabledUpdate
   })
+
+  // A fő változatban nincs devTools, így ezek a csatornák ott nem is léteznek.
+  if (deps.devTools) registerDevIpc(handle, deps.devTools, deps.configStore)
 
   handle(IPC.resetAll, async (_e, value: unknown) => {
     const options = z.strictObject({ clearApiKey: z.boolean().optional() }).optional().parse(value)

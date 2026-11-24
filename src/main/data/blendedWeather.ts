@@ -54,7 +54,7 @@ export async function fetchModelForecasts(
   return { models, daylight }
 }
 
-/** A mérés frissítése; forrás nélkül (bemutató, teszt) az induló súlyok. */
+/** A mérés frissítése; forrás nélkül (teszt) az induló súlyok. */
 export async function modelSkill(skill: SkillSource | undefined, now: Date, place: Place, models: readonly ModelForecast[]): Promise<ModelSkillSummary> {
   if (!skill) return { weights: skillWeights([], MODEL_IDS, now.getTime()), measuredHours: 0 }
   return updateModelSkill(

@@ -1,7 +1,6 @@
 import type { Settings } from '../../core/config/schema'
 import { lookupAirport, type AirportLookupResult } from '../../core/airports/lookup'
 import type { AirportWeather } from '../../core/model/route'
-import type { WeatherHour } from '../../core/model/snapshot'
 import { ICAO_PATTERN } from '../../core/route/timing'
 import { addDays, daysBetween, localParts } from '../../core/time/zoned'
 import type { ForecastRequest, ForecastResponse } from '../net/openMeteo'
@@ -20,8 +19,6 @@ export interface RouteWeatherDeps {
   readonly fetchForecast: (request: ForecastRequest) => Promise<ForecastResponse>
   readonly now: Date
   readonly lookup?: (icao: string) => Promise<AirportLookupResult | undefined>
-  /** Bemutató módban nincs hálózat: a szintetikus órák jönnek. */
-  readonly demoHours?: () => WeatherHour[]
 }
 
 export interface RouteWeatherResult {
@@ -47,9 +44,7 @@ export async function fetchRouteWeather(deps: RouteWeatherDeps, settings: Settin
       }
       const base = { icao, latitude: airport.latitude, longitude: airport.longitude, runwayHeadingsDeg: airport.runways.map((r) => r.trueHeadingDeg) }
       try {
-        const hours = deps.demoHours
-          ? deps.demoHours()
-          : mapForecast(await deps.fetchForecast({ latitude: airport.latitude, longitude: airport.longitude, timezone: 'GMT', forecastDays: days }), tz).hours
+        const hours = mapForecast(await deps.fetchForecast({ latitude: airport.latitude, longitude: airport.longitude, timezone: 'GMT', forecastDays: days }), tz).hours
         weather[icao] = { ...base, hours }
       } catch (error) {
         // A koordináta előrejelzés nélkül is kell a szakaszidő számításához (90 csomó).

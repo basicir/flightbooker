@@ -63,7 +63,7 @@ export function Dashboard() {
           {bundle ? (
             <div className="stack">
               <p>
-                Forrás: <strong>{bundle.source === 'demo' ? 'bemutató mód, szintetikus adat' : 'FlightLogger és Open-Meteo'}</strong>
+                Forrás: <strong>{bundle.source === 'demo' ? 'szintetikus adat (fejlesztői előnézet)' : 'FlightLogger és Open-Meteo'}</strong>
                 <br />
                 Utolsó frissítés: <strong>{dateTimeFull(bundle.fetchedAt, timezone)}</strong>
               </p>
