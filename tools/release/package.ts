@@ -18,6 +18,7 @@ import { readFileSync } from 'node:fs'
 import { parseArgs } from 'node:util'
 import { Arch, build, Platform, type Configuration } from 'electron-builder'
 import { parseVersion, versionChannel } from '../../src/core/update/version'
+import { assertBuildMatchesChannel, findDevMarkers, readBuildTexts } from './buildGuard'
 import { assetBaseName, CHANNELS, type ReleaseArch, type ReleasePlatform } from './channels'
 
 const { values } = parseArgs({
@@ -42,6 +43,8 @@ if (!parsed || versionChannel(parsed) !== channel) {
     `A(z) ${version} verzió nem a(z) ${channel} csatornáé. Helyi próbához add meg: --version ${channel === 'dev' ? '0.0.0-dev.0' : '0.0.0'} (így a próbapéldány a következő kiadásra frissül).`,
   )
 }
+// A fő kiadásba nem kerülhet fejlesztői eszköz, a DEV-be kell (FRS-09–FRS-11).
+assertBuildMatchesChannel(channel, findDevMarkers(readBuildTexts('out')))
 const c = CHANNELS[channel]
 const base = assetBaseName(channel, version, platform, arch)
 /** A csomag commitja: a DEV-ből indított fő kiadás pontosan ezt adja ki (FRS-09). */

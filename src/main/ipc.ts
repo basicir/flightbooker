@@ -30,7 +30,7 @@ import type { PlanStore } from './planStoreCore'
 import type { SecretStore } from './secretStore'
 import { loadSyllabi } from './syllabusStore'
 import type { Updater } from './update/updaterCore'
-import { registerDevIpc, type DevTools } from './dev/devTools'
+import { registerDevIpc, type DevTools } from '@dev-tools/main'
 
 /** A programmal szállított feladatsorok: fejlesztéskor a projektben, telepítve az erőforrások között. */
 function bundledSyllabusDir(): string {

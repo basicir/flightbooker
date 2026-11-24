@@ -4,7 +4,7 @@ import { formatIssues } from '@core/config/settings'
 import { applySettingsImport, readSettingsImport, type SettingsImportFile } from '@core/config/transfer'
 import { useEffect, useState } from 'react'
 import { api, isBrowserDemo } from '../bridge'
-import { StableApiKeyButton } from '../components/devTools'
+import { StableApiKeyButton } from '@dev-tools/ui'
 import { useUpdateState } from '../update/UpdateGate'
 import {
   AirportEditor,

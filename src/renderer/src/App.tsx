@@ -13,7 +13,7 @@ import { useApp, useNow, type ScreenId } from './state'
 import { Button, ErrorList, LoadingOverlay, progressSummary } from './components/ui'
 import { HelpIcon, useHelp } from './help/HelpPanel'
 import { UpdateBanner, useUpdateState } from './update/UpdateGate'
-import { DevImportNotice } from './components/devTools'
+import { DevBadge, DevImportNotice } from '@dev-tools/ui'
 
 /** Oldalsáv: áttekintés, a heti munkafolyamat öt lépése sorban, végül a kiegészítők. */
 const NAV_GROUPS: ReadonlyArray<{ title?: string; items: ReadonlyArray<{ id: ScreenId; label: string; step?: number }> }> = [
@@ -69,11 +69,7 @@ export function App() {
       <nav className="sidebar" aria-label="Fő navigáció">
         {(isBrowserDemo || update?.channel === 'dev') && (
           <div className="brand">
-            {update?.channel === 'dev' && (
-              <span className="dev-flag" title={`Fejlesztői változat (${update.currentVersion})`}>
-                DEV
-              </span>
-            )}
+            {update?.channel === 'dev' && <DevBadge version={update.currentVersion} />}
             {isBrowserDemo && (
               <span className="demo-flag" title="Böngészős fejlesztői előnézet, szintetikus adattal">
                 előnézet

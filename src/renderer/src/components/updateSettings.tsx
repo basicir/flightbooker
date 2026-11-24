@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { api } from '../bridge'
 import { channelLabel, useUpdateState } from '../update/UpdateGate'
-import { DevTools } from './devTools'
+import { DevTools } from '@dev-tools/ui'
 import { Badge, Button, Checkbox } from './ui'
 
 /** Beállítások → Frissítés (FRS-06): verzió, csatorna, automatikus frissítés, kézi ellenőrzés. */

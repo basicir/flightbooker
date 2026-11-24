@@ -5,12 +5,25 @@ import { useUpdateState } from '../update/UpdateGate'
 import { Button, Field, TextInput } from './ui'
 
 /**
- * A fejlesztői (DEV) változat eszközei (FRS-09, FRS-10). Csak a DEV-ben jelenik meg (a
- * Frissítés fülön); a fő változatban a főfolyamat a hozzájuk tartozó hívásokat sem kezeli.
+ * A fejlesztői (DEV) változat felületelemei (FRS-09–FRS-11). Csak a DEV-buildbe kerülnek: a fő
+ * kiadásban a `@dev-tools/ui` alias a devToolsDisabled.tsx-re mutat (electron.vite.config.ts).
+ * A DEV-buildben is csak DEV-csatornán jelennek meg.
  */
-export function DevTools() {
+
+/** A „DEV” jelvény az oldalsáv tetején. */
+export function DevBadge(props: { readonly version: string }) {
   return (
-    <div className="stack">
+    <span className="dev-flag" title={`Fejlesztői változat (${props.version})`}>
+      DEV
+    </span>
+  )
+}
+
+/** A Frissítés fül fejlesztői része. */
+export function DevTools() {
+  // Az adatattribútum a csomagolási őr jelölője (tools/release/buildGuard.ts): csak a DEV-buildben lehet.
+  return (
+    <div className="stack" data-fejlesztoi-eszkozok="">
       <h4>Fejlesztői eszközök (csak a DEV-ben)</h4>
       <StableImport />
       <Promotion />

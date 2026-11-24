@@ -69,9 +69,12 @@ fájljában van, az exportba nem kerül.
 
 ## A DEV eszközei
 
-Csak a Foglalástervező DEV-ben, a **Beállítások → Frissítés** fül alján (`src/main/dev/`,
-`src/renderer/src/components/devTools.tsx`). A fő változatban a felület nem mutatja őket, és a
-főfolyamat a hozzájuk tartozó hívásokat sem kezeli (FRS-09, FRS-10).
+Csak a Foglalástervező DEV-ben (`src/main/dev/`, `src/renderer/src/components/devTools.tsx`). **A fő
+kiadásba a kódjuk sem kerül bele:** az `electron.vite.config.ts` a fő buildben a `@dev-tools/main` és
+`@dev-tools/ui` aliasokat üres modulra (`devToolsDisabled.*`) irányítja – a DEV-build a verzióról
+ismerhető fel (`X.Y.Z-dev.N`) –, és a csomagoló (`tools/release/buildGuard.ts`) megállítja a fő
+kiadást, ha DEV-kódot talál benne (és a DEV-et, ha hiányzik belőle). A DEV „DEV” jelvénye, sávja,
+fejlesztői eszközei és narancs ikonja így csak a DEV-ben van.
 
 - **Beállítások átvétele a Foglalástervezőből.** A fő változat beállítása (a növendékekkel), mentett heti
   tervei, saját feladatsorai és a modellpontosság mérése átkerül a DEV-be; a DEV-é felülíródik, a fő

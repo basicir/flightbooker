@@ -11,7 +11,8 @@
     "types": [],
     "paths": {
       "@core/*": ["./src/core/*"],
-      "@browser-demo": ["./src/renderer/src/browserDemo/browserDemoApi.ts"]
+      "@browser-demo": ["./src/renderer/src/browserDemo/browserDemoApi.ts"],
+      "@dev-tools/ui": ["./src/renderer/src/components/devTools.tsx"]
     }
   },
   "include": [

@@ -7,7 +7,11 @@
     ],
     "types": [
       "node"
-    ]
+    ],
+    "paths": {
+      "@core/*": ["./src/core/*"],
+      "@dev-tools/main": ["./src/main/dev/devTools.ts"]
+    }
   },
   "include": [
     "electron.vite.config.ts",

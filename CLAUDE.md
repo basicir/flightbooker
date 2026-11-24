@@ -57,8 +57,10 @@ Open-Meteo előrejelzéséből heti foglalási tervezetet készít egy oktatóna
   feltérképezéséhez (kattintások és hatásuk, DOM-pillanatkép, képernyőkép, térkép). Csak figyel, hálózatot
   nem használ; a nevek álnevesítve. Kimenete (ZIP) a `tests/local/fl-felvetel/` alá kerül.
 - `src/main/dev/` – csak a Foglalástervező DEV eszközei (koncepció FRS-09–FRS-11): a fő változat beállításainak
-  (első indításkor magától) és API-kulcsának (gombbal, Kulcskarika-engedéllyel) átvétele, a „Kiadás: dev → main” gomb. Csak DEV-csatornán jönnek létre (`index.ts`), csak akkor
-  regisztrálódnak az IPC-kezelőik; a felület a Beállítások → Frissítés fülön, csak DEV-ben mutatja őket.
+  (első indításkor magától) és API-kulcsának (gombbal, Kulcskarika-engedéllyel) átvétele, a „Kiadás: dev → main” gomb.
+  **A fő kiadásba a kódjuk sem kerül bele:** a `@dev-tools/main` és `@dev-tools/ui` aliasok a fő buildben üres
+  modulra mutatnak (`electron.vite.config.ts`, a verzióból: `-dev.N` = DEV-build), és a csomagoló ezt ellenőrzi
+  (`tools/release/buildGuard.ts`). DEV-elemet csak ezeken az aliasokon át szabad bekötni.
 - Bemutató mód nincs (megszűnt 2026-11-25). A szintetikus adat (`src/core/demo/`) csak a tesztekhez és a böngészős
   fejlesztői előnézethez (`npm run dev:web`, `src/renderer/src/browserDemo/`) kell; az Electron-buildben a
   `@browser-demo` alias üres modulra mutat, így a programba nem kerül.

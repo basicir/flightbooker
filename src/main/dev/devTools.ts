@@ -13,8 +13,9 @@ import { GithubTokenSchema, promotionState, startPromotion, verifyGithubToken, t
 
 /**
  * A fejlesztői (DEV) változat eszközei: a fő változat beállításainak átvétele (FRS-10) és a
- * „Kiadás: dev → main” gomb (FRS-09). Csak a DEV-csatornán jönnek létre (index.ts), és csak
- * ekkor regisztrálódnak az IPC-kezelőik; a fő változatban sem a gomb, sem a funkciója nincs meg.
+ * „Kiadás: dev → main” gomb (FRS-09). Csak a DEV-buildbe kerülnek: a fő kiadásban a
+ * `@dev-tools/main` alias a devToolsDisabled.ts-re mutat (electron.vite.config.ts), így ott a kódjuk
+ * sincs meg. A DEV-buildben is csak DEV-csatornán jönnek létre (index.ts).
  */
 export interface DevTools {
   /** A fő változat felhasználói adatmappája (csak olvassuk). */

@@ -17,7 +17,13 @@ function devCsp(): Plugin {
 
 export default defineConfig({
   root: resolve('src/renderer'),
-  resolve: { alias: { '@core': resolve('src/core'), '@browser-demo': resolve('src/renderer/src/browserDemo/browserDemoApi.ts') } },
+  resolve: {
+    alias: {
+      '@core': resolve('src/core'),
+      '@browser-demo': resolve('src/renderer/src/browserDemo/browserDemoApi.ts'),
+      '@dev-tools/ui': resolve('src/renderer/src/components/devTools.tsx'),
+    },
+  },
   plugins: [react(), devCsp()],
   server: { host: 'localhost', port: 5199, strictPort: true },
 })
