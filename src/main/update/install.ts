@@ -55,8 +55,35 @@ async function moveInto(source: string, target: string): Promise<void> {
   }
 }
 
+/**
+ * Az Electron `fs`-e az `.asar` fájlt mappának látja, ezért egy programcsomag rekurzív törlése
+ * elakadna benne (ENOTEMPTY), és a régi csomag mentése megmaradna – a következő frissítés pedig
+ * már a mentés törlésénél elbukna. A csomagműveletek idejére ezt kikapcsoljuk.
+ */
+async function withoutAsar<T>(operation: () => Promise<T>): Promise<T> {
+  const previous = process.noAsar
+  process.noAsar = true
+  try {
+    return await operation()
+  } finally {
+    process.noAsar = previous
+  }
+}
+
 async function installMac(data: Uint8Array): Promise<void> {
   const bundle = macBundlePath()
+  await withoutAsar(() => replaceMacBundle(bundle, data))
+  // Az új példány csak a mostani kilépése után indul (ugyanazon az útvonalon már az új csomag van).
+  const waiter = spawn(
+    '/bin/sh',
+    ['-c', 'while /bin/kill -0 "$1" 2>/dev/null; do /bin/sleep 0.2; done; /usr/bin/open "$2"', 'frissito', String(process.pid), bundle],
+    { detached: true, stdio: 'ignore' },
+  )
+  waiter.unref()
+  app.exit(0)
+}
+
+async function replaceMacBundle(bundle: string, data: Uint8Array): Promise<void> {
   const work = await mkdtemp(join(tmpdir(), WORK_PREFIX))
   try {
     const zip = join(work, 'frissites.zip')
@@ -82,14 +109,6 @@ async function installMac(data: Uint8Array): Promise<void> {
   } finally {
     await rm(work, { recursive: true, force: true }).catch(() => undefined)
   }
-  // Az új példány csak a mostani kilépése után indul (ugyanazon az útvonalon már az új csomag van).
-  const waiter = spawn(
-    '/bin/sh',
-    ['-c', 'while /bin/kill -0 "$1" 2>/dev/null; do /bin/sleep 0.2; done; /usr/bin/open "$2"', 'frissito', String(process.pid), bundle],
-    { detached: true, stdio: 'ignore' },
-  )
-  waiter.unref()
-  app.exit(0)
 }
 
 async function installWindows(asset: ManifestAsset, data: Uint8Array): Promise<void> {

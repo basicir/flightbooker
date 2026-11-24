@@ -88,7 +88,10 @@ Csatornánként egyszerre egy kiadás fut; a várakozók közül csak a legújab
 - Ha a titkos kulcs elveszik, új kulcspár kell; a régi programok az új kulccsal aláírt kiadást nem
   fogadják el, ezért náluk egyszer kézzel kell telepíteni. Kulcscserénél a régi és az új nyilvános
   kulcs egy átmeneti kiadásban együtt is szerepelhet a `update-public-keys.json`-ban.
-- Csomagolás helyben, kipróbáláshoz: `npm run build && npx tsx tools/release/package.ts --channel dev --platform mac --arch arm64`.
+- Csomagolás helyben, kipróbáláshoz: `npm run build && npx tsx tools/release/package.ts --channel dev --platform mac --arch arm64 --version 0.0.0-dev.0`.
+  A legalacsonyabb verzió miatt a próbapéldány a következő kiadásra frissül. A kész próbacsomagot
+  ne hagyd a `release/` mappában: a macOS azonosító szerinti indításnál (`open -b`) a nagyobb
+  verziójú példányt választja, akárhol van.
 
 ## Ismert korlátok
 
