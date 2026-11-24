@@ -4,7 +4,8 @@ import { join } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
 import { serializeSettings } from '../../../src/core/config/settings'
 import { createDemoSettings } from '../../../src/core/demo/demoData'
-import { copyStableData, readStableSettings } from '../../../src/main/dev/importFromStable'
+import type { Settings } from '../../../src/core/config/schema'
+import { copyStableData, importFromStable, importFromStableIfEmpty, readStableSettings, type SettingsTarget } from '../../../src/main/dev/importFromStable'
 
 /** Szintetikus adatmappák egy ideiglenes könyvtárban; valódi felhasználói adat nincs bennük. */
 const dirs: string[] = []
@@ -68,5 +69,51 @@ describe('beállítások átvétele a fő változatból (FRS-10)', () => {
     expect(await copyStableData(stable, dev)).toEqual({ plans: 0, syllabi: 0, weatherLog: false })
     expect(await readdir(dev)).not.toContain('tervek')
     await expect(copyStableData(dev, dev)).rejects.toThrow(/ugyanaz/)
+  })
+})
+
+/** A DEV beállítási tárolója a tesztben: csak az állapotot és a mentett beállítást tartja. */
+function fakeTarget(status: 'ok' | 'missing'): SettingsTarget & { saved: Settings[] } {
+  const saved: Settings[] = []
+  return { saved, load: async () => ({ status }), save: async (s) => void saved.push(s) }
+}
+
+describe('átvétel az első DEV-indításkor (FRS-10)', () => {
+  it('ha a DEV-nek még nincs beállítása, magától átveszi a fő változatét', async () => {
+    const stable = await tempDir()
+    const dev = await tempDir()
+    await writeFile(join(stable, 'beallitasok.json'), serializeSettings(SETTINGS))
+    await mkdir(join(stable, 'tervek'))
+    await writeFile(join(stable, 'tervek', '2026-11-23.json'), '{}')
+    const target = fakeTarget('missing')
+    expect(await importFromStableIfEmpty(stable, dev, target)).toEqual({ plans: 1, syllabi: 0, weatherLog: false, students: SETTINGS.students.length })
+    expect(target.saved).toHaveLength(1)
+    expect(await readdir(join(dev, 'tervek'))).toEqual(['2026-11-23.json'])
+  })
+
+  it('meglévő DEV-beállításhoz nem nyúl, és hiányzó fő változatnál sem csinál semmit', async () => {
+    const stable = await tempDir()
+    const dev = await tempDir()
+    await writeFile(join(stable, 'beallitasok.json'), serializeSettings(SETTINGS))
+    const existing = fakeTarget('ok')
+    expect(await importFromStableIfEmpty(stable, dev, existing)).toBeNull()
+    expect(existing.saved).toEqual([])
+    const empty = await tempDir()
+    const missing = fakeTarget('missing')
+    expect(await importFromStableIfEmpty(empty, dev, missing)).toBeNull()
+    expect(missing.saved).toEqual([])
+    expect(await readdir(dev)).toEqual([])
+  })
+
+  it('a kézi átvétel hibás fő beállításnál semmit nem ír felül', async () => {
+    const stable = await tempDir()
+    const dev = await tempDir()
+    await writeFile(join(stable, 'beallitasok.json'), '{"formatVersion": 9}')
+    await mkdir(join(dev, 'tervek'))
+    await writeFile(join(dev, 'tervek', 'sajat.json'), '{}')
+    const target = fakeTarget('ok')
+    await expect(importFromStable(stable, dev, target)).rejects.toThrow(/nem olvasható/)
+    expect(target.saved).toEqual([])
+    expect(await readdir(join(dev, 'tervek'))).toEqual(['sajat.json'])
   })
 })

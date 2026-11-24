@@ -75,8 +75,13 @@ főfolyamat a hozzájuk tartozó hívásokat sem kezeli (FRS-09, FRS-10).
 
 - **Beállítások átvétele a Foglalástervezőből.** A fő változat beállítása (a növendékekkel), mentett heti
   tervei, saját feladatsorai és a modellpontosság mérése átkerül a DEV-be; a DEV-é felülíródik, a fő
-  változaté nem változik, a DEV gyorsítótára törlődik, és a program újraindul. Az API-kulcs nem jön át
-  (ALP-06): a DEV-ben a Beállítások → Adatforrás fülön kell megadni.
+  változaté nem változik, a DEV gyorsítótára törlődik. Az API-kulcs nem jön át (ALP-06): a DEV-ben a
+  Beállítások → Adatforrás fülön kell megadni.
+  - **Első indításkor magától:** ha a DEV-nek még nincs beállítása, és a fő változatnak van, induláskor
+    (az ablak előtt) átjön, így a DEV nem az első beállítással indul; egy sáv jelzi, mi jött át, és
+    hogy az API-kulcs még kell.
+  - **Később gombbal:** Beállítások → Frissítés, illetve (ha az automatikus átvétel nem futhatott) az
+    első beállítás első lépésén. Utána a program újraindul.
 - **Kiadás: dev → main.** Első használatkor egy GitHub-token kell:
   1. GitHub → Settings → Developer settings → **Fine-grained tokens → Generate new token**
      (közvetlenül: `https://github.com/settings/personal-access-tokens/new`).

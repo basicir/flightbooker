@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
-import type { PromotionRun, PromotionState } from '../../../shared/api'
+import type { PromotionRun, PromotionState, StableImportSummary } from '../../../shared/api'
 import { api } from '../bridge'
+import { useUpdateState } from '../update/UpdateGate'
 import { Button, Field, TextInput } from './ui'
 
 /**
@@ -25,8 +26,51 @@ const IMPORT_CONFIRM =
   'A fő változathoz a program nem nyúl. Az API-kulcs nem jön át: a DEV-ben külön kell megadni.\n\n' +
   'Utána a program újraindul. Átveszed?'
 
-/** A fő változat beállításainak átvétele (FRS-10). */
-function StableImport() {
+const describeImport = (r: StableImportSummary): string =>
+  [`beállítás (${r.students} növendékkel)`, `${r.plans} heti terv`, `${r.syllabi} saját feladatsor`, ...(r.weatherLog ? ['az időjárás-modellek mérése'] : [])].join(', ')
+
+/**
+ * Az első DEV-indításkor magától átvett adat jelzése (FRS-10): mi jött át, és hogy az API-kulcsot
+ * külön kell megadni. Csak a DEV-ben, és csak abban az indításban, amelyikben az átvétel történt.
+ */
+export function DevImportNotice(props: { readonly onOpenSettings: () => void }) {
+  const update = useUpdateState()
+  const isDev = update?.channel === 'dev'
+  const [summary, setSummary] = useState<StableImportSummary | null>(null)
+  const [hidden, setHidden] = useState(false)
+  useEffect(() => {
+    if (!isDev) return
+    let active = true
+    api.dev.startupImport().then(
+      (s) => {
+        if (active) setSummary(s)
+      },
+      () => undefined,
+    )
+    return () => {
+      active = false
+    }
+  }, [isDev])
+  if (!isDev || !summary || hidden) return null
+  return (
+    <div className="banner info row" role="status">
+      <span>
+        A Foglalástervező adatait átvettem: {describeImport(summary)}. Az API-kulcsot a DEV-ben külön kell megadnod.
+      </span>
+      <span className="row">
+        <button type="button" className="btn btn-primary btn-small" onClick={props.onOpenSettings}>
+          API-kulcs megadása
+        </button>
+        <button type="button" className="btn btn-ghost btn-small" onClick={() => setHidden(true)}>
+          Bezárás
+        </button>
+      </span>
+    </div>
+  )
+}
+
+/** A fő változat beállításainak átvétele (FRS-10); a Frissítés fülön és a DEV első beállításában. */
+export function StableImport() {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const run = async (): Promise<void> => {
@@ -35,8 +79,7 @@ function StableImport() {
     setError(null)
     try {
       const r = await api.dev.importFromStable()
-      const parts = [`beállítás (${r.students} növendékkel)`, `${r.plans} heti terv`, `${r.syllabi} saját feladatsor`, ...(r.weatherLog ? ['az időjárás-modellek mérése'] : [])]
-      window.alert(`Átvéve: ${parts.join(', ')}.\n\nA program most újraindul.`)
+      window.alert(`Átvéve: ${describeImport(r)}.\n\nA program most újraindul.`)
       await api.dev.relaunch()
     } catch (e) {
       setError(messageOf(e))

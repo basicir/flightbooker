@@ -13,6 +13,7 @@ import { useApp, useNow, type ScreenId } from './state'
 import { Button, ErrorList, LoadingOverlay, progressSummary } from './components/ui'
 import { HelpIcon, useHelp } from './help/HelpPanel'
 import { UpdateBanner, useUpdateState } from './update/UpdateGate'
+import { DevImportNotice } from './components/devTools'
 
 /** Oldalsáv: áttekintés, a heti munkafolyamat öt lépése sorban, végül a kiegészítők. */
 const NAV_GROUPS: ReadonlyArray<{ title?: string; items: ReadonlyArray<{ id: ScreenId; label: string; step?: number }> }> = [
@@ -139,6 +140,7 @@ export function App() {
       </nav>
       <main className="content">
         <UpdateBanner onOpenSettings={() => app.navigate('settings', { settingsTab: 'Frissítés' })} />
+        <DevImportNotice onOpenSettings={() => app.navigate('settings', { settingsTab: 'Adatforrás' })} />
         {app.dataError && <ErrorList errors={[`Adatfrissítési hiba: ${app.dataError}`]} />}
         {app.saveError && (
           <div className="banner error" role="alert">

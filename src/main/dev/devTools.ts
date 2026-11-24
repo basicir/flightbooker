@@ -7,7 +7,7 @@ import { createDevPromoteFetch } from '../net/allowedFetch'
 import { createElectronSecretStore } from '../secrets'
 import type { SecretStore } from '../secretStore'
 import { readBuildCommit } from '../update/buildInfo'
-import { copyStableData, readStableSettings } from './importFromStable'
+import { importFromStable, importFromStableIfEmpty } from './importFromStable'
 import { GithubTokenSchema, promotionState, startPromotion, verifyGithubToken, type PromotionDeps } from './promotion'
 
 /**
@@ -21,6 +21,8 @@ export interface DevTools {
   /** A kiadás GitHub-tokenje a rendszer titoktárolójában, külön fájlban. */
   readonly tokenStore: SecretStore
   readonly promotion: PromotionDeps
+  /** Az első indításkor magától átvett adat összegzése (a felület egyszer jelzi), vagy `null`. */
+  startupImport: StableImportSummary | null
 }
 
 export function createDevTools(channel: string | null): DevTools {
@@ -35,19 +37,24 @@ export function createDevTools(channel: string | null): DevTools {
       buildVersion: app.getVersion(),
       buildCommit: readBuildCommit(),
     },
+    startupImport: null,
   }
+}
+
+/**
+ * Indításkor, az ablak előtt: ha a DEV-nek még nincs beállítása, átveszi a fő változatét (FRS-10),
+ * hogy a DEV ne az első beállítással induljon. Hiba esetén az első beállítás jön, a gombbal pótolható.
+ */
+export async function importOnFirstStart(dev: DevTools, configStore: ConfigStore): Promise<void> {
+  dev.startupImport = await importFromStableIfEmpty(dev.stableDir, app.getPath('userData'), configStore).catch(() => null)
 }
 
 type Handle = (channel: string, fn: (event: IpcMainInvokeEvent, ...args: unknown[]) => unknown) => void
 
 export function registerDevIpc(handle: Handle, dev: DevTools, configStore: ConfigStore): void {
-  handle(IPC.devImportFromStable, async (): Promise<StableImportSummary> => {
-    // Előbb a beállítás: ha a fő változaté hiányzik vagy hibás, semmi nem íródik felül.
-    const settings = await readStableSettings(dev.stableDir)
-    const copied = await copyStableData(dev.stableDir, app.getPath('userData'))
-    await configStore.save(settings)
-    return { ...copied, students: settings.students.length }
-  })
+  handle(IPC.devImportFromStable, async (): Promise<StableImportSummary> => importFromStable(dev.stableDir, app.getPath('userData'), configStore))
+
+  handle(IPC.devStartupImport, async (): Promise<StableImportSummary | null> => dev.startupImport)
 
   handle(IPC.devRelaunch, async () => {
     app.relaunch()

@@ -143,6 +143,9 @@ export function createBrowserDemoApi(): FlightbookerApi {
       async importFromStable() {
         throw new Error('Csak a Foglalástervező DEV-ben érhető el.')
       },
+      async startupImport() {
+        return null
+      },
       async relaunch() {},
       async getPromotionState() {
         throw new Error('Csak a Foglalástervező DEV-ben érhető el.')

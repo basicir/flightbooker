@@ -58,6 +58,7 @@ const api: FlightbookerApi = {
   // A fő változatban a főfolyamat ezeket nem kezeli: a hívás ott hibával tér vissza.
   dev: {
     importFromStable: () => ipcRenderer.invoke(IPC.devImportFromStable),
+    startupImport: () => ipcRenderer.invoke(IPC.devStartupImport),
     relaunch: () => ipcRenderer.invoke(IPC.devRelaunch),
     getPromotionState: () => ipcRenderer.invoke(IPC.devPromotionState),
     saveGithubToken: (token) => ipcRenderer.invoke(IPC.devSaveGithubToken, token),

@@ -15,6 +15,9 @@ import { SKILL_FILE_NAME } from '../skillStore'
  * modellpontosság mérése. Nem jön át: az API-kulcs (a fő változat titoktárolójában van, és a
  * kulcsot mindig a felhasználó írja be – ALP-06), a gyorsítótár (a DEV-é törlődik, a következő
  * frissítés újratölti) és a gépenkénti frissítési beállítás.
+ *
+ * Két úton fut: a DEV első indításakor magától, ha a DEV-nek még nincs beállítása (ilyenkor nincs
+ * mit felülírni), illetve kézzel, a Beállítások → Frissítés vagy az első beállítás gombjával.
  */
 
 /** A mappák, amelyek egészükben átjönnek: heti tervek és saját feladatsorok. */
@@ -42,6 +45,33 @@ const exists = async (path: string): Promise<boolean> =>
 async function countJsonFiles(dir: string): Promise<number> {
   const entries = await readdir(dir, { recursive: true }).catch(() => [] as string[])
   return entries.filter((name) => name.endsWith('.json')).length
+}
+
+/** A DEV beállítási tárolója annyiban, amennyi az átvételhez kell (configStoreCore). */
+export interface SettingsTarget {
+  load(): Promise<{ readonly status: string }>
+  save(settings: Settings): Promise<void>
+}
+
+async function apply(settings: Settings, stableDir: string, devDir: string, target: SettingsTarget): Promise<StableImportSummary> {
+  const copied = await copyStableData(stableDir, devDir)
+  await target.save(settings)
+  return { ...copied, students: settings.students.length }
+}
+
+/** Kézi átvétel: előbb a beállítás ellenőrzése (ha hiányzik vagy hibás, semmi nem íródik felül). */
+export async function importFromStable(stableDir: string, devDir: string, target: SettingsTarget): Promise<StableImportSummary> {
+  return apply(await readStableSettings(stableDir), stableDir, devDir, target)
+}
+
+/**
+ * Első DEV-indításkor: ha a DEV-nek még nincs beállítása, és a fő változatnak van érvényes, magától
+ * átveszi. Egyébként (van már DEV-beállítás, vagy a fő változaté hiányzik) nem nyúl semmihez.
+ */
+export async function importFromStableIfEmpty(stableDir: string, devDir: string, target: SettingsTarget): Promise<StableImportSummary | null> {
+  if ((await target.load()).status !== 'missing') return null
+  const settings = await readStableSettings(stableDir).catch(() => null)
+  return settings ? apply(settings, stableDir, devDir, target) : null
 }
 
 /** A tervek, a feladatsorok és a mérés átmásolása; a DEV gyorsítótára törlődik. */

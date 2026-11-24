@@ -197,6 +197,8 @@ export interface PromotionState {
 export interface DevApi {
   /** A fő változat beállításainak, terveinek és feladatsorainak átvétele (felülírja a DEV-éit). */
   importFromStable(): Promise<StableImportSummary>
+  /** Ha a DEV első indításkor magától átvette a fő változat adatait: mit (a felület egyszer jelzi). */
+  startupImport(): Promise<StableImportSummary | null>
   /** A program újraindítása (az átvétel után). */
   relaunch(): Promise<void>
   getPromotionState(): Promise<PromotionState>
@@ -237,6 +239,7 @@ export const IPC = {
   skipUpdate: 'update:skip',
   setAutoUpdate: 'update:set-auto',
   devImportFromStable: 'dev:import-from-stable',
+  devStartupImport: 'dev:startup-import',
   devRelaunch: 'dev:relaunch',
   devPromotionState: 'dev:promotion-state',
   devSaveGithubToken: 'dev:github-token-save',

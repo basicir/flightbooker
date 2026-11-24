@@ -9,6 +9,8 @@ import { api } from '../bridge'
 import { AirportEditor, ClassroomsEditor, LimitsEditor, ResourcesEditor, StudentsEditor, WeatherMinimaEditor, WorkTimeEditor } from '../components/settingsEditors'
 import type { RefreshProgress } from '../../../shared/api'
 import { Button, Card, ErrorList, Field, LoadingOverlay, TextInput } from '../components/ui'
+import { StableImport } from '../components/devTools'
+import { useUpdateState } from '../update/UpdateGate'
 import { SETUP_STEP_HELP } from '../help/helpContent'
 import { HelpIcon, useHelp, useHelpTopic } from '../help/HelpPanel'
 import { todayIn, useApp } from '../state'
@@ -22,6 +24,7 @@ import { todayIn, useApp } from '../state'
 const STEPS = ['Adatforrás', 'Repülőtér', 'Limitek és időjárás', 'Gépek', 'Termek', 'Növendékek', 'Munkaidő'] as const
 
 export function FirstSetup(props: { initial: Settings }) {
+  const isDev = useUpdateState()?.channel === 'dev'
   const { finishSetup } = useApp()
   const [step, setStep] = useState(0)
   const [settings, setSettings] = useState<Settings>(props.initial)
@@ -133,6 +136,12 @@ export function FirstSetup(props: { initial: Settings }) {
       <Card title={STEPS[step]}>
         {step === 0 && (
           <div className="stack">
+            {/* Csak a DEV-ben (FRS-10): az első beállítás helyett a fő változat adatai is átvehetők. */}
+            {isDev && (
+              <div className="banner info">
+                <StableImport />
+              </div>
+            )}
             <p>
               A program csak olvassa a FlightLoggert. Az API-kulcs a rendszer titoktárolójába kerül (macOS Kulcskarika, Windows DPAPI), a beállítási fájlba nem.
             </p>
