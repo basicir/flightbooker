@@ -25,8 +25,10 @@ Open-Meteo előrejelzéséből heti foglalási tervezetet készít egy oktatóna
    hálózatot.
 3. **API-kulcs (ALP-06).** Csak `safeStorage`-ban (Keychain / DPAPI) tárolódik, sosem a beállítási
    fájlban. A kulcsot mindig a felhasználó írja be. Nem kerülhet csevegésbe, naplóba, jelentésbe,
-   hibaüzenetbe, tesztbe vagy fixture-be. Ugyanez vonatkozik a DEV kiadás gombjának GitHub-tokenjére (FRS-09):
-   azt is a felhasználó írja be a DEV-be, és csak a titoktárolóba kerül.
+   hibaüzenetbe, tesztbe vagy fixture-be. Egyetlen kivétel (a felhasználó döntése, 2026-11-25, FRS-11): a
+   Foglalástervező DEV a fő változat kulcsát gombbal átveheti, a macOS Kulcskarika engedélyével; a kulcs ekkor is
+   csak a memóriában van, és a DEV titoktárolójába kerül. Ugyanez vonatkozik a DEV kiadás gombjának
+   GitHub-tokenjére (FRS-09): azt is a felhasználó írja be a DEV-be, és csak a titoktárolóba kerül.
 4. **Nincs személyes adat a repóban.** Tesztadat csak szintetikus lehet (`tests/fixtures/`).
    Név, e-mail, foglalási komment nem kerül jelentésbe vagy naplóba. A `reports/` és a gyorsítótár
    gitignore-olt.
@@ -54,8 +56,8 @@ Open-Meteo előrejelzéséből heti foglalási tervezetet készít egy oktatóna
 - `tools/tampermonkey/foglalas-felvevo.user.js` – fejlesztői felvevő a FlightLogger foglalási felületének
   feltérképezéséhez (kattintások és hatásuk, DOM-pillanatkép, képernyőkép, térkép). Csak figyel, hálózatot
   nem használ; a nevek álnevesítve. Kimenete (ZIP) a `tests/local/fl-felvetel/` alá kerül.
-- `src/main/dev/` – csak a Foglalástervező DEV eszközei (koncepció FRS-09, FRS-10): a fő változat beállításainak
-  átvétele és a „Kiadás: dev → main” gomb. Csak DEV-csatornán jönnek létre (`index.ts`), csak akkor
+- `src/main/dev/` – csak a Foglalástervező DEV eszközei (koncepció FRS-09–FRS-11): a fő változat beállításainak
+  (első indításkor magától) és API-kulcsának (gombbal, Kulcskarika-engedéllyel) átvétele, a „Kiadás: dev → main” gomb. Csak DEV-csatornán jönnek létre (`index.ts`), csak akkor
   regisztrálódnak az IPC-kezelőik; a felület a Beállítások → Frissítés fülön, csak DEV-ben mutatja őket.
 - Bemutató mód nincs (megszűnt 2026-11-25). A szintetikus adat (`src/core/demo/`) csak a tesztekhez és a böngészős
   fejlesztői előnézethez (`npm run dev:web`, `src/renderer/src/browserDemo/`) kell; az Electron-buildben a

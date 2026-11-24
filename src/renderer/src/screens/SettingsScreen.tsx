@@ -4,6 +4,8 @@ import { formatIssues } from '@core/config/settings'
 import { applySettingsImport, readSettingsImport, type SettingsImportFile } from '@core/config/transfer'
 import { useEffect, useState } from 'react'
 import { api, isBrowserDemo } from '../bridge'
+import { StableApiKeyButton } from '../components/devTools'
+import { useUpdateState } from '../update/UpdateGate'
 import {
   AirportEditor,
   ClassroomsEditor,
@@ -30,6 +32,7 @@ const TABS = ['Növendékek', 'Gépek', 'Termek', 'Munkaidő', 'Limitek', 'Időj
 type Tab = (typeof TABS)[number]
 
 export function SettingsScreen() {
+  const isDev = useUpdateState()?.channel === 'dev'
   const app = useApp()
   const requested = TABS.find((t) => t === app.settingsTab)
   const [tab, setTab] = useState<Tab>(requested ?? 'Növendékek')
@@ -221,6 +224,12 @@ export function SettingsScreen() {
                   </Button>
                 </div>
               </Field>
+            )}
+            {/* Csak a DEV-ben (FRS-11): a fő változat kulcsa átvehető, a macOS Kulcskarika engedélyével. */}
+            {isDev && (
+              <div className="row">
+                <StableApiKeyButton onImported={() => void api.hasApiKey().then(setHasKey)} />
+              </div>
             )}
             {keyMessage && <p>{keyMessage}</p>}
             <hr className="divider" />

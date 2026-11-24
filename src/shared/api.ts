@@ -199,6 +199,11 @@ export interface DevApi {
   importFromStable(): Promise<StableImportSummary>
   /** Ha a DEV első indításkor magától átvette a fő változat adatait: mit (a felület egyszer jelzi). */
   startupImport(): Promise<StableImportSummary | null>
+  /**
+   * A fő változat API-kulcsának átvétele (FRS-11, csak macOS): a macOS Kulcskarika engedélyt kér, a
+   * kulcs kipróbálás után a DEV titoktárolójába kerül. A kulcs a felületre nem jut el.
+   */
+  importApiKey(): Promise<ConnectionTest>
   /** A program újraindítása (az átvétel után). */
   relaunch(): Promise<void>
   getPromotionState(): Promise<PromotionState>
@@ -240,6 +245,7 @@ export const IPC = {
   setAutoUpdate: 'update:set-auto',
   devImportFromStable: 'dev:import-from-stable',
   devStartupImport: 'dev:startup-import',
+  devImportApiKey: 'dev:import-api-key',
   devRelaunch: 'dev:relaunch',
   devPromotionState: 'dev:promotion-state',
   devSaveGithubToken: 'dev:github-token-save',

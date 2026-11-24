@@ -131,7 +131,8 @@ export function registerIpc(deps: IpcDeps): void {
 
   handle(IPC.hasApiKey, async () => deps.secretStore.hasApiKey())
 
-  handle(IPC.saveApiKey, async (_e, value: unknown): Promise<ConnectionTest> => {
+  // A kulcs kipróbálása (csak olvasó lekérdezés) és mentése; a DEV kulcsátvétele is ezt használja.
+  const testAndSaveApiKey = async (value: unknown): Promise<ConnectionTest> => {
     const key = apiKeySchema.safeParse(value)
     if (!key.success) return { ok: false, message: 'A kulcs formátuma nem megfelelő.' }
     try {
@@ -142,7 +143,9 @@ export function registerIpc(deps: IpcDeps): void {
     }
     await deps.secretStore.saveApiKey(key.data)
     return { ok: true, message: 'A kulcs működik, és a rendszer titoktárolójába került.' }
-  })
+  }
+
+  handle(IPC.saveApiKey, async (_e, value: unknown): Promise<ConnectionTest> => testAndSaveApiKey(value))
 
   handle(IPC.clearApiKey, async () => deps.secretStore.clearApiKey())
 
@@ -315,7 +318,7 @@ export function registerIpc(deps: IpcDeps): void {
   })
 
   // A fő változatban nincs devTools, így ezek a csatornák ott nem is léteznek.
-  if (deps.devTools) registerDevIpc(handle, deps.devTools, deps.configStore)
+  if (deps.devTools) registerDevIpc(handle, deps.devTools, deps.configStore, testAndSaveApiKey)
 
   handle(IPC.resetAll, async (_e, value: unknown) => {
     const options = z.strictObject({ clearApiKey: z.boolean().optional() }).optional().parse(value)

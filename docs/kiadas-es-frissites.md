@@ -75,13 +75,20 @@ főfolyamat a hozzájuk tartozó hívásokat sem kezeli (FRS-09, FRS-10).
 
 - **Beállítások átvétele a Foglalástervezőből.** A fő változat beállítása (a növendékekkel), mentett heti
   tervei, saját feladatsorai és a modellpontosság mérése átkerül a DEV-be; a DEV-é felülíródik, a fő
-  változaté nem változik, a DEV gyorsítótára törlődik. Az API-kulcs nem jön át (ALP-06): a DEV-ben a
-  Beállítások → Adatforrás fülön kell megadni.
+  változaté nem változik, a DEV gyorsítótára törlődik. Az API-kulcs ezzel nem jön át (lásd lent).
   - **Első indításkor magától:** ha a DEV-nek még nincs beállítása, és a fő változatnak van, induláskor
     (az ablak előtt) átjön, így a DEV nem az első beállítással indul; egy sáv jelzi, mi jött át, és
     hogy az API-kulcs még kell.
   - **Később gombbal:** Beállítások → Frissítés, illetve (ha az automatikus átvétel nem futhatott) az
     első beállítás első lépésén. Utána a program újraindul.
+- **API-kulcs átvétele a Foglalástervezőből** (FRS-11, csak macOS). A DEV-sávban (amíg a DEV-ben nincs
+  kulcs) és a Beállítások → Adatforrás fülön. A fő változat a kulcsot a safeStorage-dzsal titkosította
+  (a Chromium macOS-es „v10” formátuma, a jelszó a Kulcskarika „Foglalástervező Safe Storage” eleme). A
+  gomb a `security find-generic-password` paranccsal kéri ezt a jelszót, ezért a macOS egy ablakban
+  engedélyt kér: Mac-jelszó, „Engedélyezés” (a „Mindig engedélyez” nem kell). A DEV visszafejti a kulcsot,
+  kipróbálja a FlightLoggernél, és a saját titoktárolójába menti; a kulcs csak a memóriában van.
+  (`src/main/dev/stableApiKey.ts`; ha egy Electron-frissítés a formátumot megváltoztatja, a gomb hibát
+  ad, és a kulcsot kézzel kell beírni.)
 - **Kiadás: dev → main.** Első használatkor egy GitHub-token kell:
   1. GitHub → Settings → Developer settings → **Fine-grained tokens → Generate new token**
      (közvetlenül: `https://github.com/settings/personal-access-tokens/new`).

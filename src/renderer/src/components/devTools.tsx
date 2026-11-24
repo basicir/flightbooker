@@ -29,21 +29,53 @@ const IMPORT_CONFIRM =
 const describeImport = (r: StableImportSummary): string =>
   [`beállítás (${r.students} növendékkel)`, `${r.plans} heti terv`, `${r.syllabi} saját feladatsor`, ...(r.weatherLog ? ['az időjárás-modellek mérése'] : [])].join(', ')
 
+const API_KEY_CONFIRM =
+  'API-kulcs átvétele a Foglalástervezőből\n\n' +
+  'A macOS egy ablakban megkérdezi, hogy a „security” hozzáférhet-e a „Foglalástervező Safe Storage” Kulcskarika-elemhez. ' +
+  'Írd be a Mac jelszavadat, és kattints az „Engedélyezés” gombra (a „Mindig engedélyez” nem kell).\n\n' +
+  'A DEV a kulcsot kipróbálja a FlightLoggernél, és a saját titoktárolójába menti; a kulcs sehol nem jelenik meg.\n\nFolytatod?'
+
+/** A fő változat API-kulcsának átvétele (FRS-11): a macOS Kulcskarika engedélyével. */
+export function StableApiKeyButton(props: { readonly onImported: () => void; readonly small?: boolean }) {
+  const [busy, setBusy] = useState(false)
+  const [message, setMessage] = useState<{ readonly ok: boolean; readonly text: string } | null>(null)
+  const run = async (): Promise<void> => {
+    if (!window.confirm(API_KEY_CONFIRM)) return
+    setBusy(true)
+    setMessage(null)
+    const result = await api.dev.importApiKey().catch((e: unknown) => ({ ok: false, message: messageOf(e) }))
+    setBusy(false)
+    setMessage({ ok: result.ok, text: result.message })
+    if (result.ok) props.onImported()
+  }
+  return (
+    <>
+      <button type="button" className={`btn btn-primary${props.small ? ' btn-small' : ''}`} disabled={busy} onClick={() => void run()}>
+        {busy ? 'Átvétel (nézd a Kulcskarika ablakát)…' : 'API-kulcs átvétele a Foglalástervezőből'}
+      </button>
+      {message && <span className={message.ok ? 'ok-text' : 'con-text'}>{message.text}</span>}
+    </>
+  )
+}
+
 /**
- * Az első DEV-indításkor magától átvett adat jelzése (FRS-10): mi jött át, és hogy az API-kulcsot
- * külön kell megadni. Csak a DEV-ben, és csak abban az indításban, amelyikben az átvétel történt.
+ * A DEV-sáv (FRS-10, FRS-11): ha az első indításkor magától átjöttek a fő változat adatai, mi jött
+ * át; és amíg a DEV-ben nincs API-kulcs, az átvétel gombja. Csak a DEV-ben.
  */
 export function DevImportNotice(props: { readonly onOpenSettings: () => void }) {
   const update = useUpdateState()
   const isDev = update?.channel === 'dev'
   const [summary, setSummary] = useState<StableImportSummary | null>(null)
+  const [hasKey, setHasKey] = useState<boolean | null>(null)
   const [hidden, setHidden] = useState(false)
   useEffect(() => {
     if (!isDev) return
     let active = true
-    api.dev.startupImport().then(
-      (s) => {
-        if (active) setSummary(s)
+    Promise.all([api.dev.startupImport(), api.hasApiKey()]).then(
+      ([s, k]) => {
+        if (!active) return
+        setSummary(s)
+        setHasKey(k)
       },
       () => undefined,
     )
@@ -51,16 +83,23 @@ export function DevImportNotice(props: { readonly onOpenSettings: () => void }) 
       active = false
     }
   }, [isDev])
-  if (!isDev || !summary || hidden) return null
+  if (!isDev || hidden || (!summary && hasKey !== false)) return null
   return (
     <div className="banner info row" role="status">
       <span>
-        A Foglalástervező adatait átvettem: {describeImport(summary)}. Az API-kulcsot a DEV-ben külön kell megadnod.
+        {summary && <>A Foglalástervező adatait átvettem: {describeImport(summary)}. </>}
+        {hasKey === false && 'A DEV-ben még nincs API-kulcs: átveheted a Foglalástervezőből, vagy beírhatod.'}
       </span>
       <span className="row">
-        <button type="button" className="btn btn-primary btn-small" onClick={props.onOpenSettings}>
-          API-kulcs megadása
-        </button>
+        {hasKey === false && (
+          <>
+            {/* Sikeres átvétel után újratöltjük a felületet: az adatok már a kulccsal jönnek. */}
+            <StableApiKeyButton small onImported={() => setTimeout(() => window.location.reload(), 1500)} />
+            <button type="button" className="btn btn-ghost btn-small" onClick={props.onOpenSettings}>
+              Beírom kézzel
+            </button>
+          </>
+        )}
         <button type="button" className="btn btn-ghost btn-small" onClick={() => setHidden(true)}>
           Bezárás
         </button>

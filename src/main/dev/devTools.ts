@@ -8,6 +8,7 @@ import { createElectronSecretStore } from '../secrets'
 import type { SecretStore } from '../secretStore'
 import { readBuildCommit } from '../update/buildInfo'
 import { importFromStable, importFromStableIfEmpty } from './importFromStable'
+import { readMacKeychainPassword, readStableApiKey } from './stableApiKey'
 import { GithubTokenSchema, promotionState, startPromotion, verifyGithubToken, type PromotionDeps } from './promotion'
 
 /**
@@ -51,10 +52,22 @@ export async function importOnFirstStart(dev: DevTools, configStore: ConfigStore
 
 type Handle = (channel: string, fn: (event: IpcMainInvokeEvent, ...args: unknown[]) => unknown) => void
 
-export function registerDevIpc(handle: Handle, dev: DevTools, configStore: ConfigStore): void {
+export function registerDevIpc(handle: Handle, dev: DevTools, configStore: ConfigStore, testAndSaveApiKey: (key: unknown) => Promise<ConnectionTest>): void {
   handle(IPC.devImportFromStable, async (): Promise<StableImportSummary> => importFromStable(dev.stableDir, app.getPath('userData'), configStore))
 
   handle(IPC.devStartupImport, async (): Promise<StableImportSummary | null> => dev.startupImport)
+
+  // Az API-kulcs átvétele (FRS-11): a macOS Kulcskarika engedélyével, kipróbálás után ment.
+  handle(IPC.devImportApiKey, async (): Promise<ConnectionTest> => {
+    let key: string
+    try {
+      key = await readStableApiKey({ stableDir: dev.stableDir, appName: APP_DISPLAY_NAME.stable, platform: process.platform, readKeychainPassword: readMacKeychainPassword })
+    } catch (error) {
+      return { ok: false, message: error instanceof Error ? error.message : 'Az API-kulcs nem vehető át.' }
+    }
+    const result = await testAndSaveApiKey(key)
+    return result.ok ? { ok: true, message: 'Átvettem a Foglalástervező API-kulcsát: működik, és a DEV titoktárolójába került.' } : result
+  })
 
   handle(IPC.devRelaunch, async () => {
     app.relaunch()

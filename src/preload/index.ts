@@ -59,6 +59,7 @@ const api: FlightbookerApi = {
   dev: {
     importFromStable: () => ipcRenderer.invoke(IPC.devImportFromStable),
     startupImport: () => ipcRenderer.invoke(IPC.devStartupImport),
+    importApiKey: () => ipcRenderer.invoke(IPC.devImportApiKey),
     relaunch: () => ipcRenderer.invoke(IPC.devRelaunch),
     getPromotionState: () => ipcRenderer.invoke(IPC.devPromotionState),
     saveGithubToken: (token) => ipcRenderer.invoke(IPC.devSaveGithubToken, token),
