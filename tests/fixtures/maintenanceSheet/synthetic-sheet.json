@@ -1,0 +1,75 @@
+{
+  "date": "2026-11-09",
+  "rows": [
+    {
+      "registration": "HA-DCA",
+      "current": 4412,
+      "next": 4430,
+      "remaining": 18,
+      "maintenanceType": 50
+    },
+    {
+      "registration": "HA-DCB",
+      "current": 9120,
+      "next": 9168,
+      "remaining": 48,
+      "maintenanceType": 100
+    },
+    {
+      "registration": "HA-DQA",
+      "current": 1503,
+      "next": 1500,
+      "remaining": -3,
+      "maintenanceType": 50
+    },
+    {
+      "registration": "HA-DQB",
+      "current": null,
+      "next": null,
+      "remaining": 0,
+      "maintenanceType": null
+    },
+    {
+      "registration": "HA-DPA",
+      "current": 12077,
+      "next": 12099,
+      "remaining": 22,
+      "maintenanceType": 50
+    },
+    {
+      "registration": "HA-DPB",
+      "current": 6350,
+      "next": 6354,
+      "remaining": 4,
+      "maintenanceType": 25
+    },
+    {
+      "registration": "HA-DPC",
+      "current": 8741,
+      "next": 8776,
+      "remaining": 35,
+      "maintenanceType": 100
+    },
+    {
+      "registration": "HA-DQC",
+      "current": 10234,
+      "next": 10234,
+      "remaining": 0,
+      "maintenanceType": 50
+    },
+    {
+      "registration": "HA-DQD",
+      "current": 7719,
+      "next": 7766,
+      "remaining": 47,
+      "maintenanceType": 200
+    },
+    {
+      "registration": "HA-DQE",
+      "current": 3388,
+      "next": 3401,
+      "remaining": 13,
+      "maintenanceType": 50
+    }
+  ]
+}

@@ -1,0 +1,5191 @@
+# FlightLogger GraphQL-séma (introspekció, 2026-11-12T07:04:36.546Z)
+
+schema {
+  query: Queries
+  mutation: Mutations
+}
+
+"""The FlightLogger account scoped by the API key."""
+type Account {
+  company: String!
+  country: String
+  countryCode: String
+  disabled: Boolean!
+
+  """The URL of the account logo, if present."""
+  logoUrl: String
+  moneyLocale: String
+  subdomain: String!
+}
+
+input AccountTransactionTypeDescriptionInput {
+  """
+  The unique identifier of the transaction type. Must be provided if freeText is not provided.
+  """
+  transactionTypeId: Id
+
+  """
+  A free-text description of the transaction type. Must be provided if transactionTypeId is not provided.
+  """
+  freeText: String
+}
+
+"""Represents a transfer of credit in the accounting module."""
+type AccountingTransaction implements Auditable {
+  audit: AuditInfo
+
+  """The remaining balance after this transaction."""
+  balanceCents: BigInt
+
+  """The currency of the account balance."""
+  balanceCurrency: String
+  comment: String
+  createdAt: DateTime!
+  externalReference: String
+  id: Id!
+
+  """The amount of credit charged."""
+  priceCents: BigInt
+
+  """The currency of the credit transfer."""
+  priceCurrency: String
+
+  """The unique identifier of the transaction."""
+  transactionId: Int!
+
+  """The type/category of the transaction."""
+  transactionType: String
+}
+
+"""The connection type for AccountingTransaction."""
+type AccountingTransactionConnection {
+  """A list of edges."""
+  edges: [AccountingTransactionEdge]
+
+  """A list of nodes."""
+  nodes: [AccountingTransaction]
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type AccountingTransactionEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+
+  """The item at the end of the edge."""
+  node: AccountingTransaction
+}
+
+"""
+A valid transaction type for creating accounting transactions (e.g. Cash Payment, Wire Transfer).
+"""
+type AccountingTransactionType {
+  cents: BigInt!
+  currency: String!
+  description: String
+  id: Id!
+}
+
+"""An aircraft."""
+type Aircraft implements Auditable {
+  """The classification of the aircraft."""
+  aircraftClass: AircraftClassEnum!
+  aircraftType: AircraftTypeEnum!
+  asymmetricTimeEnabled: Boolean
+  audit: AuditInfo
+  auprtTimeEnabled: Boolean
+
+  """Aircraft availability events in a given span of time."""
+  availabilities(
+    """
+    If provided, will only fetch events beginning after this point in time. Defaults to beginning of current day.
+    """
+    from: DateTime
+
+    """
+    If provided, will only fetch events ending before this point in time. Defaults to end of day of `from` time.
+    """
+    to: DateTime
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): AircraftAvailabilityConnection!
+  callSign: String!
+  currentAirport: Airport
+
+  """The current location of the aircraft."""
+  currentLocation: CurrentLocation!
+
+  """Default simulated engine type. Applies only to simulators."""
+  defaultEngineType: EngineTypeEnum
+
+  """The default PM/PF value. Null if PM/PF is not enabled."""
+  defaultPMF: PmfTypeEnum
+  disabled: Boolean!
+
+  """The flights performed by the aircraft."""
+  flights(
+    """
+    If provided, finds only entries beginning after the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    from: DateTime
+
+    """
+    If provided, finds only entries ending before the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    to: DateTime
+
+    """
+    If provided, finds only entries created or updated after this date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    changedAfter: DateTime
+
+    """
+    If true, will also resolve resources that the requesting user is not associated with, provided they have permission.
+    """
+    all: Boolean
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): FlightConnection!
+  floatTimeEnabled: Boolean
+
+  """Null for simulators."""
+  fuelCoefficient: Float
+
+  """
+  Volumetric measurement unit used for the fuel of the aircraft. Null for simulators.
+  """
+  fuelCoefficientMeasurement: FuelMeasurementUnitEnum
+
+  """
+  Flight time measurement basis used in fuel coefficient calculations. Null for simulators.
+  """
+  fuelCoefficientUnit: FuelCoefficientBasisEnum
+  homeAirport: Airport
+  id: Id!
+  instrumentTimeEnabled: Boolean
+
+  """The maintenance parts of the aircraft."""
+  maintenanceParts(
+    """
+    If provided, will only provide maintenance parts with a matching status.
+    """
+    status: [MaintenancePartStatusEnum!]
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): MaintenancePartConnection!
+
+  """The aircraft model-number."""
+  model: String!
+  nextService: ServiceSummary
+
+  """Will only be null if the requesting user is not allowed to read it."""
+  primaryLog: FlightLogConfiguration
+  secondaryLog: FlightLogConfiguration
+
+  """
+  Default taxi in time, in minutes. Null if taxi times are not enabled for the aircraft.
+  """
+  taxiInTime: Int @deprecated(reason: "Use `flightLogConfiguration` instead.")
+
+  """
+  Default taxi out time, in minutes. Null if taxi times are not enabled for the aircraft.
+  """
+  taxiOutTime: Int @deprecated(reason: "Use `flightLogConfiguration` instead.")
+  tertiaryLog: FlightLogConfiguration
+
+  """
+  Current value of the aircraft timer. Null if timer is not enabled for the aircraft.
+  """
+  timerSeconds: Int @deprecated(reason: "Use `flightLogConfiguration` instead.")
+
+  """The total airborne time of the aircraft, in minutes."""
+  totalAirborneMinutes: Int @deprecated(reason: "Use `flightLogConfiguration` instead.")
+
+  """
+  Current fuel of the aircraft. Unit of measurement matches fuel coefficient unit. Null for simulators.
+  """
+  totalFuel: Float
+
+  """
+  The total amount of landings performed by the aircraft. Null for simulators.
+  """
+  totalLandings: Int
+
+  """
+  Method of air time capture used by the aircraft. Null if timer is not enabled for the aircraft.
+  """
+  typeOfTimer: FlightTimerEnum @deprecated(reason: "Use `flightLogConfiguration` instead.")
+
+  """
+  Time measurement unit for the aircraft timer. Null if timer is not enabled for the aircraft.
+  """
+  typeOfTimerMeasurement: DurationFormatEnum @deprecated(reason: "Use `flightLogConfiguration` instead.")
+  worstMaintenanceWarning: MaintenanceWarning
+  worstWarning: MaintenanceWarning @deprecated(reason: "Use `worstMaintenanceWarning` instead.")
+}
+
+"""
+An aircraft availability event. Indicates the availability of an aircraft in a certain timespan.
+"""
+type AircraftAvailability {
+  endsAt: DateTime!
+  startsAt: DateTime!
+}
+
+"""The connection type for AircraftAvailability."""
+type AircraftAvailabilityConnection {
+  """A list of edges."""
+  edges: [AircraftAvailabilityEdge]
+
+  """A list of nodes."""
+  nodes: [AircraftAvailability]
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type AircraftAvailabilityEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+
+  """The item at the end of the edge."""
+  node: AircraftAvailability
+}
+
+"""Fields common to all bookings tied to aircraft."""
+interface AircraftBooking {
+  """Will only be null if the requesting user is not allowed to read it."""
+  aircraft: Aircraft
+  arrivalAirport: Airport
+  departureAirport: Airport
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  flightEndsAt: DateTime!
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  flightStartsAt: DateTime!
+}
+
+"""Aircraft engine class."""
+enum AircraftClassEnum {
+  SINGLE_ENGINE
+  MULTI_ENGINE
+  SIMULATOR
+}
+
+"""The connection type for Aircraft."""
+type AircraftConnection {
+  """A list of edges."""
+  edges: [AircraftEdge]
+
+  """A list of nodes."""
+  nodes: [Aircraft]
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type AircraftEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+
+  """The item at the end of the edge."""
+  node: Aircraft
+}
+
+"""Aircraft/vessel type."""
+enum AircraftTypeEnum {
+  AIRPLANE
+  HELICOPTER
+}
+
+"""An airport."""
+type Airport implements Auditable {
+  audit: AuditInfo
+
+  """
+  The ICAO code of the connected airport. Null if no airport is connected.
+  """
+  icaoCode: String
+  id: Id!
+
+  """The name given to the airport."""
+  name: String!
+}
+
+"""A file attached to another entity."""
+type Attachment implements Auditable {
+  audit: AuditInfo
+
+  """The name of the underlying file."""
+  fileName: String!
+
+  """The file type of the underlying file."""
+  fileType: String
+
+  """Address used to retrieve the underlying file."""
+  fileUrl: String
+  id: String!
+}
+
+input AttachmentInput {
+  id: String
+  isRemoved: Boolean
+  filename: String!
+  fileUrl: String!
+}
+
+"""Represents a user's attendance as part of a theory registration."""
+enum AttendanceStatusEnum {
+  ATTENDED
+  DID_NOT_ATTEND
+  PARTIALLY_ATTENDED
+  NOT_STARTED
+}
+
+"""
+Fields pertaining to auditing (modification history tracking) of an entity.
+"""
+type AuditInfo {
+  """Expects a date-time to be specified in ISO 8610 format."""
+  createdAt: DateTime
+  createdById: Id
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  updatedAt: DateTime
+  updatedById: Id
+}
+
+"""
+An entity whose modification and creation times/instigators are tracked.
+"""
+interface Auditable {
+  audit: AuditInfo
+}
+
+"""
+Represents non-fractional signed whole numeric values. Since the value may exceed the size of a 32-bit integer, it's encoded as a string.
+"""
+scalar BigInt
+
+"""Fields common to all booking types."""
+interface Booking {
+  """The color of the booking (If not present we use default colors)."""
+  color: String
+  comment: String
+
+  """
+  Whether or not email notifications will be sent to participants when changes are made to the booking.
+  """
+  emailNotifications: Boolean!
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  endsAt: DateTime!
+
+  """
+  External reference supplied by external systems/sources for their own tracking.
+  """
+  externalReference: String
+  id: String!
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  startsAt: DateTime!
+
+  """The current lifecycle status of the booking."""
+  status: BookingStatusEnum!
+}
+
+"""A cancellation of a booking, stating the reasoning why."""
+type BookingCancellation implements Auditable {
+  audit: AuditInfo
+  booking: BookingUnion!
+  comment: String
+  id: String!
+  title: String!
+  user: User
+}
+
+"""The current state of the bookings' lifecycle"""
+enum BookingStatusEnum {
+  CANCELLED
+  OPEN
+  COMPLETED
+  PARTIALLY_COMPLETED
+}
+
+enum BookingSubtypeEnum {
+  OPERATION
+  MULTI_STUDENT
+  SINGLE_STUDENT
+  MAINTENANCE
+  MEETING
+  PROGRESS_TEST
+  RENTAL
+  EXTRA_THEORY
+  EXAM
+  CLASS_THEORY
+  THEORY_RELEASE
+  TYPE_QUESTIONNAIRE
+}
+
+"""Represents specific booking subtypes."""
+union BookingUnion = ClassTheoryBooking | ExamBooking | ExtraTheoryBooking | MaintenanceBooking | MeetingBooking | MultiStudentBooking | OperationBooking | ProgressTestBooking | RentalBooking | SingleStudentBooking | TheoryReleaseBooking | TypeQuestionnaireBooking
+
+"""The connection type for BookingUnion."""
+type BookingUnionConnection {
+  """A list of edges."""
+  edges: [BookingUnionEdge]
+
+  """A list of nodes."""
+  nodes: [BookingUnion]
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type BookingUnionEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+
+  """The item at the end of the edge."""
+  node: BookingUnion
+}
+
+input BulkLogbookEntryInput {
+  id: ID
+
+  """ISO 8610"""
+  offBlock: DateTime!
+  typeOfAircraft: String
+  registration: String
+  nightSeconds: Int
+  daySeconds: Int
+  landingsDay: Int
+  landingsNight: Int
+  nameOfPilotInCommand: String
+  multiPilotSeconds: Int
+  flightInstructorSeconds: Int
+  dualSeconds: Int
+  pilotInCommandSeconds: Int
+  syntheticTrainingSeconds: Int
+  instructorSyntheticTrainingSeconds: Int
+  coPilotSeconds: Int
+  singleEngineVfrSeconds: Int
+  singleEngineIfrSeconds: Int
+  multiEngineVfrSeconds: Int
+  multiEngineIfrSeconds: Int
+  ifTimeSeconds: Int
+  remarksAndEndorsements: String
+  documents: [AttachmentInput!]
+}
+
+"""A class with a cohort of students."""
+type Class implements Auditable {
+  audit: AuditInfo
+  id: String!
+  name: String!
+  users: [User]!
+}
+
+"""The connection type for Class."""
+type ClassConnection {
+  """A list of edges."""
+  edges: [ClassEdge]
+
+  """A list of nodes."""
+  nodes: [Class]
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type ClassEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+
+  """The item at the end of the edge."""
+  node: Class
+}
+
+"""A class theory registration."""
+type ClassTheory implements Auditable & Theory {
+  attachments: [Attachment]
+  audit: AuditInfo
+  booking: ClassTheoryBooking
+  class: Class
+  comment: String
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  endsAt: DateTime
+
+  """Only present if an expense invoice is filled."""
+  expensesInvoiceNumber: String
+
+  """Will only be null if the requesting user is not allowed to read it."""
+  groundTrainingSubject: SubjectCategory
+  id: String!
+
+  """Will only be null if the requesting user is not allowed to read."""
+  instructor: User
+  participations: [TheoryParticipation]!
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  startsAt: DateTime!
+  subject: String
+
+  """Will only be null if the requesting user is not allowed to read it."""
+  subjectCategory: SubjectCategory @deprecated(reason: "Renamed to `groundTrainingSubject`")
+}
+
+"""A booking for a class theory."""
+type ClassTheoryBooking implements Auditable & Booking & GroundBooking & TheoryBooking {
+  audit: AuditInfo
+  class: Class
+
+  """
+  The location (i.e. classroom) in which the booking will take place. Will only be null if the requesting user is not allowed to read it.
+  """
+  classroom: Classroom
+
+  """The color of the booking (If not present we use default colors)."""
+  color: String
+  comment: String
+
+  """
+  Whether or not email notifications will be sent to participants when changes are made to the booking.
+  """
+  emailNotifications: Boolean!
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  endsAt: DateTime!
+
+  """
+  External reference supplied by external systems/sources for their own tracking.
+  """
+  externalReference: String
+  id: String!
+
+  """
+  The instructor/examiner slated to oversee the booking. Will only be null if the requesting user is not allowed to read it.
+  """
+  instructor: User
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  startsAt: DateTime!
+
+  """The current lifecycle status of the booking."""
+  status: BookingStatusEnum!
+
+  """Students slated to participate in the activity."""
+  students: [User]!
+
+  """The subject or name of the theoretical activity."""
+  subject: String
+
+  """Will only be null if the requesting user is not allowed to read it."""
+  theoryCourse: TheoryCourse
+}
+
+input ClassTheoryBookingInput {
+  bookingStart: DateTime!
+  bookingEnd: DateTime!
+  comment: String
+  notifyViaEmail: Boolean
+  recurrenceRule: String
+  color: String
+
+  """
+  When true, the booking is created as "Awaiting Approval" even if the caller has approval rights. Defaults to false (auto-approved when the caller has the approve ability).
+  """
+  awaitingApproval: Boolean
+
+  """
+  External reference supplied by external systems/sources for their own tracking.
+  """
+  externalReference: String
+  classroomId: ID!
+  instructorById: ID!
+  theoryCourse: ID
+  programId: ID
+  subjectCategoryId: ID!
+  theoryLessonId: ID
+  programRevisionId: ID
+  subject: String
+  teamId: ID
+  studentsById: [StudentInput!]
+}
+
+"""The connection type for ClassTheory."""
+type ClassTheoryConnection {
+  """A list of edges."""
+  edges: [ClassTheoryEdge]
+
+  """A list of nodes."""
+  nodes: [ClassTheory]
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type ClassTheoryEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+
+  """The item at the end of the edge."""
+  node: ClassTheory
+}
+
+"""
+A ground school location (usually a classroom, briefing room, conference room, etc.).
+"""
+type Classroom implements Auditable {
+  audit: AuditInfo
+
+  """The current location of the classroom."""
+  currentLocation: CurrentLocation!
+  id: Id!
+  name: String!
+}
+
+"""The connection type for Classroom."""
+type ClassroomConnection {
+  """A list of edges."""
+  edges: [ClassroomEdge]
+
+  """A list of nodes."""
+  nodes: [Classroom]
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type ClassroomEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+
+  """The item at the end of the edge."""
+  node: Classroom
+}
+
+"""The current location of an aircraft, classroom, student or instructor."""
+type CurrentLocation {
+  """The airport. Null when `kind` is `ALL_LOCATIONS`."""
+  airport: Airport
+  kind: LocationKindEnum!
+}
+
+"""A customer. Used during operations."""
+type Customer implements Auditable {
+  address: String
+  audit: AuditInfo
+  city: String
+  company: String
+  country: String
+  email: String
+  fullName: String
+  id: String!
+
+  """A short representation of the name of the customer."""
+  name: String!
+  phone: String
+  reference: String
+  zipCode: String
+}
+
+"""The connection type for Customer."""
+type CustomerConnection {
+  """A list of edges."""
+  edges: [CustomerEdge]
+
+  """A list of nodes."""
+  nodes: [Customer]
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type CustomerEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+
+  """The item at the end of the edge."""
+  node: Customer
+}
+
+input CustomerInput {
+  """Company name. Either company or fullName must be provided."""
+  company: String
+
+  """Contact full name. Either fullName or company must be provided."""
+  fullName: String
+
+  """Customer email address."""
+  email: String
+
+  """Customer phone number."""
+  phone: String
+
+  """Street address."""
+  address: String
+
+  """Postal or ZIP code."""
+  zipCode: String
+
+  """City name."""
+  city: String
+
+  """Country name or ISO alpha-2 code."""
+  country: String
+
+  """
+  External reference. Used to identify the customer in external systems/sources.
+  """
+  reference: String
+}
+
+"""An ISO 8601-encoded date"""
+scalar Date
+
+"""An ISO 8601-encoded datetime"""
+scalar DateTime
+
+"""Represents the deletion of an entity."""
+type Deletion implements VersionEvent {
+  """The id of the entity."""
+  entityId: Id!
+
+  """The type of the entity."""
+  entityType: VersionableEntityEnum!
+
+  """The type of versioning that took place."""
+  eventType: VersionEventTypeEnum!
+
+  """
+  The point in time at which the event took place. Expects a date-time to be specified in ISO 8610 format.
+  """
+  happenedAt: DateTime!
+
+  """The instigator of the event."""
+  whoDoneIt: User
+}
+
+"""Format of a duration of time."""
+enum DurationFormatEnum {
+  """
+  Decimal number of hours representation with 2 decimal places. Example: 2.25 (2 hours and 15 minutes)
+  """
+  LONG_DECIMAL_HOURS
+
+  """
+  Decimal number of hours representation with 1 decimal place. Example: 2.2 (2 hours and 12 minutes)
+  """
+  DECIMAL_HOURS
+
+  """Digital clock representation. Example: 2:15 (2 hours and 15 minutes)"""
+  HOURS_MINUTES
+}
+
+"""A duty time registration."""
+type DutyTime implements Auditable {
+  audit: AuditInfo
+  comment: String
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  endsAt: DateTime!
+
+  """Only present if an expense invoice is filled."""
+  expensesInvoiceNumber: String
+  id: Id!
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  startsAt: DateTime!
+  state: DutyTimeStateEnum!
+
+  """Will only be null if the requesting user is not allowed to read it."""
+  user: User
+}
+
+"""The connection type for DutyTime."""
+type DutyTimeConnection {
+  """A list of edges."""
+  edges: [DutyTimeEdge]
+
+  """A list of nodes."""
+  nodes: [DutyTime]
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type DutyTimeEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+
+  """The item at the end of the edge."""
+  node: DutyTime
+}
+
+enum DutyTimeStateEnum {
+  DRAFT
+  AWAITS_APPROVAL
+  FINALIZED
+}
+
+input EmergencyInput {
+  """"""
+  firstName: String
+
+  """"""
+  lastName: String
+
+  """"""
+  email: String
+
+  """"""
+  phone: String
+
+  """"""
+  address: String
+
+  """"""
+  postCode: String
+
+  """"""
+  city: String
+
+  """"""
+  country: String
+
+  """"""
+  relationShip: String
+}
+
+"""Engine type."""
+enum EngineTypeEnum {
+  SINGLE_ENGINE
+  MULTI_ENGINE
+}
+
+"""An exam registration."""
+type Exam implements Auditable & Theory {
+  attachments: [Attachment]
+  audit: AuditInfo
+  booking: ExamBooking
+  class: Class
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  endsAt: DateTime
+
+  """Will only be null if the requesting user is not allowed to read."""
+  examiner: User
+
+  """Only present if an expense invoice is filled."""
+  expensesInvoiceNumber: String
+
+  """Will only be null if the requesting user is not allowed to read it."""
+  groundTrainingSubject: SubjectCategory
+  id: Id!
+  participations: [ExamParticipation]!
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  startsAt: DateTime!
+
+  """Will only be null if the requesting user is not allowed to read it."""
+  subjectCategory: SubjectCategory @deprecated(reason: "Renamed to `groundTrainingSubject`")
+}
+
+"""A booking for an exam."""
+type ExamBooking implements Auditable & Booking & GroundBooking & TheoryBooking {
+  audit: AuditInfo
+  class: Class
+
+  """
+  The location (i.e. classroom) in which the booking will take place. Will only be null if the requesting user is not allowed to read it.
+  """
+  classroom: Classroom
+
+  """The color of the booking (If not present we use default colors)."""
+  color: String
+  comment: String
+
+  """
+  Whether or not email notifications will be sent to participants when changes are made to the booking.
+  """
+  emailNotifications: Boolean!
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  endsAt: DateTime!
+
+  """
+  External reference supplied by external systems/sources for their own tracking.
+  """
+  externalReference: String
+  id: String!
+
+  """
+  The instructor/examiner slated to oversee the booking. Will only be null if the requesting user is not allowed to read it.
+  """
+  instructor: User
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  startsAt: DateTime!
+
+  """The current lifecycle status of the booking."""
+  status: BookingStatusEnum!
+
+  """Students slated to participate in the activity."""
+  students: [User]!
+
+  """The subject or name of the theoretical activity."""
+  subject: String
+
+  """Will only be null if the requesting user is not allowed to read it."""
+  theoryCourse: TheoryCourse
+}
+
+input ExamBookingInput {
+  bookingStart: DateTime!
+  bookingEnd: DateTime!
+  comment: String
+  notifyViaEmail: Boolean
+  recurrenceRule: String
+  color: String
+
+  """
+  When true, the booking is created as "Awaiting Approval" even if the caller has approval rights. Defaults to false (auto-approved when the caller has the approve ability).
+  """
+  awaitingApproval: Boolean
+
+  """
+  External reference supplied by external systems/sources for their own tracking.
+  """
+  externalReference: String
+  classroomId: ID!
+  instructorById: ID!
+  theoryCourse: ID
+  programId: ID
+  subjectCategoryId: ID!
+  theoryLessonId: ID
+  programRevisionId: ID
+  subject: String
+  teamId: ID
+  studentsById: [StudentInput!]
+}
+
+"""The connection type for Exam."""
+type ExamConnection {
+  """A list of edges."""
+  edges: [ExamEdge]
+
+  """A list of nodes."""
+  nodes: [Exam]
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type ExamEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+
+  """The item at the end of the edge."""
+  node: Exam
+}
+
+"""Represents a students participation in an exam."""
+type ExamParticipation implements Auditable {
+  attendanceStatus: AttendanceStatusEnum!
+
+  """
+  Actual attended classroom hours (in seconds) for this participation. Zero if did_not_attend.
+  """
+  attendedSeconds: Int
+  audit: AuditInfo
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  endsAt: DateTime
+
+  """The grade given to the participant. Not applicable to class theories."""
+  grade: String
+  id: String!
+
+  """Only present if an income invoice is filled."""
+  incomeInvoiceNumber: String
+  referenceNumber: String
+  sitting: Sitting
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  startsAt: DateTime
+
+  """Comment given by the student. Not applicable to exams."""
+  studentComment: String
+  user: User
+}
+
+"""A type of report"""
+enum ExportTypeEnum {
+  PDF
+  CSV
+}
+
+"""An extra theory registration."""
+type ExtraTheory implements Auditable {
+  attachments: [Attachment]!
+  audit: AuditInfo
+  booking: ExtraTheoryBooking
+  description: String
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  endsAt: DateTime!
+
+  """Only present if an expense invoice is filled."""
+  expensesInvoiceNumber: String
+  id: Id!
+
+  """Only present if an income invoice is filled."""
+  incomeInvoiceNumber: String
+
+  """Will only be null if the requesting user is not allowed to read."""
+  instructor: User
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  startsAt: DateTime!
+
+  """Will only be null if the requesting user is not allowed to read it."""
+  user: User
+}
+
+"""A booking for an extra theory lesson."""
+type ExtraTheoryBooking implements Auditable & Booking & GroundBooking {
+  audit: AuditInfo
+
+  """
+  The location (i.e. classroom) in which the booking will take place. Will only be null if the requesting user is not allowed to read it.
+  """
+  classroom: Classroom
+
+  """The color of the booking (If not present we use default colors)."""
+  color: String
+  comment: String
+
+  """
+  Whether or not email notifications will be sent to participants when changes are made to the booking.
+  """
+  emailNotifications: Boolean!
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  endsAt: DateTime!
+
+  """
+  External reference supplied by external systems/sources for their own tracking.
+  """
+  externalReference: String
+  id: String!
+
+  """Will only be null if the requesting user is not allowed to read it."""
+  instructor: User
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  startsAt: DateTime!
+
+  """The current lifecycle status of the booking."""
+  status: BookingStatusEnum!
+
+  """Will only be null if the requesting user is not allowed to read it."""
+  student: User
+}
+
+input ExtraTheoryBookingInput {
+  bookingStart: DateTime!
+  bookingEnd: DateTime!
+  comment: String
+  notifyViaEmail: Boolean
+  recurrenceRule: String
+  color: String
+
+  """
+  When true, the booking is created as "Awaiting Approval" even if the caller has approval rights. Defaults to false (auto-approved when the caller has the approve ability).
+  """
+  awaitingApproval: Boolean
+
+  """
+  External reference supplied by external systems/sources for their own tracking.
+  """
+  externalReference: String
+  classroomId: ID!
+  instructorById: ID!
+  studentById: StudentInput!
+  programRevisionId: ID!
+}
+
+"""The connection type for ExtraTheory."""
+type ExtraTheoryConnection {
+  """A list of edges."""
+  edges: [ExtraTheoryEdge]
+
+  """A list of nodes."""
+  nodes: [ExtraTheory]
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type ExtraTheoryEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+
+  """The item at the end of the edge."""
+  node: ExtraTheory
+}
+
+"""A flight registration."""
+type Flight implements Auditable {
+  """Account transactions incurred by the flight."""
+  accountingTransactions: [AccountingTransaction]
+
+  """
+  The specific activity registration associated with the flight (e.g. training, rental, operation, etc.)
+  """
+  activityRegistration: FlightRegistration
+
+  """The aircraft performing the flight."""
+  aircraft: Aircraft
+
+  """
+  The airport registered at the arrival of the flight. Will always be present for a non-simulator flight.
+  """
+  arrivalAirport: Airport
+  atSeconds: Int!
+  audit: AuditInfo
+  auprtSeconds: Int!
+
+  """
+  Uses the planes fuel coefficient and unit to determine the fuel usage of the flight. Unit of measurement matches that of the aircraft.
+  """
+  calculatedFuelUsage: String
+  crossCountrySeconds: Int!
+  daySeconds: Int!
+
+  """
+  The airport registered at the departure of the flight. Will always be present for a non-simulator flight.
+  """
+  departureAirport: Airport
+
+  """
+  The total fuel before flight. Unit of measurement matches that of the aircraft.
+  """
+  departureFuel: String
+
+  """
+  The amount of fuel added before the flight. Unit of measurement matches that of the aircraft.
+  """
+  departureFuelAdded: String
+
+  """
+  The amount of oil added before the flight. Unit of measurement matches that of the aircraft.
+  """
+  departureOilAdded: String
+
+  """
+  The amount of oil added to the right engine before the flight. Unit of measurement matches that of the aircraft engine.
+  """
+  departureOilAddedTwo: String
+
+  """Only present if an expense invoice is filled."""
+  expensesInvoiceNumber: String
+  flightType: FlightTypeEnum
+  ftSeconds: Int!
+  id: Id!
+  ifSeconds: Int!
+  ifrSeconds: Int!
+
+  """Only present if an income invoice is filled."""
+  incomeInvoiceNumber: String
+
+  """
+  The point in time at which the aircraft landed. Expects a date-time to be specified in ISO 8610 format.
+  """
+  landing: DateTime @deprecated(reason: "Use `flightLog` instead.")
+
+  """The landing(s) performed during the flight."""
+  landings: [Landing]
+  localSeconds: Int!
+  nightSeconds: Int!
+
+  """
+  The point in time of the beginning of the off-block portion of the flight. Expects a date-time to be specified in ISO 8610 format.
+  """
+  offBlock: DateTime! @deprecated(reason: "Use `flightLog` instead.")
+
+  """
+  The point in time of the beginning of the on-block portion of the flight. Expects a date-time to be specified in ISO 8610 format.
+  """
+  onBlock: DateTime! @deprecated(reason: "Use `flightLog` instead.")
+  pilotFlyingSeconds: Int!
+  pilotMonitoringSeconds: Int!
+
+  """Will only be null if the requesting user is not allowed to read it."""
+  primaryLog: FlightLog
+  secondaryLog: FlightLog
+
+  """
+  The point in time at which the aircraft took off. Expects a date-time to be specified in ISO 8610 format.
+  """
+  takeoff: DateTime @deprecated(reason: "Use `flightLog` instead.")
+  tertiaryLog: FlightLog
+
+  """
+  The timer value at the end of the flight. Will never be null if the aircraft uses timer.
+  """
+  timerFinishSeconds: Int @deprecated(reason: "Use `flightLog` instead.")
+
+  """
+  The timer value at the beginning of the flight. Will never be null if the aircraft uses timer.
+  """
+  timerStartSeconds: Int @deprecated(reason: "Use `flightLog` instead.")
+  vfrSeconds: Int!
+}
+
+"""The connection type for Flight."""
+type FlightConnection {
+  """A list of edges."""
+  edges: [FlightEdge]
+
+  """A list of nodes."""
+  nodes: [Flight]
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type FlightEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+
+  """The item at the end of the edge."""
+  node: Flight
+}
+
+"""A log registration."""
+type FlightLog {
+  """The duration of the log, in seconds."""
+  durationSeconds: Int!
+
+  """
+  The point in time of the end of the log. Expects a date-time to be specified in ISO 8610 format. Will be null if the log measurement type is decimal.
+  """
+  endsAt: DateTime
+
+  """
+  The timer value at the end of the log. Will be null if the log measurement type is hours minutes.
+  """
+  finishSeconds: Int
+
+  """The flying duration in seconds."""
+  flyingDurationSeconds: Int!
+
+  """The id of the log."""
+  id: Id!
+
+  """
+  The timer value at the beginning of the log. Will be null if the log measurement type is hours minutes.
+  """
+  startSeconds: Int
+
+  """
+  The point in time of the beginning of the log. Expects a date-time to be specified in ISO 8610 format. Will be null if the log measurement type is decimal and not primary log.
+  """
+  startsAt: DateTime
+
+  """The type of log."""
+  type: FlightTimerEnum!
+}
+
+"""A log configuration."""
+type FlightLogConfiguration {
+  """Whether or not the log has action buttons."""
+  actionButtonsIsEnabled: Boolean!
+
+  """The percentage of the log duration that will trigger a warning."""
+  durationWarningPercent: Int
+
+  """The id of the log."""
+  id: Id!
+
+  """The type of measurement used for the log."""
+  measurementType: LogMeasurementEnum!
+
+  """The end of the offset warning."""
+  offsetWarningSecondsEnd: Int
+
+  """The start of the offset warning."""
+  offsetWarningSecondsStart: Int
+
+  """Whether or not the log is pre-filled."""
+  prefillIsEnabled: Boolean!
+
+  """The total seconds of the log."""
+  totalSeconds: Int!
+
+  """The type of log."""
+  type: FlightTimerEnum!
+}
+
+"""Represents something that has flights."""
+interface FlightRegistration {
+  asymmetricSeconds: Int!
+  crossCountrySeconds: Int!
+  flights: [Flight]!
+  floatSeconds: Int!
+  id: Id!
+  ifrDualSeconds: Int!
+  ifrSimSeconds: Int!
+  ifrSpicSeconds: Int!
+  instrumentSeconds: Int!
+  multiSeconds: Int!
+  nightSeconds: Int!
+  pilotFlyingSeconds: Int!
+  pilotMonitoringSeconds: Int!
+  singleSeconds: Int!
+  totalSeconds: Int!
+  vfrDualSeconds: Int!
+  vfrSimSeconds: Int!
+  vfrSoloSeconds: Int!
+  vfrSpicSeconds: Int!
+}
+
+"""Flight time measurement method."""
+enum FlightTimerEnum {
+  AIRSWITCH
+  HOBBS
+  TACH
+  VDO
+  DATCON
+  EDU
+  FLIGHT_TIME
+  BLOCK
+  AIRBORNE
+  HEATER_HOBBS
+}
+
+"""Represents the tracking status of a flight."""
+type FlightTrack {
+  """The UUID of the flight."""
+  flightUuid: String
+
+  """The status of the flight track."""
+  status: FlightTrackStatusEnum!
+}
+
+"""Aircraft engine class."""
+enum FlightTrackStatusEnum {
+  COMPLETED
+  UNCOMPLETED
+}
+
+"""Type of flight."""
+enum FlightTypeEnum {
+  DUAL
+  SPIC
+  SIM
+  SOLO
+}
+
+"""Flight time measurement basis used in fuel coefficient calculations."""
+enum FuelCoefficientBasisEnum {
+  AIRSWITCH
+  HOBBS
+  TACH
+  VDO
+  DATCON
+  EDU
+  FLIGHT_TIME
+  BLOCK
+  AIRBORNE
+  HEATER_HOBBS
+}
+
+"""Unit of measurement for fuel."""
+enum FuelMeasurementUnitEnum {
+  LITERS
+  USG
+}
+
+"""Gender options for a user."""
+enum GenderEnum {
+  UNKNOWN
+  FEMALE
+  MALE
+  OTHER
+  PREFER_NOT_TO_SAY
+}
+
+"""Gender input options for a user."""
+enum GenderInputEnum {
+  FEMALE
+  MALE
+  OTHER
+  PREFER_NOT_TO_SAY
+}
+
+type GradedCompetency {
+  coreCompetencyName: String
+  grade: String
+  gradedIndicators: [GradedIndicator]
+  id: String!
+  normGrade: String
+}
+
+type GradedIndicator {
+  id: String!
+  performanceIndicatorName: String!
+}
+
+"""
+Fields common to all bookings tied to ground resources (i.e. classrooms).
+"""
+interface GroundBooking {
+  """
+  The location (i.e. classroom) in which the booking will take place. Will only be null if the requesting user is not allowed to read it.
+  """
+  classroom: Classroom
+}
+
+"""An unique identifier"""
+scalar Id
+
+"""A landing done as part of a `Flight`."""
+type Landing implements Auditable {
+  """
+  The airport at which the landing took place. Will only be null if the requesting user is not allowed to read it.
+  """
+  airport: Airport
+  audit: AuditInfo
+  id: Id!
+
+  """True if the landing is the last landing (arrival)."""
+  isArrival: Boolean!
+  landingType: LandingTypeEnum!
+  landingTypeCount: Int!
+  nightLanding: Boolean!
+}
+
+enum LandingTypeEnum {
+  APPROACH
+  TOUCH_AND_GO
+  LANDING
+  GO_AROUND
+}
+
+"""
+A lecture/lesson on a program. Not to be confused with a `Training`, which is a completed lecture/lesson registration.
+"""
+type Lecture implements Auditable {
+  audit: AuditInfo
+  auprtMinutes: Int!
+
+  """The duration of the briefing, in minutes."""
+  briefingMinutes: Int!
+  crossCountryMinutes: Int!
+
+  """The duration of the de-briefing, in minutes."""
+  debriefingMinutes: Int!
+  id: Id!
+  ifrDualMinutes: Int!
+  ifrSimMinutes: Int!
+  ifrSpicMinutes: Int!
+  instrumentFlightMinutes: Int!
+  lessonCategory: LessonCategoryEnum!
+  multiEngineMinutes: Int!
+  name: String!
+  nightMinutes: Int!
+  pilotFlyingMinutes: Int!
+  pilotMonitoringMinutes: Int!
+
+  """Will only be null if the requesting user is not allowed to read it."""
+  programPhase: ProgramPhase
+  vfrDualMinutes: Int!
+  vfrSimMinutes: Int!
+  vfrSoloMinutes: Int!
+  vfrSpicMinutes: Int!
+}
+
+"""The category/type of a lesson within a flight training program."""
+enum LessonCategoryEnum {
+  FLIGHT_LESSON
+  STAGE_CHECK
+  FINAL_STAGE_CHECK
+  OFFICIAL_SKILL_TEST
+  PROFICIENCY_CHECK
+}
+
+"""The kind of current location."""
+enum LocationKindEnum {
+  """At one airport."""
+  AIRPORT
+
+  """Not tied to one airport, shown as All locations in FlightLogger."""
+  ALL_LOCATIONS
+}
+
+"""Format of a duration of time."""
+enum LogMeasurementEnum {
+  """
+  Decimal number of hours representation with 2 decimal places. Example: 2.25 (2 hours and 15 minutes)
+  """
+  LONG_DECIMAL_HOURS
+
+  """
+  Decimal number of hours representation with 1 decimal place. Example: 2.2 (2 hours and 12 minutes)
+  """
+  DECIMAL_HOURS
+
+  """Digital clock representation. Example: 2:15 (2 hours and 15 minutes)"""
+  HOURS_MINUTES
+
+  """Timestamp with date and time. Example: 2023-12-24 13:37"""
+  TIMESTAMP
+}
+
+"""A Logbook"""
+type Logbook {
+  accountCompany: String
+  accountDomain: String
+  arrivalAirportName: String
+  coPilotSeconds: Int
+
+  """Flight time at day."""
+  daySeconds: Int
+  departureAirportName: String
+
+  """
+  Entries will only be null if the requesting user is not allowed to read them.
+  """
+  documents: [MemberAttachment]
+  dualSeconds: Int
+  flightInstructorSeconds: Int
+  id: Id!
+  ifTimeSeconds: Int
+  includeInFtl: Boolean
+  instructorSyntheticTrainingSeconds: Int
+  landingsDay: Int
+  landingsNight: Int
+  multiEngineIfrSeconds: Int
+  multiEngineVfrSeconds: Int
+  multiPilotSeconds: Int
+  nameOfPilotInCommand: String
+
+  """Flight time at night."""
+  nightSeconds: Int
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  offBlock: DateTime!
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  onBlock: DateTime!
+  pilotInCommandSeconds: Int
+  registration: String
+  remarksAndEndorsements: String
+  singleEngineIfrSeconds: Int
+  singleEngineVfrSeconds: Int
+  syntheticTrainingSeconds: Int
+
+  """Total flight time."""
+  totalSeconds: Int
+  typeOfAircraft: String
+}
+
+"""The connection type for Logbook."""
+type LogbookConnection {
+  """A list of edges."""
+  edges: [LogbookEdge]
+
+  """A list of nodes."""
+  nodes: [Logbook]
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type LogbookEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+
+  """The item at the end of the edge."""
+  node: Logbook
+}
+
+input LogbookEntryInput {
+  id: ID
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  offBlock: DateTime!
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  onBlock: DateTime!
+  typeOfAircraft: String!
+  registration: String!
+  remarksAndEndorsements: String
+  nameOfPilotInCommand: String!
+  departureAirportName: String!
+  arrivalAirportName: String!
+  landingsDay: Int
+  landingsNight: Int
+
+  """Flight time at night."""
+  nightSeconds: Int
+  vfrSeconds: Int
+  ifrSeconds: Int
+  pilotInCommandSeconds: Int
+  multiPilotSeconds: Int
+  coPilotSeconds: Int
+  flightInstructorSeconds: Int
+  dualSeconds: Int
+
+  """Total flight time."""
+  totalSeconds: Int!
+  engineType: EngineTypeEnum!
+}
+
+enum LogbookSorter {
+  USER_LOGBOOK_ENTRIES
+}
+
+"""A Logbook"""
+type LogbookSummation {
+  coPilotSeconds: Int
+
+  """Flight time at day."""
+  daySeconds: Int
+  dualSeconds: Int
+  flightInstructorSeconds: Int
+
+  """Float training time in seconds."""
+  floatTimeSeconds: Int
+
+  """Instrumental flight seconds."""
+  ifTimeSeconds: Int
+  instructorSyntheticTrainingSeconds: Int
+  landingsDay: Int
+  landingsNight: Int
+  multiEngineIfrSeconds: Int
+  multiEngineVfrSeconds: Int
+  multiPilotSeconds: Int
+
+  """Flight time at night."""
+  nightSeconds: Int
+  pilotInCommandSeconds: Int
+  singleEngineIfrSeconds: Int
+  singleEngineVfrSeconds: Int
+  syntheticTrainingSeconds: Int
+
+  """Total flight time."""
+  totalSeconds: Int
+}
+
+"""A Maintenance Part Type."""
+type Maintenance implements Auditable {
+  audit: AuditInfo
+  blockable: Boolean!
+  createdAt: DateTime
+  disabled: Boolean
+  expiresOnCycles: Boolean!
+  expiresOnDate: Boolean!
+  expiresOnLog: FlightTimerEnum
+  name: String!
+  requireSerialNumber: Boolean
+  requireUploadOfDocument: Boolean
+  triggerOnLogTime: Boolean
+  updatedAt: DateTime
+}
+
+"""A booking for an aircraft maintenance."""
+type MaintenanceBooking implements AircraftBooking & Auditable & Booking {
+  """Will only be null if the requesting user is not allowed to read it."""
+  aircraft: Aircraft
+  arrivalAirport: Airport
+  audit: AuditInfo
+
+  """The color of the booking (If not present we use default colors)."""
+  color: String
+  comment: String
+  departureAirport: Airport
+
+  """
+  Whether or not email notifications will be sent to participants when changes are made to the booking.
+  """
+  emailNotifications: Boolean!
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  endsAt: DateTime!
+
+  """
+  External reference supplied by external systems/sources for their own tracking.
+  """
+  externalReference: String
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  flightEndsAt: DateTime!
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  flightStartsAt: DateTime!
+  id: String!
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  startsAt: DateTime!
+
+  """The current lifecycle status of the booking."""
+  status: BookingStatusEnum!
+}
+
+input MaintenanceBookingInput {
+  bookingStart: DateTime!
+  bookingEnd: DateTime!
+  comment: String
+  notifyViaEmail: Boolean
+  recurrenceRule: String
+  color: String
+
+  """
+  When true, the booking is created as "Awaiting Approval" even if the caller has approval rights. Defaults to false (auto-approved when the caller has the approve ability).
+  """
+  awaitingApproval: Boolean
+
+  """
+  External reference supplied by external systems/sources for their own tracking.
+  """
+  externalReference: String
+  aircraftId: ID!
+}
+
+"""The connection type for Maintenance."""
+type MaintenanceConnection {
+  """A list of edges."""
+  edges: [MaintenanceEdge]
+
+  """A list of nodes."""
+  nodes: [Maintenance]
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type MaintenanceEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+
+  """The item at the end of the edge."""
+  node: Maintenance
+}
+
+"""A Maintenance Part Type."""
+type MaintenancePart implements Auditable {
+  approvedAt: DateTime
+  approvedBy: User
+  audit: AuditInfo
+  expirationCycles: Int
+  expirationDate: DateTime
+  expirationLogSeconds: Int
+  expiresOnLog: FlightTimerEnum
+  id: Id!
+
+  """Will only be null if the requesting user is not allowed to read it."""
+  maintenanceType: Maintenance
+  name: String!
+
+  """Will only be null if the requesting user is not allowed to read it."""
+  plane: Aircraft
+  rejectedAt: DateTime
+  rejectedBy: User
+  serialNumber: String
+  status: MaintenancePartStatusEnum
+}
+
+"""The connection type for MaintenancePart."""
+type MaintenancePartConnection {
+  """A list of edges."""
+  edges: [MaintenancePartEdge]
+
+  """A list of nodes."""
+  nodes: [MaintenancePart]
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type MaintenancePartEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+
+  """The item at the end of the edge."""
+  node: MaintenancePart
+}
+
+"""
+Fields for a maintenance part. What you must send depends on how that maintenance item is set up in your organization (date, flight time, cycles, serial number, or attachments).
+"""
+input MaintenancePartInput {
+  """Free-text description."""
+  description: String
+
+  """Needed when that maintenance type expects a serial number."""
+  serialNumber: String
+
+  """Your own reference or document number."""
+  referenceNo: String
+
+  """Needed when expiry is based on a calendar date."""
+  expirationDate: Date
+
+  """Needed when expiry is based on aircraft flight time (as seconds)."""
+  expirationLogSeconds: Int
+
+  """Which flight-time meter applies, when expiry is based on flight time."""
+  expiresOnLog: FlightTimerEnum
+
+  """Needed when expiry is based on cycles (e.g. landings)."""
+  expirationCycles: Int
+
+  """Earlier part this one replaces, if applicable."""
+  previousMaintenancePartId: Id
+}
+
+"""Maintenance Part Status Enum"""
+enum MaintenancePartStatusEnum {
+  TO_APPROVAL
+  APPROVED
+  EXPIRED
+}
+
+"""A maintenance warning"""
+type MaintenanceWarning implements Auditable {
+  audit: AuditInfo
+  blockable: Boolean!
+  color: String
+  cyclesLeft: Int
+  daysLeft: Int
+  expiryCycles: String
+  expiryDate: String
+  expiryTime: Int
+  hasDocument: Boolean!
+  id: Id!
+  logMeasurementType: String!
+  logType: String
+  requirers: [String!]!
+  serialNumber: String
+  status: String!
+  subjectName: String!
+  timeLeft: Float
+  typeOfTimer: String
+  typeOfTimerMeasurement: String!
+}
+
+"""A booking for a meeting."""
+type MeetingBooking implements Auditable & Booking & GroundBooking {
+  audit: AuditInfo
+
+  """
+  The location (i.e. classroom) in which the booking will take place. Will only be null if the requesting user is not allowed to read it.
+  """
+  classroom: Classroom
+
+  """The color of the booking (If not present we use default colors)."""
+  color: String
+  comment: String
+
+  """
+  Whether or not email notifications will be sent to participants when changes are made to the booking.
+  """
+  emailNotifications: Boolean!
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  endsAt: DateTime!
+
+  """
+  External reference supplied by external systems/sources for their own tracking.
+  """
+  externalReference: String
+  id: String!
+  participants: [User]!
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  startsAt: DateTime!
+
+  """The current lifecycle status of the booking."""
+  status: BookingStatusEnum!
+}
+
+input MeetingBookingInput {
+  bookingStart: DateTime!
+  bookingEnd: DateTime!
+  comment: String
+  notifyViaEmail: Boolean
+  recurrenceRule: String
+  color: String
+
+  """
+  When true, the booking is created as "Awaiting Approval" even if the caller has approval rights. Defaults to false (auto-approved when the caller has the approve ability).
+  """
+  awaitingApproval: Boolean
+
+  """
+  External reference supplied by external systems/sources for their own tracking.
+  """
+  externalReference: String
+  classroomId: ID!
+  participantsById: [ID]!
+}
+
+type MemberAttachment implements Auditable {
+  audit: AuditInfo
+
+  """The name of the underlying file."""
+  fileName: String!
+
+  """The file type of the underlying file."""
+  fileType: String
+
+  """Address used to retrieve the underlying file."""
+  fileUrl: String
+  id: String!
+}
+
+"""A booking for a multi-student training flight."""
+type MultiStudentBooking implements AircraftBooking & Auditable & Booking {
+  """Will only be null if the requesting user is not allowed to read it."""
+  aircraft: Aircraft
+  arrivalAirport: Airport
+  audit: AuditInfo
+
+  """The cancellation registration associated with the booking."""
+  cancellations: [BookingCancellation]
+
+  """The color of the booking (If not present we use default colors)."""
+  color: String
+  comment: String
+  departureAirport: Airport
+
+  """
+  Whether or not email notifications will be sent to participants when changes are made to the booking.
+  """
+  emailNotifications: Boolean!
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  endsAt: DateTime!
+
+  """
+  External reference supplied by external systems/sources for their own tracking.
+  """
+  externalReference: String
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  flightEndsAt: DateTime!
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  flightStartsAt: DateTime!
+  id: String!
+
+  """Will only be null if the requesting user is not allowed to read it."""
+  instructor: User
+  observers: [User]!
+
+  """The planned training lessons associated with the booking."""
+  plannedLessons: [Training]
+
+  """The training registrations associated with the booking."""
+  registrations: [Training]
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  startsAt: DateTime!
+
+  """The current lifecycle status of the booking."""
+  status: BookingStatusEnum!
+  students: [User]!
+}
+
+input MultiStudentBookingInput {
+  bookingStart: DateTime!
+  bookingEnd: DateTime!
+  comment: String
+  notifyViaEmail: Boolean
+  recurrenceRule: String
+  color: String
+
+  """
+  When true, the booking is created as "Awaiting Approval" even if the caller has approval rights. Defaults to false (auto-approved when the caller has the approve ability).
+  """
+  awaitingApproval: Boolean
+
+  """
+  External reference supplied by external systems/sources for their own tracking.
+  """
+  externalReference: String
+  aircraftId: ID!
+  instructorById: ID!
+  studentsById: [StudentInput!]!
+  observersById: [ID]
+  flightStart: DateTime!
+  flightEnd: DateTime!
+}
+
+type Mutations {
+  """Approve a maintenance part."""
+  approveMaintenancePart(id: Id!): MaintenancePart!
+
+  """Bulk cancel bookings"""
+  cancelBookings(bookingIds: [ID!]!, reasonId: ID!, comment: String, sendEmails: Boolean): String!
+
+  """
+  Create an accounting transaction for a user (e.g. record a payment from external system).
+  """
+  createAccountingTransaction(
+    """The user to create the transaction for."""
+    userId: Id!
+
+    """
+    Amount in cents. Positive = credit to user (payment received), negative = debit.
+    """
+    amountCents: Int!
+    comment: String
+
+    """External system reference for tracking."""
+    externalReference: String
+
+    """
+    The type/category of the transaction. Must provide either a valid transactionTypeId or a freeText description.
+    """
+    transactionType: AccountTransactionTypeDescriptionInput!
+
+    """The date of the activity of the transaction."""
+    activityDate: Date
+  ): AccountingTransaction!
+
+  """Creates a class theory booking"""
+  createClassTheoryBooking(skipWarnings: Boolean, booking: ClassTheoryBookingInput!): ClassTheoryBooking!
+
+  """Create a customer on the current account."""
+  createCustomer(customer: CustomerInput!): Customer!
+
+  """Creates an exam booking"""
+  createExamBooking(skipWarnings: Boolean, booking: ExamBookingInput!): ExamBooking!
+
+  """Creates an extra theory booking"""
+  createExtraTheoryBooking(skipWarnings: Boolean, booking: ExtraTheoryBookingInput!): ExtraTheoryBooking!
+
+  """Create a maintenance booking."""
+  createMaintenanceBooking(skipWarnings: Boolean, booking: MaintenanceBookingInput!): MaintenanceBooking!
+
+  """Create a maintenance part pending approval for an aircraft."""
+  createMaintenancePart(aircraftId: Id!, maintenanceRequirementId: Id!, maintenancePart: MaintenancePartInput = {  }): MaintenancePart!
+
+  """Create a meeting booking."""
+  createMeetingBooking(skipWarnings: Boolean, booking: MeetingBookingInput!): MeetingBooking!
+
+  """Creates a multi student booking"""
+  createMultiStudentBooking(skipWarnings: Boolean, booking: MultiStudentBookingInput!): MultiStudentBooking!
+
+  """Creates an operation booking"""
+  createOperationBooking(skipWarnings: Boolean, booking: OperationBookingInput!): OperationBooking!
+
+  """Creates a progress test booking"""
+  createProgressTestBooking(skipWarnings: Boolean, booking: ProgressTestBookingInput!): ProgressTestBooking!
+
+  """Creates a rental booking"""
+  createRentalBooking(skipWarnings: Boolean, booking: RentalBookingInput!): RentalBooking!
+
+  """Creates a single student booking"""
+  createSingleStudentBooking(skipWarnings: Boolean, booking: SingleStudentBookingInput!): SingleStudentBooking!
+
+  """Creates a theory release booking"""
+  createTheoryReleaseBooking(skipWarnings: Boolean, booking: TheoryReleaseBookingInput!): TheoryReleaseBooking!
+
+  """Creates a type questionnaire booking"""
+  createTypeQuestionnaireBooking(skipWarnings: Boolean, booking: TypeQuestionnaireBookingInput!): TypeQuestionnaireBooking!
+
+  """Create a user in a organization"""
+  createUser(
+    user: UserInput!
+    emergency: EmergencyInput
+
+    """"""
+    roles: [UserRoleEnum]!
+  ): User!
+
+  """Deletes a booking"""
+  deleteBooking(bookingId: ID!, recurrentBookingUpdateMethod: RecurrentBookingUpdateMethodEnum): Boolean!
+
+  """Bulk delete bookings"""
+  deleteBookings(bookingIds: [ID!]!, sendEmails: Boolean, recurrentBookingUpdateMethod: RecurrentBookingUpdateMethodEnum): String!
+
+  """
+  Get my|FlightLogger data, subsequent queries gets data across all accounts.
+  """
+  myFlightLogger: MyFlightLoggerEntry
+
+  """
+  Publish flight tracks to flightlogger. Returns the flight_uuid if successful.
+  """
+  publishFlightTrack(
+    """The aircraft registration whose tracks are to be published."""
+    registration: String!
+
+    """The flight data provider."""
+    providerName: String!
+
+    """
+    The flight status of the track. Defaults to uncompleted for new flights; omitted on update preserves existing status.
+    """
+    status: FlightTrackStatusEnum
+
+    """The unique flight identifier."""
+    flightUuid: String
+
+    """The engine on datetime."""
+    engineOn: DateTime
+
+    """The engine off datetime."""
+    engineOff: DateTime
+
+    """The takeoff datetime."""
+    takeoff: DateTime!
+
+    """The landing datetime."""
+    landing: DateTime!
+
+    """The on block datetime."""
+    onBlock: DateTime
+
+    """The off block datetime."""
+    offBlock: DateTime
+
+    """The URL to view the flight."""
+    viewUrl: String
+
+    """The URL to the KML file for the flight track."""
+    kmlUrl: String
+  ): FlightTrack!
+
+  """Reject a maintenance part."""
+  rejectMaintenancePart(id: Id!): MaintenancePart!
+
+  """Updates a class theory booking"""
+  updateClassTheoryBooking(id: ID!, skipWarnings: Boolean, booking: ClassTheoryBookingInput!): ClassTheoryBooking!
+
+  """Update a customer on the current account."""
+  updateCustomer(id: ID!, customer: CustomerInput!): Customer!
+
+  """Updates an exam booking"""
+  updateExamBooking(id: ID!, skipWarnings: Boolean, booking: ExamBookingInput!): ExamBooking!
+
+  """Updates an extra theory booking"""
+  updateExtraTheoryBooking(id: ID!, skipWarnings: Boolean, booking: ExtraTheoryBookingInput!): ExtraTheoryBooking!
+
+  """Update a maintenance booking."""
+  updateMaintenanceBooking(id: ID!, skipWarnings: Boolean, booking: MaintenanceBookingInput!): MaintenanceBooking!
+
+  """
+  Update a maintenance part (returns it to pending approval when changed).
+  """
+  updateMaintenancePart(id: Id!, maintenancePart: MaintenancePartInput!): MaintenancePart!
+
+  """Update a meeting booking."""
+  updateMeetingBooking(id: ID!, skipWarnings: Boolean, booking: MeetingBookingInput!): MeetingBooking!
+
+  """Updates a multi student booking"""
+  updateMultiStudentBooking(id: ID!, skipWarnings: Boolean, booking: MultiStudentBookingInput!): MultiStudentBooking!
+
+  """Updates a operation booking"""
+  updateOperationBooking(id: ID!, skipWarnings: Boolean, booking: OperationBookingInput!): OperationBooking!
+
+  """Updates a progress test booking"""
+  updateProgressTestBooking(id: ID!, skipWarnings: Boolean, booking: ProgressTestBookingInput!): ProgressTestBooking!
+
+  """Updates a rental booking"""
+  updateRentalBooking(id: ID!, skipWarnings: Boolean, booking: RentalBookingInput!): RentalBooking!
+
+  """Updates a single student booking"""
+  updateSingleStudentBooking(id: ID!, skipWarnings: Boolean, booking: SingleStudentBookingInput!): SingleStudentBooking!
+
+  """Updates a theory release booking"""
+  updateTheoryReleaseBooking(id: ID!, skipWarnings: Boolean, booking: TheoryReleaseBookingInput!): TheoryReleaseBooking!
+
+  """Updates a type questionnaire booking"""
+  updateTypeQuestionnaireBooking(id: ID!, skipWarnings: Boolean, booking: TypeQuestionnaireBookingInput!): TypeQuestionnaireBooking!
+
+  """Update a user in a organization"""
+  updateUser(id: ID!, user: UserInput, emergency: EmergencyInput): User!
+}
+
+"""A myFlightLogger account"""
+type MyFlightLogger {
+  avatarUrl: String!
+  callSign: String!
+  email: String!
+  firstName: String!
+  lastName: String!
+
+  """Get logbooks within a time frame."""
+  logbookEntries(
+    """
+    If provided, finds only entries created or updated after this date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    changedAfter: DateTime
+
+    """
+    If provided, finds only entries beginning after the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    from: DateTime
+
+    """
+    If provided, finds only entries ending before the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    to: DateTime
+    sortBy: LogbookSorter
+    sortDesc: Boolean = false
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): LogbookConnection
+
+  """Get summaries of logbook within a time frame."""
+  logbookSummations(
+    """
+    If provided, finds only entries created or updated after this date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    changedAfter: DateTime
+
+    """
+    If provided, finds only entries beginning after the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    from: DateTime
+
+    """
+    If provided, finds only entries ending before the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    to: DateTime
+  ): LogbookSummation
+}
+
+"""A myFlightLogger account collection for entries"""
+type MyFlightLoggerEntry {
+  """Create a manual bulk logbook entry."""
+  createBulkLogbookEntry(input: BulkLogbookEntryInput!): Logbook!
+
+  """Create a manual logbook entry."""
+  createLogbookEntry(input: LogbookEntryInput!): Logbook!
+
+  """Create a manual logbook entry."""
+  createSimLogbookEntry(input: SimLogbookEntryInput!): Logbook!
+
+  """Destroy a manual logbook entry."""
+  destroyLogbookEntry(id: ID!): Boolean!
+
+  """Initiate generation of a report"""
+  generateReport(startsAt: Date, endsAt: Date, exportType: ExportTypeEnum!, reportType: ReportTypeEnum!): String!
+
+  """Update a manual bulk logbook entry."""
+  updateBulkLogbookEntry(input: BulkLogbookEntryInput!): Logbook!
+
+  """Updates a manual logbook entry."""
+  updateLogbookEntry(input: LogbookEntryInput!): Logbook!
+
+  """Updates a manual logbook entry."""
+  updateSimLogbookEntry(input: SimLogbookEntryInput!): Logbook!
+}
+
+"""An operation registration."""
+type Operation implements Auditable & FlightRegistration {
+  asymmetricSeconds: Int!
+  audit: AuditInfo
+  booking: OperationBooking
+  comment: String
+
+  """
+  Entries will only be null if the requesting user is not allowed to read them.
+  """
+  crew: [User]!
+  crossCountrySeconds: Int!
+  customer: Customer
+  expensesInvoiceNumber: String
+  flights: [Flight]!
+  floatSeconds: Int!
+  id: Id!
+  ifrDualSeconds: Int!
+  ifrSimSeconds: Int!
+  ifrSpicSeconds: Int!
+  incomeInvoiceNumber: String
+  instrumentSeconds: Int!
+  multiSeconds: Int!
+  nightSeconds: Int!
+
+  """The type of operation performed."""
+  operationType: OperationType
+
+  """Will only be null if the requesting user is not allowed to read it."""
+  pic: User
+  pilotFlyingSeconds: Int!
+  pilotMonitoringSeconds: Int!
+  singleSeconds: Int!
+  totalSeconds: Int!
+  vfrDualSeconds: Int!
+  vfrSimSeconds: Int!
+  vfrSoloSeconds: Int!
+  vfrSpicSeconds: Int!
+}
+
+"""A booking for an operation flight."""
+type OperationBooking implements AircraftBooking & Auditable & Booking {
+  """Will only be null if the requesting user is not allowed to read it."""
+  aircraft: Aircraft
+  arrivalAirport: Airport
+  audit: AuditInfo
+
+  """The cancellation registration associated with the booking."""
+  cancellation: BookingCancellation
+
+  """The color of the booking (If not present we use default colors)."""
+  color: String
+  comment: String
+
+  """Attending crew."""
+  crew: [User]!
+  customer: Customer
+  departureAirport: Airport
+
+  """
+  Whether or not email notifications will be sent to participants when changes are made to the booking.
+  """
+  emailNotifications: Boolean!
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  endsAt: DateTime!
+
+  """
+  External reference supplied by external systems/sources for their own tracking.
+  """
+  externalReference: String
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  flightEndsAt: DateTime!
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  flightStartsAt: DateTime!
+  id: String!
+
+  """
+  The type of operation that has been slated to be flown. Will only be null if the requesting user is not allowed to read it.
+  """
+  operationType: OperationType
+
+  """
+  Pilot in Command. Will only be null if the requesting user is not allowed to read it.
+  """
+  pic: User
+
+  """The operation registration associated with the booking."""
+  registration: Operation
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  startsAt: DateTime!
+
+  """The current lifecycle status of the booking."""
+  status: BookingStatusEnum!
+}
+
+input OperationBookingInput {
+  bookingStart: DateTime!
+  bookingEnd: DateTime!
+  comment: String
+  notifyViaEmail: Boolean
+  recurrenceRule: String
+  color: String
+
+  """
+  When true, the booking is created as "Awaiting Approval" even if the caller has approval rights. Defaults to false (auto-approved when the caller has the approve ability).
+  """
+  awaitingApproval: Boolean
+
+  """
+  External reference supplied by external systems/sources for their own tracking.
+  """
+  externalReference: String
+  aircraftId: ID!
+  picById: ID!
+  crewsById: [ID]
+  customerById: ID
+  operationId: ID!
+  flightStart: DateTime!
+  flightEnd: DateTime!
+}
+
+"""The connection type for Operation."""
+type OperationConnection {
+  """A list of edges."""
+  edges: [OperationEdge]
+
+  """A list of nodes."""
+  nodes: [Operation]
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type OperationEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+
+  """The item at the end of the edge."""
+  node: Operation
+}
+
+"""
+An operation type. To indicate the type of operation being flown as part of an operation registration.
+"""
+type OperationType implements Auditable {
+  audit: AuditInfo
+
+  """
+  Used to identify/reference this specific operation type outside of FlightLogger.
+  """
+  externalReference: String
+  id: String!
+  name: String!
+  note: String!
+}
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, the cursor to continue."""
+  endCursor: String
+
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: String
+}
+
+"""PMF (Pilot Monitoring/Flying) state."""
+enum PmfTypeEnum {
+  PILOT_FLYING
+  PILOT_MONITORING
+  PILOT_NOT_SPECIFIED
+}
+
+type PresignedUrls {
+  signedGetUrl: String
+  signedPutUrl: String
+}
+
+"""
+A program. Not to be confused with a `UserProgram`, which represents the link between a program and user.
+"""
+type Program implements Auditable {
+  """Programs define what kind of aircraft is used"""
+  aircraftType: ProgramAircraftTypeEnum
+  audit: AuditInfo
+
+  """Whether the program's active revision has CBTA enabled"""
+  cbtaEnabled: Boolean!
+
+  """
+  Used to identify/reference this specific operation type outside of FlightLogger.
+  """
+  externalReference: String
+  id: Id!
+  name: String!
+
+  """Revisions of this program"""
+  programRevisions(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): ProgramRevisionConnection!
+
+  """Programs are split into either flight or ground training"""
+  programType: ProgramTypeEnum
+}
+
+"""Aircraft for the program"""
+enum ProgramAircraftTypeEnum {
+  HELICOPTER
+  AIRPLANE
+}
+
+"""The connection type for Program."""
+type ProgramConnection {
+  """A list of edges."""
+  edges: [ProgramEdge]
+
+  """A list of nodes."""
+  nodes: [Program]
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type ProgramEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+
+  """The item at the end of the edge."""
+  node: Program
+}
+
+"""A program phase."""
+type ProgramPhase implements Auditable {
+  audit: AuditInfo
+  id: Id!
+  lectures: [Lecture]
+  name: String!
+}
+
+"""A program revision."""
+type ProgramRevision implements Auditable {
+  audit: AuditInfo
+
+  """
+  Used to identify/reference this specific operation type outside of FlightLogger.
+  """
+  externalReference: String
+  id: Id!
+  modernTheoryProgram: Boolean
+  name: String!
+  programPhases: [ProgramPhase]
+}
+
+"""The connection type for ProgramRevision."""
+type ProgramRevisionConnection {
+  """A list of edges."""
+  edges: [ProgramRevisionEdge]
+
+  """A list of nodes."""
+  nodes: [ProgramRevision]
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type ProgramRevisionEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+
+  """The item at the end of the edge."""
+  node: ProgramRevision
+}
+
+"""Program type"""
+enum ProgramTypeEnum {
+  FLIGHT_TRAINING
+  GROUND_TRAINING
+  COMBINED_SYLLABUS
+}
+
+"""A progress test registration."""
+type ProgressTest implements Auditable & Theory {
+  attachments: [Attachment]
+  audit: AuditInfo
+  booking: ProgressTestBooking
+  class: Class
+  comment: String
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  endsAt: DateTime
+
+  """Only present if an expense invoice is filled."""
+  expensesInvoiceNumber: String
+
+  """Will only be null if the requesting user is not allowed to read it."""
+  groundTrainingSubject: SubjectCategory
+  id: String!
+
+  """Will only be null if the requesting user is not allowed to read."""
+  instructor: User
+  note: String
+  participations: [TheoryParticipation]!
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  startsAt: DateTime!
+  subject: String @deprecated(reason: "Renamed to `note`")
+
+  """Will only be null if the requesting user is not allowed to read it."""
+  subjectCategory: SubjectCategory @deprecated(reason: "Renamed to `groundTrainingSubject`")
+}
+
+"""A booking for a progress test."""
+type ProgressTestBooking implements Auditable & Booking & GroundBooking & TheoryBooking {
+  audit: AuditInfo
+  class: Class
+
+  """
+  The location (i.e. classroom) in which the booking will take place. Will only be null if the requesting user is not allowed to read it.
+  """
+  classroom: Classroom
+
+  """The color of the booking (If not present we use default colors)."""
+  color: String
+  comment: String
+
+  """
+  Whether or not email notifications will be sent to participants when changes are made to the booking.
+  """
+  emailNotifications: Boolean!
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  endsAt: DateTime!
+
+  """
+  External reference supplied by external systems/sources for their own tracking.
+  """
+  externalReference: String
+  id: String!
+
+  """
+  The instructor/examiner slated to oversee the booking. Will only be null if the requesting user is not allowed to read it.
+  """
+  instructor: User
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  startsAt: DateTime!
+
+  """The current lifecycle status of the booking."""
+  status: BookingStatusEnum!
+
+  """Students slated to participate in the activity."""
+  students: [User]!
+
+  """The subject or name of the theoretical activity."""
+  subject: String
+
+  """Will only be null if the requesting user is not allowed to read it."""
+  theoryCourse: TheoryCourse
+}
+
+input ProgressTestBookingInput {
+  bookingStart: DateTime!
+  bookingEnd: DateTime!
+  comment: String
+  notifyViaEmail: Boolean
+  recurrenceRule: String
+  color: String
+
+  """
+  When true, the booking is created as "Awaiting Approval" even if the caller has approval rights. Defaults to false (auto-approved when the caller has the approve ability).
+  """
+  awaitingApproval: Boolean
+
+  """
+  External reference supplied by external systems/sources for their own tracking.
+  """
+  externalReference: String
+  classroomId: ID!
+  instructorById: ID!
+  theoryCourse: ID
+  programId: ID
+  subjectCategoryId: ID!
+  theoryLessonId: ID
+  programRevisionId: ID
+  subject: String
+  teamId: ID
+  studentsById: [StudentInput!]
+}
+
+"""The connection type for ProgressTest."""
+type ProgressTestConnection {
+  """A list of edges."""
+  edges: [ProgressTestEdge]
+
+  """A list of nodes."""
+  nodes: [ProgressTest]
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type ProgressTestEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+
+  """The item at the end of the edge."""
+  node: ProgressTest
+}
+
+type Queries {
+  """Get the FlightLogger account scoped by an account-specific API key."""
+  account: Account
+
+  """Valid transaction types for creating accounting transactions."""
+  accountingTransactionTypes: [AccountingTransactionType!]!
+
+  """
+  Accounting transactions for the account or a specific user. Newest first.
+  """
+  accountingTransactions(
+    """
+    If provided, finds only entries beginning after the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    from: DateTime
+
+    """
+    If provided, finds only entries ending before the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    to: DateTime
+
+    """
+    Filter by user. When omitted from root query, returns all account transactions.
+    """
+    userId: Id
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): AccountingTransactionConnection!
+
+  """Finds active aircraft."""
+  aircraft(
+    """
+    If provided, will only find aircraft whose callsign is included in the list.
+    """
+    callSigns: [String!]
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): AircraftConnection!
+
+  """Find bookings in a timespan."""
+  bookings(
+    """
+    If provided, finds only entries beginning after the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    from: DateTime
+
+    """
+    If provided, finds only entries ending before the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    to: DateTime
+
+    """
+    If provided, finds only entries created or updated after this date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    changedAfter: DateTime
+
+    """
+    If true, will also resolve resources that the requesting user is not associated with, provided they have permission.
+    """
+    all: Boolean
+
+    """
+    If provided, will only return bookings that match one of the provided subtypes.
+    """
+    subtypes: [BookingSubtypeEnum!]
+
+    """
+    If provided, will only return bookings whose lifecycle status matches one in the list.
+    """
+    statuses: [BookingStatusEnum!]
+
+    """
+    If true, includes bookings that overlap the requested time window instead of only bookings fully contained within it.
+    """
+    overlap: Boolean = false
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): BookingUnionConnection!
+
+  """Gets class theory registrations within a time-frame."""
+  classTheories(
+    """
+    If provided, finds only entries beginning after the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    from: DateTime
+
+    """
+    If provided, finds only entries ending before the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    to: DateTime
+
+    """
+    If provided, finds only entries created or updated after this date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    changedAfter: DateTime
+
+    """
+    If true, will also resolve resources that the requesting user is not associated with, provided they have permission.
+    """
+    all: Boolean
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): ClassTheoryConnection!
+
+  """Gets classes (groups of students)."""
+  classes(
+    """
+    If provided, finds only entries created or updated after this date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    changedAfter: DateTime
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): ClassConnection!
+
+  """Finds classrooms."""
+  classrooms(
+    """If provided, will only return classrooms with the given IDs."""
+    ids: [Id!]
+
+    """If true, will include disabled classrooms."""
+    includeDisabled: Boolean = false
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): ClassroomConnection!
+
+  """Find a customer by ID."""
+  customer(id: String!): Customer
+
+  """Get customers on the current account."""
+  customers(
+    """
+    If provided, finds only entries created or updated after this date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    changedAfter: DateTime
+
+    """
+    If provided, will only return customers whose email matches this value.
+    """
+    email: String
+
+    """
+    If provided, will only return customers whose reference matches this value.
+    """
+    reference: String
+
+    """
+    If provided, will only return customers whose company matches this value.
+    """
+    company: String
+
+    """If provided, will search company, full name, email, and reference."""
+    searchTerm: String
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): CustomerConnection!
+
+  """The duty times of the user, ordered by end time."""
+  dutyTimes(
+    """
+    If provided, finds only entries beginning after the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    from: DateTime
+
+    """
+    If provided, finds only entries ending before the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    to: DateTime
+
+    """
+    If provided, finds only entries created or updated after this date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    changedAfter: DateTime
+
+    """
+    If true, will also resolve resources that the requesting user is not associated with, provided they have permission.
+    """
+    all: Boolean
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): DutyTimeConnection!
+  exams(
+    """
+    If provided, finds only entries beginning after the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    from: DateTime
+
+    """
+    If provided, finds only entries ending before the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    to: DateTime
+
+    """
+    If provided, finds only entries created or updated after this date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    changedAfter: DateTime
+
+    """
+    If true, will also resolve resources that the requesting user is not associated with, provided they have permission.
+    """
+    all: Boolean
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): ExamConnection!
+
+  """Gets extra theory registrations within a time-frame."""
+  extraTheories(
+    """
+    If provided, finds only entries beginning after the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    from: DateTime
+
+    """
+    If provided, finds only entries ending before the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    to: DateTime
+
+    """
+    If provided, finds only entries created or updated after this date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    changedAfter: DateTime
+
+    """
+    If true, will also resolve resources that the requesting user is not associated with, provided they have permission.
+    """
+    all: Boolean
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): ExtraTheoryConnection!
+  fetchJob(
+    """The ID of the job"""
+    jobId: String!
+  ): String
+
+  """Find flights in time-span."""
+  flights(
+    """
+    If provided, finds only entries beginning after the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    from: DateTime
+
+    """
+    If provided, finds only entries ending before the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    to: DateTime
+
+    """
+    If provided, finds only entries created or updated after this date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    changedAfter: DateTime
+
+    """
+    If true, will also resolve resources that the requesting user is not associated with, provided they have permission.
+    """
+    all: Boolean
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): FlightConnection!
+
+  """A maintenance type."""
+  maintenanceParts(
+    """
+    If provided, will only provide maintenance parts with a matching status.
+    """
+    status: [MaintenancePartStatusEnum!]
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): MaintenancePartConnection!
+
+  """A maintenance part."""
+  maintenanceTypes(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): MaintenanceConnection!
+
+  """
+  Get my|FlightLogger data, subsequent queries gets data across all accounts.
+  """
+  myFlightLogger: MyFlightLogger
+  operations(
+    """
+    If provided, finds only entries beginning after the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    from: DateTime
+
+    """
+    If provided, finds only entries ending before the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    to: DateTime
+
+    """
+    If provided, finds only entries created or updated after this date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    changedAfter: DateTime
+
+    """
+    If true, will also resolve resources that the requesting user is not associated with, provided they have permission.
+    """
+    all: Boolean
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): OperationConnection!
+
+  """Gets presigned urls for uploading to cache"""
+  presignedUploadUrls(filename: String!): PresignedUrls!
+
+  """Finds active programs."""
+  programs(
+    """If provided, will only return programs with the given IDs."""
+    programIds: [Id!]
+
+    """If provided, will only return programs of the type given."""
+    programType: ProgramTypeEnum
+
+    """If provided, will only return programs with the name given."""
+    programName: String
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): ProgramConnection!
+
+  """Gets progress test registrations within a time-frame."""
+  progressTests(
+    """
+    If provided, finds only entries beginning after the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    from: DateTime
+
+    """
+    If provided, finds only entries ending before the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    to: DateTime
+
+    """
+    If provided, finds only entries created or updated after this date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    changedAfter: DateTime
+
+    """
+    If true, will also resolve resources that the requesting user is not associated with, provided they have permission.
+    """
+    all: Boolean
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): ProgressTestConnection!
+
+  """Gets class theory registrations within a time-frame."""
+  ptcClassTheories(
+    """
+    If provided, finds only entries beginning after the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    from: DateTime
+
+    """
+    If provided, finds only entries ending before the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    to: DateTime
+
+    """
+    If provided, finds only entries created or updated after this date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    changedAfter: DateTime
+
+    """
+    If true, will also resolve resources that the requesting user is not associated with, provided they have permission.
+    """
+    all: Boolean
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): ClassTheoryConnection!
+
+  """Gets exam registrations within a time-frame."""
+  ptcExams(
+    """
+    If provided, finds only entries beginning after the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    from: DateTime
+
+    """
+    If provided, finds only entries ending before the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    to: DateTime
+
+    """
+    If provided, finds only entries created or updated after this date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    changedAfter: DateTime
+
+    """
+    If true, will also resolve resources that the requesting user is not associated with, provided they have permission.
+    """
+    all: Boolean
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): ExamConnection!
+
+  """Gets progress test registrations within a time-frame."""
+  ptcProgressTests(
+    """
+    If provided, finds only entries beginning after the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    from: DateTime
+
+    """
+    If provided, finds only entries ending before the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    to: DateTime
+
+    """
+    If provided, finds only entries created or updated after this date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    changedAfter: DateTime
+
+    """
+    If true, will also resolve resources that the requesting user is not associated with, provided they have permission.
+    """
+    all: Boolean
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): ProgressTestConnection!
+
+  """Gets theory release registrations within a time-frame."""
+  ptcTheoryReleases(
+    """
+    If provided, finds only entries beginning after the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    from: DateTime
+
+    """
+    If provided, finds only entries ending before the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    to: DateTime
+
+    """
+    If provided, finds only entries created or updated after this date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    changedAfter: DateTime
+
+    """
+    If true, will also resolve resources that the requesting user is not associated with, provided they have permission.
+    """
+    all: Boolean
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): TheoryReleaseConnection!
+
+  """Gets type questionnaire registrations within a time-frame."""
+  ptcTypeQuestionnaires(
+    """
+    If provided, finds only entries beginning after the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    from: DateTime
+
+    """
+    If provided, finds only entries ending before the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    to: DateTime
+
+    """
+    If provided, finds only entries created or updated after this date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    changedAfter: DateTime
+
+    """
+    If true, will also resolve resources that the requesting user is not associated with, provided they have permission.
+    """
+    all: Boolean
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): TypeQuestionnaireConnection!
+  rentals(
+    """
+    If provided, finds only entries beginning after the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    from: DateTime
+
+    """
+    If provided, finds only entries ending before the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    to: DateTime
+
+    """
+    If provided, finds only entries created or updated after this date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    changedAfter: DateTime
+
+    """
+    If true, will also resolve resources that the requesting user is not associated with, provided they have permission.
+    """
+    all: Boolean
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): RentalConnection!
+
+  """Finds subject categories for the given program revision."""
+  subjectCategories(
+    """The program revision to return subject categories for."""
+    programRevisionId: Id!
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): SubjectCategoryConnection!
+
+  """
+  Find eligible theory lesson options for theory-related booking creation and editing.
+  """
+  theoryLessonOptions(
+    """The theory-related booking subtype to resolve lesson options for."""
+    bookingType: TheoryLessonBookingSubtypeEnum!
+
+    """The program revision to resolve lessons within."""
+    programRevisionId: Id!
+
+    """The subject category to resolve lessons for."""
+    subjectCategoryId: Id!
+
+    """The students the booking is being prepared for."""
+    studentIds: [Id!]!
+
+    """Optional team scope when resolving team-program lesson options."""
+    teamId: Id
+
+    """
+    Optionally include a specific lesson even if it would otherwise be filtered out.
+    """
+    includeTheoryLessonId: Id
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): TheoryLessonOptionConnection!
+
+  """
+  Returns eligible theory lesson options for theory-related booking creation and editing.
+  """
+  theoryLessonsForBooking(
+    """The booking subtype to resolve lesson options for."""
+    bookingType: BookingSubtypeEnum!
+
+    """The program revision to resolve lessons within."""
+    programRevisionId: Id!
+
+    """The subject category to resolve lessons for."""
+    subjectCategoryId: Id!
+
+    """The students the booking is being prepared for."""
+    studentIds: [Id!]!
+
+    """Optional team scope when resolving team-program lesson options."""
+    teamId: Id
+
+    """
+    Optionally include a specific lesson even if it would otherwise be filtered out.
+    """
+    includeTheoryLessonId: Id
+  ): [TheoryLessonOption!]! @deprecated(reason: "Use `theoryLessonOptions` instead.")
+
+  """Gets theory release registrations within a time-frame."""
+  theoryReleases(
+    """
+    If provided, finds only entries beginning after the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    from: DateTime
+
+    """
+    If provided, finds only entries ending before the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    to: DateTime
+
+    """
+    If provided, finds only entries created or updated after this date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    changedAfter: DateTime
+
+    """
+    If true, will also resolve resources that the requesting user is not associated with, provided they have permission.
+    """
+    all: Boolean
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): TheoryReleaseConnection!
+
+  """training ( user lectures )"""
+  trainings(
+    """
+    If provided, finds only entries beginning after the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    from: DateTime
+
+    """
+    If provided, finds only entries ending before the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    to: DateTime
+
+    """
+    If provided, finds only entries created or updated after this date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    changedAfter: DateTime
+
+    """
+    If true, will also resolve resources that the requesting user is not associated with, provided they have permission.
+    """
+    all: Boolean
+
+    """
+    If provided, will only return when the status is set such as Passed, failed or Completed.
+    """
+    status: [TrainingStatusEnum!]
+
+    """
+    If provided, will only return trainings for the program with the given ID.
+    """
+    programIds: [Id!]
+
+    """If provided, will only return trainings associated with user ID"""
+    userIds: [Id!]
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): TrainingConnection!
+
+  """Gets type questionnaire registrations within a time-frame."""
+  typeQuestionnaires(
+    """
+    If provided, finds only entries beginning after the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    from: DateTime
+
+    """
+    If provided, finds only entries ending before the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    to: DateTime
+
+    """
+    If provided, finds only entries created or updated after this date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    changedAfter: DateTime
+
+    """
+    If true, will also resolve resources that the requesting user is not associated with, provided they have permission.
+    """
+    all: Boolean
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): TypeQuestionnaireConnection!
+
+  """Find a user by ID or the authenticated API key."""
+  user(id: String): User
+
+  """user_programs ( user programs )"""
+  userPrograms(
+    """
+    If provided, finds only entries beginning after the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    from: DateTime
+
+    """
+    If provided, finds only entries ending before the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    to: DateTime
+
+    """
+    If provided, finds only entries created or updated after this date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    changedAfter: DateTime
+
+    """
+    If true, will also resolve resources that the requesting user is not associated with, provided they have permission.
+    """
+    all: Boolean
+
+    """
+    If provided, will only return when the status is set such as Active, Standby or Completed.
+    """
+    status: [UserProgramEnum!]
+
+    """
+    If provided, will only return trainings for the program with the given ID.
+    """
+    programIds: [Id!]
+
+    """If provided, will only return programs for the user with the given ID."""
+    userIds: [Id!]
+
+    """If provided, will only return programs of the type given."""
+    programType: ProgramTypeEnum
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): UserProgramConnection
+
+  """Get active users."""
+  users(
+    """
+    If provided, finds only entries created or updated after this date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    changedAfter: DateTime
+
+    """If provided, will only return who has all roles in the collection."""
+    roles: [UserRoleEnum!]
+
+    """If provided, will only return users whose email matches this value."""
+    email: String
+
+    """
+    If provided, will only return users whose call sign matches this value.
+    """
+    callSign: String
+
+    """
+    If provided, will only return users whose reference string matches this value.
+    """
+    reference: String
+
+    """
+    If provided, will only return users whose CAA reference number matches this value.
+    """
+    caaReferenceNumber: String
+
+    """NOTE: Marked for imminent deprecation. Avoid using if at all possible."""
+    searchTerm: String
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): UserConnection!
+
+  """
+  Find changes done (versions) to entities in a timespan. Requires an API key owned by an account administrator.
+  """
+  versions(
+    """
+    If provided, finds only entries beginning after the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    from: DateTime
+
+    """
+    If provided, finds only entries ending before the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    to: DateTime
+
+    """The types of entities to search for."""
+    types: [VersionableEntityEnum!]
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): VersionUnionConnection!
+}
+
+enum RecurrentBookingUpdateMethodEnum {
+  onlyThis
+  thisAndAllFuture
+  all
+}
+
+"""A rental flight registration."""
+type Rental implements Auditable & FlightRegistration {
+  asymmetricSeconds: Int!
+  audit: AuditInfo
+  booking: RentalBooking
+  comment: String
+  crossCountrySeconds: Int!
+  flights: [Flight]!
+  floatSeconds: Int!
+  id: Id!
+  ifrDualSeconds: Int!
+  ifrSimSeconds: Int!
+  ifrSpicSeconds: Int!
+  instrumentSeconds: Int!
+  multiSeconds: Int!
+  nightSeconds: Int!
+  pilotFlyingSeconds: Int!
+  pilotMonitoringSeconds: Int!
+
+  """Will only be null if the requesting user is not allowed to read it."""
+  renter: User
+  singleSeconds: Int!
+  totalSeconds: Int!
+  vfrDualSeconds: Int!
+  vfrSimSeconds: Int!
+  vfrSoloSeconds: Int!
+  vfrSpicSeconds: Int!
+}
+
+"""A booking for a rental flight."""
+type RentalBooking implements AircraftBooking & Auditable & Booking {
+  """Will only be null if the requesting user is not allowed to read it."""
+  aircraft: Aircraft
+
+  """
+  True if the rental request has been approved by a rental administrator. False otherwise.
+  """
+  approved: Boolean!
+  arrivalAirport: Airport
+  audit: AuditInfo
+
+  """The cancellation registration associated with the booking."""
+  cancellation: BookingCancellation
+
+  """The color of the booking (If not present we use default colors)."""
+  color: String
+  comment: String
+  departureAirport: Airport
+
+  """
+  Whether or not email notifications will be sent to participants when changes are made to the booking.
+  """
+  emailNotifications: Boolean!
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  endsAt: DateTime!
+
+  """
+  External reference supplied by external systems/sources for their own tracking.
+  """
+  externalReference: String
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  flightEndsAt: DateTime!
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  flightStartsAt: DateTime!
+  id: String!
+
+  """The rental registration associated with the booking."""
+  registration: Rental
+
+  """Will only be null if the requesting user is not allowed to read it."""
+  renter: User
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  startsAt: DateTime!
+
+  """The current lifecycle status of the booking."""
+  status: BookingStatusEnum!
+}
+
+input RentalBookingInput {
+  bookingStart: DateTime!
+  bookingEnd: DateTime!
+  comment: String
+  notifyViaEmail: Boolean
+  recurrenceRule: String
+  color: String
+
+  """
+  When true, the booking is created as "Awaiting Approval" even if the caller has approval rights. Defaults to false (auto-approved when the caller has the approve ability).
+  """
+  awaitingApproval: Boolean
+
+  """
+  External reference supplied by external systems/sources for their own tracking.
+  """
+  externalReference: String
+  aircraftId: ID!
+  renterById: ID!
+}
+
+"""The connection type for Rental."""
+type RentalConnection {
+  """A list of edges."""
+  edges: [RentalEdge]
+
+  """A list of nodes."""
+  nodes: [Rental]
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type RentalEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+
+  """The item at the end of the edge."""
+  node: Rental
+}
+
+"""Reports available for export"""
+enum ReportTypeEnum {
+  MY_LOGBOOK
+}
+
+"""A service summary"""
+type ServiceSummary {
+  cyclesWarningColor: String
+  dateWarningColor: String
+  nextPrimaryService: Float
+  nextSecondaryService: Float
+  nextServiceCycles: Float
+  nextServiceDate: String
+  nextTertiaryService: Float
+  primaryWarningColor: String
+  secondaryWarningColor: String
+  tertiaryWarningColor: String
+}
+
+input SimLogbookEntryInput {
+  id: ID
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  offBlock: DateTime!
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  onBlock: DateTime!
+  typeOfAircraft: String!
+  registration: String!
+  remarksAndEndorsements: String
+  syntheticTrainingSeconds: Int!
+  instructorSyntheticTrainingSeconds: Int
+}
+
+"""A booking for a single-student training."""
+type SingleStudentBooking implements AircraftBooking & Auditable & Booking {
+  """Will only be null if the requesting user is not allowed to read it."""
+  aircraft: Aircraft
+  arrivalAirport: Airport
+  audit: AuditInfo
+
+  """The cancellation registration associated with the booking."""
+  cancellation: BookingCancellation
+
+  """The color of the booking (If not present we use default colors)."""
+  color: String
+  comment: String
+  departureAirport: Airport
+
+  """
+  Whether or not email notifications will be sent to participants when changes are made to the booking.
+  """
+  emailNotifications: Boolean!
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  endsAt: DateTime!
+
+  """
+  External reference supplied by external systems/sources for their own tracking.
+  """
+  externalReference: String
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  flightEndsAt: DateTime!
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  flightStartsAt: DateTime!
+  id: String!
+
+  """Will only be null if the requesting user is not allowed to read it."""
+  instructor: User
+  observers: [User]!
+
+  """The planned training lesson associated with the booking."""
+  plannedLesson: Training
+
+  """The training registration associated with the booking."""
+  registration: Training
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  startsAt: DateTime!
+
+  """The current lifecycle status of the booking."""
+  status: BookingStatusEnum!
+
+  """Will only be null if the requesting user is not allowed to read it."""
+  student: User
+}
+
+input SingleStudentBookingInput {
+  bookingStart: DateTime!
+  bookingEnd: DateTime!
+  comment: String
+  notifyViaEmail: Boolean
+  recurrenceRule: String
+  color: String
+
+  """
+  When true, the booking is created as "Awaiting Approval" even if the caller has approval rights. Defaults to false (auto-approved when the caller has the approve ability).
+  """
+  awaitingApproval: Boolean
+
+  """
+  External reference supplied by external systems/sources for their own tracking.
+  """
+  externalReference: String
+  aircraftId: ID!
+  instructorById: ID!
+  studentById: StudentInput!
+  observersById: [ID]
+  flightStart: DateTime!
+  flightEnd: DateTime!
+}
+
+"""An exam sitting."""
+type Sitting implements Auditable {
+  audit: AuditInfo
+
+  """Expects a date to be specified in ISO 8610 format."""
+  endsAt: Date!
+  id: Id!
+  sittingNumber: Int!
+
+  """Expects a date to be specified in ISO 8610 format."""
+  startsAt: Date!
+}
+
+input StudentInput {
+  userId: ID!
+  userLectureId: ID
+}
+
+"""A subject category as part of a theory course."""
+type SubjectCategory implements Auditable {
+  audit: AuditInfo
+  id: Id!
+  name: String
+
+  """Will only be null if the requesting user is not allowed to read it."""
+  theoryCourse: TheoryCourse
+
+  """
+  Minimum required classroom hours (in seconds) for this subject category.
+  """
+  totalSeconds: Int
+}
+
+"""The connection type for SubjectCategory."""
+type SubjectCategoryConnection {
+  """A list of edges."""
+  edges: [SubjectCategoryEdge]
+
+  """A list of nodes."""
+  nodes: [SubjectCategory]
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type SubjectCategoryEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+
+  """The item at the end of the edge."""
+  node: SubjectCategory
+}
+
+"""A theory registration with one or more students."""
+interface Theory {
+  attachments: [Attachment]
+  booking: GroundBooking
+  class: Class
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  endsAt: DateTime
+
+  """Will only be null if the requesting user is not allowed to read it."""
+  groundTrainingSubject: SubjectCategory
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  startsAt: DateTime!
+
+  """Will only be null if the requesting user is not allowed to read it."""
+  subjectCategory: SubjectCategory @deprecated(reason: "Renamed to `groundTrainingSubject`")
+}
+
+"""Fields common to all theoretical booking."""
+interface TheoryBooking {
+  class: Class
+
+  """
+  The instructor/examiner slated to oversee the booking. Will only be null if the requesting user is not allowed to read it.
+  """
+  instructor: User
+
+  """Students slated to participate in the activity."""
+  students: [User]!
+
+  """The subject or name of the theoretical activity."""
+  subject: String
+
+  """Will only be null if the requesting user is not allowed to read it."""
+  theoryCourse: TheoryCourse
+}
+
+"""A theory course."""
+type TheoryCourse implements Auditable {
+  audit: AuditInfo
+  disabled: Boolean!
+  id: String!
+  name: String!
+}
+
+"""
+Theory-related booking subtypes that support selecting a theory lesson.
+"""
+enum TheoryLessonBookingSubtypeEnum {
+  PROGRESS_TEST
+  EXAM
+  CLASS_THEORY
+  THEORY_RELEASE
+  TYPE_QUESTIONNAIRE
+}
+
+"""
+A theory lesson option that can be used when creating or editing theory-related bookings.
+"""
+type TheoryLessonOption {
+  """The lesson duration in seconds, when available."""
+  durationSeconds: Int
+
+  """The theory lesson id."""
+  id: Id!
+
+  """The display name of the theory lesson option."""
+  name: String!
+
+  """Selected students already registered for this lesson."""
+  registeredStudentIds: [Id!]!
+}
+
+"""The connection type for TheoryLessonOption."""
+type TheoryLessonOptionConnection {
+  """A list of edges."""
+  edges: [TheoryLessonOptionEdge]
+
+  """A list of nodes."""
+  nodes: [TheoryLessonOption]
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type TheoryLessonOptionEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+
+  """The item at the end of the edge."""
+  node: TheoryLessonOption
+}
+
+"""Represents a students participation in a type of theory."""
+type TheoryParticipation implements Auditable {
+  attendanceStatus: AttendanceStatusEnum!
+
+  """
+  Actual attended classroom hours (in seconds) for this participation. Zero if did_not_attend.
+  """
+  attendedSeconds: Int
+  audit: AuditInfo
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  endsAt: DateTime
+
+  """The grade given to the participant. Not applicable to class theories."""
+  grade: String
+  id: String!
+
+  """Only present if an income invoice is filled."""
+  incomeInvoiceNumber: String
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  startsAt: DateTime
+
+  """Comment given by the student. Not applicable to exams."""
+  studentComment: String
+  user: User
+}
+
+"""A theory release registration."""
+type TheoryRelease implements Auditable & Theory {
+  attachments: [Attachment]
+  audit: AuditInfo
+  booking: TheoryReleaseBooking
+  class: Class
+  comment: String
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  endsAt: DateTime
+
+  """Only present if an expense invoice is filled."""
+  expensesInvoiceNumber: String
+
+  """Will only be null if the requesting user is not allowed to read it."""
+  groundTrainingSubject: SubjectCategory
+  id: Id!
+
+  """Will only be null if the requesting user is not allowed to read."""
+  instructor: User
+  note: String
+  participations: [TheoryParticipation]!
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  startsAt: DateTime!
+  subject: String @deprecated(reason: "Renamed to `note`")
+
+  """Will only be null if the requesting user is not allowed to read it."""
+  subjectCategory: SubjectCategory @deprecated(reason: "Renamed to `groundTrainingSubject`")
+}
+
+"""A booking for a theory release."""
+type TheoryReleaseBooking implements Auditable & Booking & GroundBooking & TheoryBooking {
+  audit: AuditInfo
+  class: Class
+
+  """
+  The location (i.e. classroom) in which the booking will take place. Will only be null if the requesting user is not allowed to read it.
+  """
+  classroom: Classroom
+
+  """The color of the booking (If not present we use default colors)."""
+  color: String
+  comment: String
+
+  """
+  Whether or not email notifications will be sent to participants when changes are made to the booking.
+  """
+  emailNotifications: Boolean!
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  endsAt: DateTime!
+
+  """
+  External reference supplied by external systems/sources for their own tracking.
+  """
+  externalReference: String
+  id: String!
+
+  """
+  The instructor/examiner slated to oversee the booking. Will only be null if the requesting user is not allowed to read it.
+  """
+  instructor: User
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  startsAt: DateTime!
+
+  """The current lifecycle status of the booking."""
+  status: BookingStatusEnum!
+
+  """Students slated to participate in the activity."""
+  students: [User]!
+
+  """The subject or name of the theoretical activity."""
+  subject: String
+
+  """Will only be null if the requesting user is not allowed to read it."""
+  theoryCourse: TheoryCourse
+}
+
+input TheoryReleaseBookingInput {
+  bookingStart: DateTime!
+  bookingEnd: DateTime!
+  comment: String
+  notifyViaEmail: Boolean
+  recurrenceRule: String
+  color: String
+
+  """
+  When true, the booking is created as "Awaiting Approval" even if the caller has approval rights. Defaults to false (auto-approved when the caller has the approve ability).
+  """
+  awaitingApproval: Boolean
+
+  """
+  External reference supplied by external systems/sources for their own tracking.
+  """
+  externalReference: String
+  classroomId: ID!
+  instructorById: ID!
+  theoryCourse: ID
+  programId: ID
+  subjectCategoryId: ID!
+  theoryLessonId: ID
+  programRevisionId: ID
+  subject: String
+  teamId: ID
+  studentsById: [StudentInput!]
+}
+
+"""The connection type for TheoryRelease."""
+type TheoryReleaseConnection {
+  """A list of edges."""
+  edges: [TheoryReleaseEdge]
+
+  """A list of nodes."""
+  nodes: [TheoryRelease]
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type TheoryReleaseEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+
+  """The item at the end of the edge."""
+  node: TheoryRelease
+}
+
+"""
+A training registration. Represents a completed `Lecture`. Not to be confused with a `Lecture` itself.
+"""
+type Training implements Auditable & FlightRegistration {
+  approvedByStudent: Boolean!
+  approvedByStudentAt: DateTime
+  asymmetricSeconds: Int!
+  audit: AuditInfo
+  booking: TrainingBookingUnion
+
+  """The duration of the briefing, in seconds."""
+  briefingSeconds: Int!
+  comment: String
+  crossCountrySeconds: Int!
+
+  """The duration of the de-briefing, in seconds."""
+  debriefingSeconds: Int!
+
+  """
+  Whether the failure is performance-related. Only present when status is FAILED.
+  """
+  failedPerformance: Boolean
+  flights: [Flight]!
+  floatSeconds: Int!
+  id: Id!
+  ifrDualSeconds: Int!
+  ifrSimSeconds: Int!
+  ifrSpicSeconds: Int!
+
+  """
+  The instructor performing the training. Note that if status is NOT_FLOWN or CREDITED, instructor may be null.
+  """
+  instructor: User
+  instrumentSeconds: Int!
+  lecture: Lecture
+  multiSeconds: Int!
+  name: String!
+  nightSeconds: Int!
+  pilotFlyingSeconds: Int!
+  pilotMonitoringSeconds: Int!
+  singleSeconds: Int!
+  status: TrainingStatusEnum!
+  student: User
+  submittedByInstructorAt: DateTime
+  totalSeconds: Int!
+  userCategories: [UserCategory]
+  userProgram: UserProgram
+  vfrDualSeconds: Int!
+  vfrSimSeconds: Int!
+  vfrSoloSeconds: Int!
+  vfrSpicSeconds: Int!
+}
+
+"""All training booking subtypes."""
+union TrainingBookingUnion = MultiStudentBooking | SingleStudentBooking
+
+"""The connection type for Training."""
+type TrainingConnection {
+  """A list of edges."""
+  edges: [TrainingEdge]
+
+  """A list of nodes."""
+  nodes: [Training]
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type TrainingEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+
+  """The item at the end of the edge."""
+  node: Training
+}
+
+"""The current state of a training registrations' lifecycle."""
+enum TrainingStatusEnum {
+  CREDITED
+  FAILED
+  NOT_FLOWN
+  PARTIALLY_COMPLETED
+  PASSED
+}
+
+"""A type questionnaire registration."""
+type TypeQuestionnaire implements Auditable & Theory {
+  attachments: [Attachment]
+  audit: AuditInfo
+  booking: TypeQuestionnaireBooking
+  class: Class
+  comment: String
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  endsAt: DateTime
+
+  """Only present if an expense invoice is filled."""
+  expensesInvoiceNumber: String
+
+  """Will only be null if the requesting user is not allowed to read it."""
+  groundTrainingSubject: SubjectCategory
+  id: Id!
+
+  """Will only be null if the requesting user is not allowed to read."""
+  instructor: User
+  note: String
+  participations: [TheoryParticipation]!
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  startsAt: DateTime!
+  subject: String @deprecated(reason: "Renamed to `note`")
+
+  """Will only be null if the requesting user is not allowed to read it."""
+  subjectCategory: SubjectCategory @deprecated(reason: "Renamed to `groundTrainingSubject`")
+}
+
+"""A booking for a type questionnaire."""
+type TypeQuestionnaireBooking implements Auditable & Booking & GroundBooking & TheoryBooking {
+  audit: AuditInfo
+  class: Class
+
+  """
+  The location (i.e. classroom) in which the booking will take place. Will only be null if the requesting user is not allowed to read it.
+  """
+  classroom: Classroom
+
+  """The color of the booking (If not present we use default colors)."""
+  color: String
+  comment: String
+
+  """
+  Whether or not email notifications will be sent to participants when changes are made to the booking.
+  """
+  emailNotifications: Boolean!
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  endsAt: DateTime!
+
+  """
+  External reference supplied by external systems/sources for their own tracking.
+  """
+  externalReference: String
+  id: String!
+
+  """
+  The instructor/examiner slated to oversee the booking. Will only be null if the requesting user is not allowed to read it.
+  """
+  instructor: User
+
+  """Expects a date-time to be specified in ISO 8610 format."""
+  startsAt: DateTime!
+
+  """The current lifecycle status of the booking."""
+  status: BookingStatusEnum!
+
+  """Students slated to participate in the activity."""
+  students: [User]!
+
+  """The subject or name of the theoretical activity."""
+  subject: String
+
+  """Will only be null if the requesting user is not allowed to read it."""
+  theoryCourse: TheoryCourse
+}
+
+input TypeQuestionnaireBookingInput {
+  bookingStart: DateTime!
+  bookingEnd: DateTime!
+  comment: String
+  notifyViaEmail: Boolean
+  recurrenceRule: String
+  color: String
+
+  """
+  When true, the booking is created as "Awaiting Approval" even if the caller has approval rights. Defaults to false (auto-approved when the caller has the approve ability).
+  """
+  awaitingApproval: Boolean
+
+  """
+  External reference supplied by external systems/sources for their own tracking.
+  """
+  externalReference: String
+  classroomId: ID!
+  instructorById: ID!
+  theoryCourse: ID
+  programId: ID
+  subjectCategoryId: ID!
+  theoryLessonId: ID
+  programRevisionId: ID
+  subject: String
+  teamId: ID
+  studentsById: [StudentInput!]
+}
+
+"""The connection type for TypeQuestionnaire."""
+type TypeQuestionnaireConnection {
+  """A list of edges."""
+  edges: [TypeQuestionnaireEdge]
+
+  """A list of nodes."""
+  nodes: [TypeQuestionnaire]
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type TypeQuestionnaireEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+
+  """The item at the end of the edge."""
+  node: TypeQuestionnaire
+}
+
+"""A user."""
+type User implements Auditable {
+  """
+  Accounting transactions for this user. Paginated, newest first. Requires accounting module.
+  """
+  accountingTransactions(
+    """
+    If provided, finds only entries beginning after the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    from: DateTime
+
+    """
+    If provided, finds only entries ending before the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    to: DateTime
+
+    """
+    Filter by user. When omitted from root query, returns all account transactions.
+    """
+    userId: Id
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): AccountingTransactionConnection!
+  audit: AuditInfo
+
+  """User availability events in a given span of time."""
+  availabilities(
+    """
+    If provided, will only fetch events beginning after this point in time. Defaults to beginning of current day.
+    """
+    from: DateTime
+
+    """
+    If provided, will only fetch events ending before this point in time. Defaults to end of day of `from` time.
+    """
+    to: DateTime
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): UserAvailabilityConnection!
+  avatarUrl: String!
+
+  """The effective booking timezone for the authenticated user."""
+  bookingTimeZone: String
+  callSign: String!
+  contact: UserContact
+
+  """
+  The current location of the user. Null unless the user is an enabled student, flight instructor or ground instructor.
+  """
+  currentLocation: CurrentLocation
+  emergencyContact: UserEmergencyContact
+  firstName: String
+
+  """The effective flight timezone for the authenticated user."""
+  flightTimeZone: String
+
+  """The flights which the user has partaken in."""
+  flights(
+    """
+    If provided, finds only entries beginning after the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    from: DateTime
+
+    """
+    If provided, finds only entries ending before the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    to: DateTime
+
+    """
+    If provided, finds only entries created or updated after this date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    changedAfter: DateTime
+
+    """
+    If true, will also resolve resources that the requesting user is not associated with, provided they have permission.
+    """
+    all: Boolean
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): FlightConnection!
+  id: String!
+  lastName: String
+  notes: UserNotes
+
+  """
+  Whether the authenticated user overrides the account timezone defaults.
+  """
+  overrideTimeZone: Boolean
+  references: UserReferences
+
+  """The effective theory timezone for the authenticated user."""
+  theoryTimeZone: String
+
+  """user_programs ( user programs )"""
+  userPrograms(
+    """
+    If provided, finds only entries beginning after the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    from: DateTime
+
+    """
+    If provided, finds only entries ending before the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    to: DateTime
+
+    """
+    If provided, finds only entries created or updated after this date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    changedAfter: DateTime
+
+    """
+    If true, will also resolve resources that the requesting user is not associated with, provided they have permission.
+    """
+    all: Boolean
+
+    """
+    If provided, will only return when the status is set such as Active, Standby or Completed.
+    """
+    status: [UserProgramEnum!]
+
+    """
+    If provided, will only return trainings for the program with the given ID.
+    """
+    programIds: [Id!]
+
+    """If provided, will only return programs for the user with the given ID."""
+    userIds: [Id!]
+
+    """If provided, will only return programs of the type given."""
+    programType: ProgramTypeEnum
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): UserProgramConnection
+}
+
+"""
+A user availability event. Indicates the availability (or unavailability) of a user in a certain timespan.
+"""
+type UserAvailability {
+  endsAt: DateTime!
+  startsAt: DateTime!
+  unavailable: Boolean!
+}
+
+"""The connection type for UserAvailability."""
+type UserAvailabilityConnection {
+  """A list of edges."""
+  edges: [UserAvailabilityEdge]
+
+  """A list of nodes."""
+  nodes: [UserAvailability]
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type UserAvailabilityEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+
+  """The item at the end of the edge."""
+  node: UserAvailability
+}
+
+type UserCategory {
+  exercises: [UserExercise]!
+  extraExercises: [UserExtraExercise]!
+  id: Id!
+  name: String!
+}
+
+"""The connection type for User."""
+type UserConnection {
+  """A list of edges."""
+  edges: [UserEdge]
+
+  """A list of nodes."""
+  nodes: [User]
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""Contact information for the user."""
+type UserContact {
+  address: String
+  city: String
+  country: String
+
+  """Expects a date to be specified in ISO 8610 format."""
+  dateOfBirth: Date
+  email: String!
+
+  """Gender of the user."""
+  gender: GenderEnum!
+  phone: String
+  zipcode: String
+}
+
+"""An edge in a connection."""
+type UserEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+
+  """The item at the end of the edge."""
+  node: User
+}
+
+"""Contact information for the emergency contact of a user."""
+type UserEmergencyContact {
+  address: String
+  city: String
+  country: String
+
+  """Expects a date to be specified in ISO 8610 format."""
+  dateOfBirth: Date
+  email: String
+  firstName: String
+  lastName: String
+  phone: String
+  relation: String
+  zipcode: String
+}
+
+type UserExercise {
+  bestGrade: String
+  carryForward: Boolean!
+  comment: String
+  flagged: Boolean!
+  grade: String
+  gradedCompetencies: [GradedCompetency]
+  id: Id!
+  name: String!
+  normGrade: String
+}
+
+type UserExtraExercise {
+  bestGrade: String
+  carryForward: Boolean!
+  comment: String
+  flagged: Boolean!
+  grade: String
+  id: Id!
+  name: String!
+}
+
+input UserInput {
+  """"""
+  callSign: String!
+
+  """"""
+  email: String!
+
+  """"""
+  firstName: String!
+
+  """"""
+  lastName: String!
+
+  """"""
+  phone: String
+
+  """"""
+  address: String
+
+  """"""
+  postCode: String
+
+  """"""
+  city: String
+
+  """"""
+  country: String
+
+  """"""
+  dateOfBirth: Date
+
+  """"""
+  placeOfBirth: String
+  gender: GenderInputEnum
+
+  """
+  External reference. Used to identify the user in external systems/sources.
+  """
+  reference: String
+  caaRefNum: String
+  publicNote: String
+  adminNote: String
+  instructorNote: String
+}
+
+"""Note information for the user."""
+type UserNotes {
+  adminNote: String
+  instructorNote: String
+  publicNote: String
+}
+
+"""Represents the link between a `User` and a `Program`."""
+type UserProgram implements Auditable {
+  assignmentDate: DateTime!
+  audit: AuditInfo
+  classTheory: [TheoryParticipation]!
+  exams: [ExamParticipation]!
+  id: Id!
+  name: String!
+  program: Program
+  programRevision: ProgramRevision
+  progressTests: [TheoryParticipation]!
+  status: String!
+  theoryReleases: [TheoryParticipation]!
+
+  """training ( user lectures )"""
+  trainings(
+    """
+    If provided, finds only entries beginning after the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    from: DateTime
+
+    """
+    If provided, finds only entries ending before the date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    to: DateTime
+
+    """
+    If provided, finds only entries created or updated after this date. Expects a date-time to be specified in ISO 8610 format.
+    """
+    changedAfter: DateTime
+
+    """
+    If true, will also resolve resources that the requesting user is not associated with, provided they have permission.
+    """
+    all: Boolean
+
+    """
+    If provided, will only return when the status is set such as Passed, failed or Completed.
+    """
+    status: [TrainingStatusEnum!]
+
+    """
+    If provided, will only return trainings for the program with the given ID.
+    """
+    programIds: [Id!]
+
+    """If provided, will only return trainings associated with user ID"""
+    userIds: [Id!]
+
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): TrainingConnection
+  typeQuestionnaires: [TheoryParticipation]!
+  user: User
+}
+
+"""The connection type for UserProgram."""
+type UserProgramConnection {
+  """A list of edges."""
+  edges: [UserProgramEdge]
+
+  """A list of nodes."""
+  nodes: [UserProgram]
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type UserProgramEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+
+  """The item at the end of the edge."""
+  node: UserProgram
+}
+
+enum UserProgramEnum {
+  ACTIVE
+  STANDBY
+  COMPLETED
+  DISCONTINUED
+}
+
+"""Reference information for the user."""
+type UserReferences {
+  caaRefNum: String
+
+  """
+  External reference. Used to identify the user in external systems/sources.
+  """
+  reference: String
+}
+
+enum UserRoleEnum {
+  STUDENT
+  INSTRUCTOR
+  GROUND_INSTRUCTOR
+  FLIGHT_INSTRUCTOR
+  CREW
+  STAFF
+  ADMINISTRATOR
+  RENTER
+  GUEST
+}
+
+"""
+Fields common to all version events (i.e. creations, updates and deletions).
+"""
+interface VersionEvent {
+  """The id of the entity."""
+  entityId: Id!
+
+  """The type of the entity."""
+  entityType: VersionableEntityEnum!
+
+  """The type of versioning that took place."""
+  eventType: VersionEventTypeEnum!
+
+  """
+  The point in time at which the event took place. Expects a date-time to be specified in ISO 8610 format.
+  """
+  happenedAt: DateTime!
+
+  """The instigator of the event."""
+  whoDoneIt: User
+}
+
+"""All possible version events that can happen to versionable entities."""
+enum VersionEventTypeEnum {
+  DELETION
+}
+
+"""Union of possible version changes of entities."""
+union VersionUnion = Deletion
+
+"""The connection type for VersionUnion."""
+type VersionUnionConnection {
+  """A list of edges."""
+  edges: [VersionUnionEdge]
+
+  """A list of nodes."""
+  nodes: [VersionUnion]
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type VersionUnionEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+
+  """The item at the end of the edge."""
+  node: VersionUnion
+}
+
+"""All possible entity types of which version changes can be retrieved."""
+enum VersionableEntityEnum {
+  FLIGHT
+  USER_PROGRAM
+  TRAINING
+  BOOKING
+  OPERATION
+  RENTAL
+  CLASS_THEORY
+  EXTRA_THEORY
+  THEORY_RELEASE
+  PROGRESS_TEST
+  EXAM
+  TYPE_QUESTIONNAIRE
+  DUTY_TIME
+  THEORY_CREDIT
+  THEORY_REGISTRATION
+  USER_THEORY_LESSON
+}

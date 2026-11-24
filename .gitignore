@@ -1,0 +1,27 @@
+# Függőségek és build
+node_modules/
+out/
+dist/
+release/
+*.tsbuildinfo
+
+# Valódi üzemi adatok helyi teszteléshez (pl. karbantartási táblázat fotói) – nem kerülnek a repóba
+tests/local/
+
+# Gyorsítótár, jelentések, titkok – soha nem kerülnek a repóba
+cache/
+.cache/
+reports/
+*.secret
+*.key
+secret.bin
+.env
+.env.*
+
+# Claude Code: helyi beállítások és külső skillek (nem a program része)
+.claude/settings.local.json
+.claude/skills/
+
+# Rendszerfájlok
+.DS_Store
+Thumbs.db

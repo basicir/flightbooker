@@ -1,0 +1,26 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "felulet-bemutato",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev:web"
+      ],
+      "port": 5199
+    },
+    {
+      "name": "felulet-bemutato-5198",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "vite",
+        "--config",
+        "vite.web.config.mts",
+        "--port",
+        "5198"
+      ],
+      "port": 5198
+    }
+  ]
+}

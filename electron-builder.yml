@@ -1,0 +1,64 @@
+appId: local.flightbooker.planner
+# A csomagon belül ASCII név: ékezetes névvel a Chromium nem találja a segédfolyamatokat
+# (a macOS szétbontott ékezetet tárol), és az alkalmazás indításkor leáll.
+# A Finderben és a Dockban a CFBundleDisplayName látszik.
+productName: Foglalastervezo
+directories:
+  buildResources: build
+  output: release/${version}
+files:
+  - out/**
+  - package.json
+  # Az OCR-hez (ERF-04) csak a „best_int” nyelvi modell kell. A WebAssembly-magok közül
+  # mindet meghagyjuk: a tesseract.js Node-os ága (7.0.0) a CPU-tól és egy belső hibától
+  # függően a teljes magot tölti be, nem az LSTM-est.
+  - '!node_modules/@tesseract.js-data/eng/4.0.0/**'
+# Feladatsorok (SZB-02): a program erőforrásai közé, a felhasználó a saját adatmappájában
+# bővítheti őket.
+extraResources:
+  - from: feladatsorok
+    to: feladatsorok
+    filter:
+      - '*.json'
+asar: true
+# Helyi OCR (ERF-04): a Tesseract worker szála nem olvas az asar-archívumból, ezért a worker
+# szkriptje, a WebAssembly-mag, a nyelvi modell és a worker által betöltött csomagok kicsomagolva
+# kerülnek a telepítőbe.
+asarUnpack:
+  - node_modules/tesseract.js/**
+  - node_modules/tesseract.js-core/**
+  - node_modules/@tesseract.js-data/eng/4.0.0_best_int/**
+  - node_modules/{bmp-js,idb-keyval,is-url,node-fetch,whatwg-url,tr46,webidl-conversions,regenerator-runtime,wasm-feature-detect,zlibjs}/**
+mac:
+  # Az ikon a build/icon.png-ből készül (1024×1024).
+  # dmg: első telepítés; zip: a program saját frissítője ebből cseréli a csomagot (FRS-07).
+  target:
+    - dmg
+    - zip
+  category: public.app-category.productivity
+  # Ad-hoc aláírás (Apple Silicon-on aláírás nélkül nem indul). Apple-tanúsítvány nélkül az első
+  # indításnál a Rendszerbeállítások → Adatvédelem és biztonság → „Megnyitás mindenképp” kell;
+  # a program saját frissítője (FRS-07) ezt a frissítéseknél nem igényli.
+  identity: '-'
+  hardenedRuntime: false
+  extendInfo:
+    CFBundleDisplayName: Foglalástervező
+win:
+  target: nsis
+# Hordozható változat (`npm run app:win`): egyetlen .exe, telepítés nélkül indul; a beállítások
+# és a tervezetek a felhasználó adatmappájába kerülnek, nem az exe mellé.
+portable:
+  artifactName: ${productName}-${version}-hordozhato.exe
+# Felhasználónkénti, egykattintásos telepítés (rendszergazdai jog nélkül): így a program saját
+# frissítője csendben (/S) telepíthet (FRS-07). Asztali és Start menü parancsikon; a kiadási
+# folyamat (tools/release/package.ts) a csatornától függő nevet adja (Foglalástervező / … DEV).
+nsis:
+  oneClick: true
+  perMachine: false
+  createDesktopShortcut: always
+  createStartMenuShortcut: true
+  shortcutName: Foglalástervező
+  uninstallDisplayName: Foglalástervező
+  runAfterFinish: true
+# A kiadásokat a GitHub Actions teszi közzé saját aláírt leírással (.github/workflows), nem az electron-builder.
+publish: null

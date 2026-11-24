@@ -1,0 +1,6 @@
+{
+  "comment": "A kiadások Ed25519-aláírásának nyilvános kulcsai (FRS-04). A titkos kulcs a GitHub UPDATE_SIGNING_KEY titkában van.",
+  "keys": [
+    "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAv20c1zgd1+RiN/WE7cXJzr5afAFa8wgJf6z+Jp13BFA=\n-----END PUBLIC KEY-----\n"
+  ]
+}

@@ -1,0 +1,163 @@
+# Közös kiadási folyamat (FRS-05): ellenőrzés → csomagolás macOS-re (arm64, x64) és Windowsra →
+# aláírt leírás → GitHub-kiadás. A release.yml (push a main/dev ágra) és a promote.yml hívja.
+name: Kiadás (közös)
+
+on:
+  workflow_call:
+    inputs:
+      channel:
+        description: stable (main) vagy dev
+        required: true
+        type: string
+      ref:
+        description: A kiadandó commit
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  prepare:
+    name: Ellenőrzés és verzió
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      tag: ${{ steps.version.outputs.tag }}
+      previous_tag: ${{ steps.version.outputs.previous_tag }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Típusellenőrzés, lint, tesztek
+        run: |
+          npm run typecheck
+          npm run lint
+          npm test
+      - name: Következő verzió
+        id: version
+        env:
+          CHANNEL: ${{ inputs.channel }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          git ls-remote --tags --refs origin 'v*' | sed 's#.*refs/tags/##' > "$RUNNER_TEMP/tags.txt"
+          npx tsx tools/release/next-version.ts --channel "$CHANNEL" --tags-file "$RUNNER_TEMP/tags.txt" --repository "$REPOSITORY" >> "$GITHUB_OUTPUT"
+          cat "$GITHUB_OUTPUT"
+
+  build:
+    name: Csomagolás (${{ matrix.platform }}-${{ matrix.arch }})
+    needs: prepare
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - { os: macos-latest, platform: mac, arch: arm64 }
+          - { os: macos-latest, platform: mac, arch: x64 }
+          - { os: windows-latest, platform: win, arch: x64 }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref }}
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Verzió beírása
+        run: npm pkg set version=${{ needs.prepare.outputs.version }}
+      - run: npm run build
+      - name: Csomagolás
+        env:
+          # Ad-hoc aláírás (electron-builder.yml); Apple-tanúsítványt nem keres.
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: npx tsx tools/release/package.ts --channel ${{ inputs.channel }} --platform ${{ matrix.platform }} --arch ${{ matrix.arch }}
+      - uses: actions/upload-artifact@v7
+        with:
+          name: app-${{ matrix.platform }}-${{ matrix.arch }}
+          path: |
+            release/${{ inputs.channel }}/${{ matrix.platform }}-${{ matrix.arch }}/*.zip
+            release/${{ inputs.channel }}/${{ matrix.platform }}-${{ matrix.arch }}/*.dmg
+            release/${{ inputs.channel }}/${{ matrix.platform }}-${{ matrix.arch }}/*.exe
+          if-no-files-found: error
+          retention-days: 3
+
+  publish:
+    name: Közzététel
+    needs: [prepare, build]
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      CHANNEL: ${{ inputs.channel }}
+      VERSION: ${{ needs.prepare.outputs.version }}
+      TAG: ${{ needs.prepare.outputs.tag }}
+      PREVIOUS_TAG: ${{ needs.prepare.outputs.previous_tag }}
+      SHA: ${{ inputs.ref }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      # Csak a leírás elkészítéséhez kell (tsx, zod); Electront nem tölt le.
+      - run: npm ci --ignore-scripts
+      - uses: actions/download-artifact@v8
+        with:
+          path: dist
+          pattern: app-*
+          merge-multiple: true
+      - name: Aláírt leírás (update-manifest.json)
+        env:
+          UPDATE_SIGNING_KEY: ${{ secrets.UPDATE_SIGNING_KEY }}
+        run: npx tsx tools/release/manifest.ts --channel "$CHANNEL" --version "$VERSION" --dir dist --commit "$SHA"
+      - name: Kiadási jegyzet
+        run: |
+          {
+            if [ "$CHANNEL" = "dev" ]; then
+              echo "Fejlesztői (DEV) kiadás a \`dev\` ágról – a **Foglalástervező DEV** program frissül rá."
+            else
+              echo "Fő kiadás a \`main\` ágról – minden telepített **Foglalástervező** frissül rá."
+            fi
+            echo
+            echo "Első telepítés: macOS-en a \`mac-arm64.dmg\` (Apple Silicon) vagy a \`mac-x64.dmg\` (Intel), Windowson a \`win-x64-setup.exe\`. Részletek a README-ben."
+            echo
+            echo "### Változások"
+            if [ -n "$PREVIOUS_TAG" ] && git rev-parse -q --verify "refs/tags/$PREVIOUS_TAG" >/dev/null; then
+              git log --no-merges --pretty='- %s (%h)' "$PREVIOUS_TAG..$SHA" | head -60
+            else
+              git log --no-merges --pretty='- %s (%h)' -20 "$SHA"
+            fi
+          } > "$RUNNER_TEMP/notes.md"
+      - name: GitHub-kiadás
+        run: |
+          if [ "$CHANNEL" = "dev" ]; then
+            TITLE="Foglalástervező DEV $VERSION"
+            FLAGS="--prerelease"
+          else
+            TITLE="Foglalástervező $VERSION"
+            FLAGS=""
+          fi
+          # Vázlatként tölt fel, és csak a végén teszi közzé: félkész kiadást a program nem lát.
+          gh release create "$TAG" dist/* --draft --target "$SHA" --title "$TITLE" --notes-file "$RUNNER_TEMP/notes.md" $FLAGS
+          if [ "$CHANNEL" = "dev" ]; then
+            gh release edit "$TAG" --draft=false --latest=false
+          else
+            gh release edit "$TAG" --draft=false --latest
+          fi
+      - name: Régi fejlesztői kiadások törlése (az utolsó 10 marad)
+        if: inputs.channel == 'dev'
+        run: |
+          gh release list --limit 200 --exclude-drafts --json tagName,createdAt \
+            --jq '[.[] | select(.tagName | test("-dev\\.[0-9]+$"))] | sort_by(.createdAt) | reverse | .[10:] | .[].tagName' |
+          while read -r old; do
+            gh release delete "$old" --cleanup-tag --yes
+          done

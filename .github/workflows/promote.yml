@@ -1,0 +1,50 @@
+# Egy gombos kiadás: a kipróbált dev ág a main-re kerül (csak előrepörgetéssel), és fő kiadás
+# készül belőle – minden telepített Foglalástervező a következő indításkor frissül rá.
+# Indítás: GitHub → Actions → „Kiadás: dev → main” → Run workflow.
+name: 'Kiadás: dev → main'
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-stable
+  cancel-in-progress: false
+
+jobs:
+  promote:
+    name: dev → main
+    runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ steps.merge.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Előrepörgetés a dev-re
+        id: merge
+        run: |
+          git fetch origin dev
+          if ! git merge --ff-only origin/dev; then
+            echo "::error::A main olyan változást is tartalmaz, ami a dev-en nincs. Előbb fésüld össze a main-t a dev-be."
+            exit 1
+          fi
+          # A GITHUB_TOKEN munkafolyamat-fájlt (.github/workflows) érintő változást nem küldhet.
+          if git diff --name-only ORIG_HEAD HEAD -- .github/workflows | grep -q .; then
+            echo "::error::A dev ág a kiadási munkafolyamatokat is módosítja; ezt ez a gomb nem küldheti a main-re. Nyiss pull requestet dev → main, és fésüld össze – az is fő kiadást indít."
+            exit 1
+          fi
+          # A GITHUB_TOKEN-nel küldött push nem indítja el a release.yml-t, így nem lesz kettős kiadás.
+          git push origin HEAD:main
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+  release:
+    needs: promote
+    uses: ./.github/workflows/build-release.yml
+    with:
+      channel: stable
+      ref: ${{ needs.promote.outputs.sha }}
+    secrets: inherit

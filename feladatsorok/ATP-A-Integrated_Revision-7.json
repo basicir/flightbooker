@@ -1,0 +1,2123 @@
+{
+  "format": "flightbooker-feladatsor",
+  "formatVersion": 1,
+  "exportedAt": "2026-11-11T08:59:39.218Z",
+  "programs": [
+    {
+      "program": "ATP(A) Integrated",
+      "revision": "Revision 7",
+      "columns": [
+        "vfrDual",
+        "vfrSolo",
+        "vfrSpic",
+        "ifrDual",
+        "ifrSpic",
+        "ifrSim",
+        "multiEngine",
+        "night",
+        "crossCountry"
+      ],
+      "phases": [
+        {
+          "name": "Phase 1",
+          "taskCount": 13
+        },
+        {
+          "name": "Phase 2",
+          "taskCount": 19
+        },
+        {
+          "name": "Phase 3",
+          "taskCount": 29
+        },
+        {
+          "name": "Phase 4",
+          "taskCount": 55
+        },
+        {
+          "name": "Phase 5",
+          "taskCount": 3
+        }
+      ],
+      "tasks": [
+        {
+          "order": 1,
+          "phase": "Phase 1",
+          "code": "I./1.",
+          "phaseNumber": 1,
+          "number": 1,
+          "variant": null,
+          "name": "I./1. Taxiing and Introduction flight",
+          "title": "Taxiing and Introduction flight",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrDual": 30
+          },
+          "flightMinutes": 30,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 2,
+          "phase": "Phase 1",
+          "code": "I./2.",
+          "phaseNumber": 1,
+          "number": 2,
+          "variant": null,
+          "name": "I./2. Air exercise in training box",
+          "title": "Air exercise in training box",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrDual": 30
+          },
+          "flightMinutes": 30,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 3,
+          "phase": "Phase 1",
+          "code": "I./3.",
+          "phaseNumber": 1,
+          "number": 3,
+          "variant": null,
+          "name": "I./3. Transitions in training box I.",
+          "title": "Transitions in training box I.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrDual": 60
+          },
+          "flightMinutes": 60,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 4,
+          "phase": "Phase 1",
+          "code": "I./4.",
+          "phaseNumber": 1,
+          "number": 4,
+          "variant": null,
+          "name": "I./4. Transitions in training box II.",
+          "title": "Transitions in training box II.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrDual": 60
+          },
+          "flightMinutes": 60,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 5,
+          "phase": "Phase 1",
+          "code": "I./5.",
+          "phaseNumber": 1,
+          "number": 5,
+          "variant": null,
+          "name": "I./5. Basic UPRT I.",
+          "title": "Basic UPRT I.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrDual": 30
+          },
+          "flightMinutes": 30,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 6,
+          "phase": "Phase 1",
+          "code": "I./6.",
+          "phaseNumber": 1,
+          "number": 6,
+          "variant": null,
+          "name": "I./6. Basic UPRT II.",
+          "title": "Basic UPRT II.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrDual": 30
+          },
+          "flightMinutes": 30,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 7,
+          "phase": "Phase 1",
+          "code": "I./7.",
+          "phaseNumber": 1,
+          "number": 7,
+          "variant": null,
+          "name": "I./7. Traffic patterns I.",
+          "title": "Traffic patterns I.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrDual": 60
+          },
+          "flightMinutes": 60,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 8,
+          "phase": "Phase 1",
+          "code": "I./8.",
+          "phaseNumber": 1,
+          "number": 8,
+          "variant": null,
+          "name": "I./8. Traffic patterns II.",
+          "title": "Traffic patterns II.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrDual": 60
+          },
+          "flightMinutes": 60,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 9,
+          "phase": "Phase 1",
+          "code": "I./9.",
+          "phaseNumber": 1,
+          "number": 9,
+          "variant": null,
+          "name": "I./9. Traffic patterns III.",
+          "title": "Traffic patterns III.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrDual": 60
+          },
+          "flightMinutes": 60,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 10,
+          "phase": "Phase 1",
+          "code": "I./10.",
+          "phaseNumber": 1,
+          "number": 10,
+          "variant": null,
+          "name": "I./10. Low traffic patterns",
+          "title": "Low traffic patterns",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrDual": 60
+          },
+          "flightMinutes": 60,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 11,
+          "phase": "Phase 1",
+          "code": "I./11.",
+          "phaseNumber": 1,
+          "number": 11,
+          "variant": null,
+          "name": "I./11. Emergency I.",
+          "title": "Emergency I.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrDual": 30
+          },
+          "flightMinutes": 30,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 12,
+          "phase": "Phase 1",
+          "code": "I./12.",
+          "phaseNumber": 1,
+          "number": 12,
+          "variant": null,
+          "name": "I./12. Emergency II.",
+          "title": "Emergency II.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrDual": 60
+          },
+          "flightMinutes": 60,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 13,
+          "phase": "Phase 1",
+          "code": "I./13.",
+          "phaseNumber": 1,
+          "number": 13,
+          "variant": null,
+          "name": "I./13. Release for 1. Solo Flight",
+          "title": "Release for 1. Solo Flight",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrDual": 30
+          },
+          "flightMinutes": 30,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 14,
+          "phase": "Phase 2",
+          "code": "II./1.",
+          "phaseNumber": 2,
+          "number": 1,
+          "variant": null,
+          "name": "II./1. First solo flight",
+          "title": "First solo flight",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrSolo": 30
+          },
+          "flightMinutes": 30,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 15,
+          "phase": "Phase 2",
+          "code": "II./2.",
+          "phaseNumber": 2,
+          "number": 2,
+          "variant": null,
+          "name": "II./2. Dual visual circuits I.",
+          "title": "Dual visual circuits I.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrDual": 60
+          },
+          "flightMinutes": 60,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 16,
+          "phase": "Phase 2",
+          "code": "II./3.",
+          "phaseNumber": 2,
+          "number": 3,
+          "variant": null,
+          "name": "II./3. Dual visual circuits II.",
+          "title": "Dual visual circuits II.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrDual": 60
+          },
+          "flightMinutes": 60,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 17,
+          "phase": "Phase 2",
+          "code": "II./4.",
+          "phaseNumber": 2,
+          "number": 4,
+          "variant": null,
+          "name": "II./4. Dual visual circuits III.",
+          "title": "Dual visual circuits III.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrDual": 60
+          },
+          "flightMinutes": 60,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 18,
+          "phase": "Phase 2",
+          "code": "II./5.",
+          "phaseNumber": 2,
+          "number": 5,
+          "variant": null,
+          "name": "II./5. Dual visual circuits IV.",
+          "title": "Dual visual circuits IV.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrDual": 60
+          },
+          "flightMinutes": 60,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 19,
+          "phase": "Phase 2",
+          "code": "II./6.",
+          "phaseNumber": 2,
+          "number": 6,
+          "variant": null,
+          "name": "II./6. Local emergency training",
+          "title": "Local emergency training",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrDual": 60
+          },
+          "flightMinutes": 60,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 20,
+          "phase": "Phase 2",
+          "code": "II./7.",
+          "phaseNumber": 2,
+          "number": 7,
+          "variant": null,
+          "name": "II./7. Enroute emergency training",
+          "title": "Enroute emergency training",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrDual": 60
+          },
+          "flightMinutes": 60,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 21,
+          "phase": "Phase 2",
+          "code": "II./8.",
+          "phaseNumber": 2,
+          "number": 8,
+          "variant": null,
+          "name": "II./8. Local Area Solo I.",
+          "title": "Local Area Solo I.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrSolo": 30
+          },
+          "flightMinutes": 30,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 22,
+          "phase": "Phase 2",
+          "code": "II./9.",
+          "phaseNumber": 2,
+          "number": 9,
+          "variant": null,
+          "name": "II./9. Local Area Solo II.",
+          "title": "Local Area Solo II.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrSolo": 45
+          },
+          "flightMinutes": 45,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 23,
+          "phase": "Phase 2",
+          "code": "II./10.",
+          "phaseNumber": 2,
+          "number": 10,
+          "variant": null,
+          "name": "II./10. Local Area Solo III.",
+          "title": "Local Area Solo III.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrSolo": 60
+          },
+          "flightMinutes": 60,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 24,
+          "phase": "Phase 2",
+          "code": "II./11.",
+          "phaseNumber": 2,
+          "number": 11,
+          "variant": null,
+          "name": "II./11. Local Area Solo IV.",
+          "title": "Local Area Solo IV.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrSolo": 60
+          },
+          "flightMinutes": 60,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 25,
+          "phase": "Phase 2",
+          "code": "II./12.",
+          "phaseNumber": 2,
+          "number": 12,
+          "variant": null,
+          "name": "II./12. Local Area Solo V.",
+          "title": "Local Area Solo V.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrSolo": 60
+          },
+          "flightMinutes": 60,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 26,
+          "phase": "Phase 2",
+          "code": "II./13.",
+          "phaseNumber": 2,
+          "number": 13,
+          "variant": null,
+          "name": "II./13. Local Area Solo VI.",
+          "title": "Local Area Solo VI.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrSolo": 60
+          },
+          "flightMinutes": 60,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 27,
+          "phase": "Phase 2",
+          "code": "II./14.",
+          "phaseNumber": 2,
+          "number": 14,
+          "variant": null,
+          "name": "II./14. Local basic radio navigation exercise (VOR/NDB)",
+          "title": "Local basic radio navigation exercise (VOR/NDB)",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrDual": 60
+          },
+          "flightMinutes": 60,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 28,
+          "phase": "Phase 2",
+          "code": "II./15.",
+          "phaseNumber": 2,
+          "number": 15,
+          "variant": null,
+          "name": "II./15. Introduction of VFR Navigation",
+          "title": "Introduction of VFR Navigation",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrDual": 90,
+            "crossCountry": 90
+          },
+          "flightMinutes": 90,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 29,
+          "phase": "Phase 2",
+          "code": "II./16.",
+          "phaseNumber": 2,
+          "number": 16,
+          "variant": null,
+          "name": "II./16. Cross-country flight based on basic radio navigation (VOR/NDB)",
+          "title": "Cross-country flight based on basic radio navigation (VOR/NDB)",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrDual": 90,
+            "crossCountry": 90
+          },
+          "flightMinutes": 90,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 30,
+          "phase": "Phase 2",
+          "code": "II./17.",
+          "phaseNumber": 2,
+          "number": 17,
+          "variant": null,
+          "name": "II./17. Solo Cross-Country I.",
+          "title": "Solo Cross-Country I.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrSolo": 75,
+            "crossCountry": 75
+          },
+          "flightMinutes": 75,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 31,
+          "phase": "Phase 2",
+          "code": "II./18.",
+          "phaseNumber": 2,
+          "number": 18,
+          "variant": null,
+          "name": "II./18. Solo Cross-Country II.",
+          "title": "Solo Cross-Country II.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrSolo": 90,
+            "crossCountry": 90
+          },
+          "flightMinutes": 90,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 32,
+          "phase": "Phase 2",
+          "code": "II./19.",
+          "phaseNumber": 2,
+          "number": 19,
+          "variant": null,
+          "name": "II./19. SOLO X-Country III. (Traffic pattern at other airport)",
+          "title": "SOLO X-Country III. (Traffic pattern at other airport)",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrSolo": 90,
+            "crossCountry": 90
+          },
+          "flightMinutes": 90,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 33,
+          "phase": "Phase 3",
+          "code": "III./1.",
+          "phaseNumber": 3,
+          "number": 1,
+          "variant": null,
+          "name": "III./1. Cross-country flight I.",
+          "title": "Cross-country flight I.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrSpic": 90,
+            "crossCountry": 90
+          },
+          "flightMinutes": 90,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 34,
+          "phase": "Phase 3",
+          "code": "III./2.",
+          "phaseNumber": 3,
+          "number": 2,
+          "variant": null,
+          "name": "III./2. Cross-country flight II.",
+          "title": "Cross-country flight II.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrSpic": 90,
+            "crossCountry": 90
+          },
+          "flightMinutes": 90,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 35,
+          "phase": "Phase 3",
+          "code": "III./3.",
+          "phaseNumber": 3,
+          "number": 3,
+          "variant": null,
+          "name": "III./3. Cross-country flight III.",
+          "title": "Cross-country flight III.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrSpic": 90,
+            "crossCountry": 90
+          },
+          "flightMinutes": 90,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 36,
+          "phase": "Phase 3",
+          "code": "III./4.",
+          "phaseNumber": 3,
+          "number": 4,
+          "variant": null,
+          "name": "III./4. Cross-country flight IV.",
+          "title": "Cross-country flight IV.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrSpic": 120,
+            "crossCountry": 120
+          },
+          "flightMinutes": 120,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 37,
+          "phase": "Phase 3",
+          "code": "III./5.",
+          "phaseNumber": 3,
+          "number": 5,
+          "variant": null,
+          "name": "III./5. Cross-country flight V.",
+          "title": "Cross-country flight V.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrSpic": 80,
+            "crossCountry": 80
+          },
+          "flightMinutes": 80,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 38,
+          "phase": "Phase 3",
+          "code": "III./6.",
+          "phaseNumber": 3,
+          "number": 6,
+          "variant": null,
+          "name": "III./6. Cross-country flight VI. (Check Flight)",
+          "title": "Cross-country flight VI. (Check Flight)",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrSpic": 180,
+            "crossCountry": 180
+          },
+          "flightMinutes": 180,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 39,
+          "phase": "Phase 3",
+          "code": "III./7.",
+          "phaseNumber": 3,
+          "number": 7,
+          "variant": null,
+          "name": "III./7. Low cross-country flight I.",
+          "title": "Low cross-country flight I.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrSpic": 90,
+            "crossCountry": 90
+          },
+          "flightMinutes": 90,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 40,
+          "phase": "Phase 3",
+          "code": "III./8.",
+          "phaseNumber": 3,
+          "number": 8,
+          "variant": null,
+          "name": "III./8. Low cross-country flight II.",
+          "title": "Low cross-country flight II.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrSpic": 90,
+            "crossCountry": 90
+          },
+          "flightMinutes": 90,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 41,
+          "phase": "Phase 3",
+          "code": "III./9.",
+          "phaseNumber": 3,
+          "number": 9,
+          "variant": null,
+          "name": "III./9. Local basic radio navigation exercise (VOR/NDB)",
+          "title": "Local basic radio navigation exercise (VOR/NDB)",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrDual": 60
+          },
+          "flightMinutes": 60,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 42,
+          "phase": "Phase 3",
+          "code": "III./10.",
+          "phaseNumber": 3,
+          "number": 10,
+          "variant": null,
+          "name": "III./10. Cross-country flight based on basic radio navigation (VOR/NDB)",
+          "title": "Cross-country flight based on basic radio navigation (VOR/NDB)",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrDual": 90,
+            "crossCountry": 90
+          },
+          "flightMinutes": 90,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 43,
+          "phase": "Phase 3",
+          "code": "III./11.",
+          "phaseNumber": 3,
+          "number": 11,
+          "variant": null,
+          "name": "III./11. Advanced cross-country flight",
+          "title": "Advanced cross-country flight",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrSpic": 90,
+            "crossCountry": 90
+          },
+          "flightMinutes": 90,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 44,
+          "phase": "Phase 3",
+          "code": "III./12.",
+          "phaseNumber": 3,
+          "number": 12,
+          "variant": null,
+          "name": "III./12. Introduction to Night Operations",
+          "title": "Introduction to Night Operations",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrDual": 60,
+            "night": 60
+          },
+          "flightMinutes": 60,
+          "simulator": false,
+          "night": true
+        },
+        {
+          "order": 45,
+          "phase": "Phase 3",
+          "code": "III./13.",
+          "phaseNumber": 3,
+          "number": 13,
+          "variant": null,
+          "name": "III./13. Consolidation of Night Landings I.",
+          "title": "Consolidation of Night Landings I.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrDual": 60,
+            "night": 60
+          },
+          "flightMinutes": 60,
+          "simulator": false,
+          "night": true
+        },
+        {
+          "order": 46,
+          "phase": "Phase 3",
+          "code": "III./14.",
+          "phaseNumber": 3,
+          "number": 14,
+          "variant": null,
+          "name": "III./14. Consolidation of Night Landings II.",
+          "title": "Consolidation of Night Landings II.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrSpic": 60,
+            "night": 60
+          },
+          "flightMinutes": 60,
+          "simulator": false,
+          "night": true
+        },
+        {
+          "order": 47,
+          "phase": "Phase 3",
+          "code": "III./15.",
+          "phaseNumber": 3,
+          "number": 15,
+          "variant": null,
+          "name": "III./15. Night check flight",
+          "title": "Night check flight",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrSpic": 30,
+            "night": 30
+          },
+          "flightMinutes": 30,
+          "simulator": false,
+          "night": true
+        },
+        {
+          "order": 48,
+          "phase": "Phase 3",
+          "code": "III./16.",
+          "phaseNumber": 3,
+          "number": 16,
+          "variant": null,
+          "name": "III./16. Solo Traffic Pattern at Night",
+          "title": "Solo Traffic Pattern at Night",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrSolo": 40,
+            "night": 40
+          },
+          "flightMinutes": 40,
+          "simulator": false,
+          "night": true
+        },
+        {
+          "order": 49,
+          "phase": "Phase 3",
+          "code": "III./17.",
+          "phaseNumber": 3,
+          "number": 17,
+          "variant": null,
+          "name": "III./17. PIC traffic patterns I. (Maximum performance take-offs and short-field landings)",
+          "title": "PIC traffic patterns I. (Maximum performance take-offs and short-field landings)",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrSpic": 60
+          },
+          "flightMinutes": 60,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 50,
+          "phase": "Phase 3",
+          "code": "III./18.",
+          "phaseNumber": 3,
+          "number": 18,
+          "variant": null,
+          "name": "III./18. PIC traffic patterns II.",
+          "title": "PIC traffic patterns II.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrSpic": 60
+          },
+          "flightMinutes": 60,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 51,
+          "phase": "Phase 3",
+          "code": "III./19.",
+          "phaseNumber": 3,
+          "number": 19,
+          "variant": null,
+          "name": "III./19. PIC traffic patterns III.",
+          "title": "PIC traffic patterns III.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrSpic": 60
+          },
+          "flightMinutes": 60,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 52,
+          "phase": "Phase 3",
+          "code": "III./20.",
+          "phaseNumber": 3,
+          "number": 20,
+          "variant": null,
+          "name": "III./20. PIC traffic patterns IV.",
+          "title": "PIC traffic patterns IV.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrSpic": 60
+          },
+          "flightMinutes": 60,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 53,
+          "phase": "Phase 3",
+          "code": "III./21.",
+          "phaseNumber": 3,
+          "number": 21,
+          "variant": null,
+          "name": "III./21. Aircraft familiarization flights with new type I.",
+          "title": "Aircraft familiarization flights with new type I.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrDual": 30
+          },
+          "flightMinutes": 30,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 54,
+          "phase": "Phase 3",
+          "code": "III./22.",
+          "phaseNumber": 3,
+          "number": 22,
+          "variant": null,
+          "name": "III./22. Aircraft familiarization flights with new type II.",
+          "title": "Aircraft familiarization flights with new type II.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrSpic": 60
+          },
+          "flightMinutes": 60,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 55,
+          "phase": "Phase 3",
+          "code": "III./23.",
+          "phaseNumber": 3,
+          "number": 23,
+          "variant": null,
+          "name": "III./23. Local emergency training with new type",
+          "title": "Local emergency training with new type",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrSpic": 60
+          },
+          "flightMinutes": 60,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 56,
+          "phase": "Phase 3",
+          "code": "III./24.",
+          "phaseNumber": 3,
+          "number": 24,
+          "variant": null,
+          "name": "III./24. PIC traffic patterns V.",
+          "title": "PIC traffic patterns V.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrSpic": 60
+          },
+          "flightMinutes": 60,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 57,
+          "phase": "Phase 3",
+          "code": "III./25.",
+          "phaseNumber": 3,
+          "number": 25,
+          "variant": null,
+          "name": "III./25. PIC traffic patterns VI.",
+          "title": "PIC traffic patterns VI.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrSpic": 60
+          },
+          "flightMinutes": 60,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 58,
+          "phase": "Phase 3",
+          "code": "III./26.",
+          "phaseNumber": 3,
+          "number": 26,
+          "variant": null,
+          "name": "III./26. Cross Country Flight VII.",
+          "title": "Cross Country Flight VII.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrSpic": 210,
+            "crossCountry": 210
+          },
+          "flightMinutes": 210,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 59,
+          "phase": "Phase 3",
+          "code": "III./27.",
+          "phaseNumber": 3,
+          "number": 27,
+          "variant": null,
+          "name": "III./27. Cross Country Flight VIII.",
+          "title": "Cross Country Flight VIII.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrSpic": 180,
+            "crossCountry": 180
+          },
+          "flightMinutes": 180,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 60,
+          "phase": "Phase 3",
+          "code": "III./28.",
+          "phaseNumber": 3,
+          "number": 28,
+          "variant": null,
+          "name": "III./28. Cross-Country Triangle 300NM",
+          "title": "Cross-Country Triangle 300NM",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrSolo": 270,
+            "crossCountry": 270
+          },
+          "flightMinutes": 270,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 61,
+          "phase": "Phase 3",
+          "code": "III./29.",
+          "phaseNumber": 3,
+          "number": 29,
+          "variant": null,
+          "name": "III./29. Progress Check CPL VFR NAV",
+          "title": "Progress Check CPL VFR NAV",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrSpic": 210,
+            "crossCountry": 210
+          },
+          "flightMinutes": 210,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 62,
+          "phase": "Phase 4",
+          "code": "IV./1.S.",
+          "phaseNumber": 4,
+          "number": 1,
+          "variant": "S",
+          "name": "IV./1.S. Introduction to instrument flying (FNPT II.)",
+          "title": "Introduction to instrument flying (FNPT II.)",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrSim": 120
+          },
+          "flightMinutes": 120,
+          "simulator": true,
+          "night": false
+        },
+        {
+          "order": 63,
+          "phase": "Phase 4",
+          "code": "IV./2.S.",
+          "phaseNumber": 4,
+          "number": 2,
+          "variant": "S",
+          "name": "IV./2.S. Getting the grips with IFR flying I. (FNPT II.)",
+          "title": "Getting the grips with IFR flying I. (FNPT II.)",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrSim": 120
+          },
+          "flightMinutes": 120,
+          "simulator": true,
+          "night": false
+        },
+        {
+          "order": 64,
+          "phase": "Phase 4",
+          "code": "IV./3.S.",
+          "phaseNumber": 4,
+          "number": 3,
+          "variant": "S",
+          "name": "IV./3.S. Getting the grips with IFR flying II. (FNPT II.)",
+          "title": "Getting the grips with IFR flying II. (FNPT II.)",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrSim": 120
+          },
+          "flightMinutes": 120,
+          "simulator": true,
+          "night": false
+        },
+        {
+          "order": 65,
+          "phase": "Phase 4",
+          "code": "IV./4.S.",
+          "phaseNumber": 4,
+          "number": 4,
+          "variant": "S",
+          "name": "IV./4.S. VOR Practise (FNPT II.)",
+          "title": "VOR Practise (FNPT II.)",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrSim": 120
+          },
+          "flightMinutes": 120,
+          "simulator": true,
+          "night": false
+        },
+        {
+          "order": 66,
+          "phase": "Phase 4",
+          "code": "IV./5.S.",
+          "phaseNumber": 4,
+          "number": 5,
+          "variant": "S",
+          "name": "IV./5.S. VOR Holdings (FNPT II.)",
+          "title": "VOR Holdings (FNPT II.)",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrSim": 120
+          },
+          "flightMinutes": 120,
+          "simulator": true,
+          "night": false
+        },
+        {
+          "order": 67,
+          "phase": "Phase 4",
+          "code": "IV./6.S.",
+          "phaseNumber": 4,
+          "number": 6,
+          "variant": "S",
+          "name": "IV./6.S. ADF Practise (FNPT II.)",
+          "title": "ADF Practise (FNPT II.)",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrSim": 120
+          },
+          "flightMinutes": 120,
+          "simulator": true,
+          "night": false
+        },
+        {
+          "order": 68,
+          "phase": "Phase 4",
+          "code": "IV./7.S.",
+          "phaseNumber": 4,
+          "number": 7,
+          "variant": "S",
+          "name": "IV./7.S. ADF Holdings (FNPT II.)",
+          "title": "ADF Holdings (FNPT II.)",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrSim": 120
+          },
+          "flightMinutes": 120,
+          "simulator": true,
+          "night": false
+        },
+        {
+          "order": 69,
+          "phase": "Phase 4",
+          "code": "IV./8.S.",
+          "phaseNumber": 4,
+          "number": 8,
+          "variant": "S",
+          "name": "IV./8.S. DME Arc and DME Holding. (FNPT II.)",
+          "title": "DME Arc and DME Holding. (FNPT II.)",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrSim": 120
+          },
+          "flightMinutes": 120,
+          "simulator": true,
+          "night": false
+        },
+        {
+          "order": 70,
+          "phase": "Phase 4",
+          "code": "IV./9.S.",
+          "phaseNumber": 4,
+          "number": 9,
+          "variant": "S",
+          "name": "IV./9.S. IFR internal check flight I. (FNPT II.)",
+          "title": "IFR internal check flight I. (FNPT II.)",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrSim": 120
+          },
+          "flightMinutes": 120,
+          "simulator": true,
+          "night": false
+        },
+        {
+          "order": 71,
+          "phase": "Phase 4",
+          "code": "IV./10.S.",
+          "phaseNumber": 4,
+          "number": 10,
+          "variant": "S",
+          "name": "IV./10.S. Introduction to precision approaches (FNPT II.)",
+          "title": "Introduction to precision approaches (FNPT II.)",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrSim": 120
+          },
+          "flightMinutes": 120,
+          "simulator": true,
+          "night": false
+        },
+        {
+          "order": 72,
+          "phase": "Phase 4",
+          "code": "IV./11.S.",
+          "phaseNumber": 4,
+          "number": 11,
+          "variant": "S",
+          "name": "IV./11.S. Precision approaches (FNPT II.)",
+          "title": "Precision approaches (FNPT II.)",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrSim": 120
+          },
+          "flightMinutes": 120,
+          "simulator": true,
+          "night": false
+        },
+        {
+          "order": 73,
+          "phase": "Phase 4",
+          "code": "IV./12.S.",
+          "phaseNumber": 4,
+          "number": 12,
+          "variant": "S",
+          "name": "IV./12.S. Introduction to non-precision approaches (FNPT II.)",
+          "title": "Introduction to non-precision approaches (FNPT II.)",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrSim": 120
+          },
+          "flightMinutes": 120,
+          "simulator": true,
+          "night": false
+        },
+        {
+          "order": 74,
+          "phase": "Phase 4",
+          "code": "IV./13.S.",
+          "phaseNumber": 4,
+          "number": 13,
+          "variant": "S",
+          "name": "IV./13.S. Non-precision approaches (FNPT II.)",
+          "title": "Non-precision approaches (FNPT II.)",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrSim": 120
+          },
+          "flightMinutes": 120,
+          "simulator": true,
+          "night": false
+        },
+        {
+          "order": 75,
+          "phase": "Phase 4",
+          "code": "IV./14.S.",
+          "phaseNumber": 4,
+          "number": 14,
+          "variant": "S",
+          "name": "IV./14.S. Use of GNSS and RNAV procedures (FNPT II.)",
+          "title": "Use of GNSS and RNAV procedures (FNPT II.)",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrSim": 120
+          },
+          "flightMinutes": 120,
+          "simulator": true,
+          "night": false
+        },
+        {
+          "order": 76,
+          "phase": "Phase 4",
+          "code": "IV./15.S.",
+          "phaseNumber": 4,
+          "number": 15,
+          "variant": "S",
+          "name": "IV./15.S. Advanced approach Procedures (FNPT II.)",
+          "title": "Advanced approach Procedures (FNPT II.)",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrSim": 120
+          },
+          "flightMinutes": 120,
+          "simulator": true,
+          "night": false
+        },
+        {
+          "order": 77,
+          "phase": "Phase 4",
+          "code": "IV./16.S.",
+          "phaseNumber": 4,
+          "number": 16,
+          "variant": "S",
+          "name": "IV./16.S. IFR Internal Check flight II. (FNPT II.)",
+          "title": "IFR Internal Check flight II. (FNPT II.)",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrSim": 120
+          },
+          "flightMinutes": 120,
+          "simulator": true,
+          "night": false
+        },
+        {
+          "order": 78,
+          "phase": "Phase 4",
+          "code": "IV./17.A.",
+          "phaseNumber": 4,
+          "number": 17,
+          "variant": "A",
+          "name": "IV./17.A. Basic IFR – Instrument Patterns I.",
+          "title": "Basic IFR – Instrument Patterns I.",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrDual": 75
+          },
+          "flightMinutes": 75,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 79,
+          "phase": "Phase 4",
+          "code": "IV./18.A.",
+          "phaseNumber": 4,
+          "number": 18,
+          "variant": "A",
+          "name": "IV./18.A. Basic IFR – Instrument Patterns II.",
+          "title": "Basic IFR – Instrument Patterns II.",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrDual": 75
+          },
+          "flightMinutes": 75,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 80,
+          "phase": "Phase 4",
+          "code": "IV./19.A.",
+          "phaseNumber": 4,
+          "number": 19,
+          "variant": "A",
+          "name": "IV./19.A. Radio Navigation Use of ADF I.",
+          "title": "Radio Navigation Use of ADF I.",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrDual": 90
+          },
+          "flightMinutes": 90,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 81,
+          "phase": "Phase 4",
+          "code": "IV./20.A.",
+          "phaseNumber": 4,
+          "number": 20,
+          "variant": "A",
+          "name": "IV./20.A. Radio Navigation Use of ADF II.",
+          "title": "Radio Navigation Use of ADF II.",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrDual": 90
+          },
+          "flightMinutes": 90,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 82,
+          "phase": "Phase 4",
+          "code": "IV./21.A.",
+          "phaseNumber": 4,
+          "number": 21,
+          "variant": "A",
+          "name": "IV./21.A. NDB Holdings and procedure turns",
+          "title": "NDB Holdings and procedure turns",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrDual": 90
+          },
+          "flightMinutes": 90,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 83,
+          "phase": "Phase 4",
+          "code": "IV./22.A.",
+          "phaseNumber": 4,
+          "number": 22,
+          "variant": "A",
+          "name": "IV./22.A. Radio Navigation Use of VOR",
+          "title": "Radio Navigation Use of VOR",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrDual": 90
+          },
+          "flightMinutes": 90,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 84,
+          "phase": "Phase 4",
+          "code": "IV./23.A.",
+          "phaseNumber": 4,
+          "number": 23,
+          "variant": "A",
+          "name": "IV./23.A. VOR Holdings and Procedure Turns",
+          "title": "VOR Holdings and Procedure Turns",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrDual": 90
+          },
+          "flightMinutes": 90,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 85,
+          "phase": "Phase 4",
+          "code": "IV./24.A.",
+          "phaseNumber": 4,
+          "number": 24,
+          "variant": "A",
+          "name": "IV./24.A. DME Arc and Special Holding Procedures",
+          "title": "DME Arc and Special Holding Procedures",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrDual": 60
+          },
+          "flightMinutes": 60,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 86,
+          "phase": "Phase 4",
+          "code": "IV./25.A.",
+          "phaseNumber": 4,
+          "number": 25,
+          "variant": "A",
+          "name": "IV./25.A. Unusual Attitudes and Recovery",
+          "title": "Unusual Attitudes and Recovery",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrDual": 60
+          },
+          "flightMinutes": 60,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 87,
+          "phase": "Phase 4",
+          "code": "IV./26.A.",
+          "phaseNumber": 4,
+          "number": 26,
+          "variant": "A",
+          "name": "IV./26.A. NDB traffic pattern",
+          "title": "NDB traffic pattern",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrDual": 90
+          },
+          "flightMinutes": 90,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 88,
+          "phase": "Phase 4",
+          "code": "IV./27.A.",
+          "phaseNumber": 4,
+          "number": 27,
+          "variant": "A",
+          "name": "IV./27.A. NDB approach",
+          "title": "NDB approach",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrDual": 90
+          },
+          "flightMinutes": 90,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 89,
+          "phase": "Phase 4",
+          "code": "IV./28.A.",
+          "phaseNumber": 4,
+          "number": 28,
+          "variant": "A",
+          "name": "IV./28.A. VOR approach I.",
+          "title": "VOR approach I.",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrDual": 90
+          },
+          "flightMinutes": 90,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 90,
+          "phase": "Phase 4",
+          "code": "IV./29.A.",
+          "phaseNumber": 4,
+          "number": 29,
+          "variant": "A",
+          "name": "IV./29.A. VOR approach II.",
+          "title": "VOR approach II.",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrDual": 90
+          },
+          "flightMinutes": 90,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 91,
+          "phase": "Phase 4",
+          "code": "IV./30.A.",
+          "phaseNumber": 4,
+          "number": 30,
+          "variant": "A",
+          "name": "IV./30.A. Advanced approach procedures",
+          "title": "Advanced approach procedures",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrDual": 90
+          },
+          "flightMinutes": 90,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 92,
+          "phase": "Phase 4",
+          "code": "IV./31.A.",
+          "phaseNumber": 4,
+          "number": 31,
+          "variant": "A",
+          "name": "IV./31.A. LHDC Session I.",
+          "title": "LHDC Session I.",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrDual": 150
+          },
+          "flightMinutes": 150,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 93,
+          "phase": "Phase 4",
+          "code": "IV./32.A.",
+          "phaseNumber": 4,
+          "number": 32,
+          "variant": "A",
+          "name": "IV./32.A. LHDC Session II.",
+          "title": "LHDC Session II.",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrDual": 150
+          },
+          "flightMinutes": 150,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 94,
+          "phase": "Phase 4",
+          "code": "IV./33.A.",
+          "phaseNumber": 4,
+          "number": 33,
+          "variant": "A",
+          "name": "IV./33.A. International IR Cross country I.",
+          "title": "International IR Cross country I.",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrDual": 150,
+            "crossCountry": 150
+          },
+          "flightMinutes": 150,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 95,
+          "phase": "Phase 4",
+          "code": "IV./34.A.",
+          "phaseNumber": 4,
+          "number": 34,
+          "variant": "A",
+          "name": "IV./34.A. International IR Cross country II.",
+          "title": "International IR Cross country II.",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrDual": 180,
+            "crossCountry": 180
+          },
+          "flightMinutes": 180,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 96,
+          "phase": "Phase 4",
+          "code": "IV./35.A.",
+          "phaseNumber": 4,
+          "number": 35,
+          "variant": "A",
+          "name": "IV./35.A. International IR Cross country III.",
+          "title": "International IR Cross country III.",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrDual": 120,
+            "crossCountry": 120
+          },
+          "flightMinutes": 120,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 97,
+          "phase": "Phase 4",
+          "code": "IV./36.A.",
+          "phaseNumber": 4,
+          "number": 36,
+          "variant": "A",
+          "name": "IV./36.A. LHDC Night Session",
+          "title": "LHDC Night Session",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrSpic": 150,
+            "night": 30,
+            "crossCountry": 150
+          },
+          "flightMinutes": 150,
+          "simulator": false,
+          "night": true
+        },
+        {
+          "order": 98,
+          "phase": "Phase 4",
+          "code": "IV./37.A.",
+          "phaseNumber": 4,
+          "number": 37,
+          "variant": "A",
+          "name": "IV./37.A. IR Cross country I.",
+          "title": "IR Cross country I.",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrSpic": 180,
+            "crossCountry": 180
+          },
+          "flightMinutes": 180,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 99,
+          "phase": "Phase 4",
+          "code": "IV./38.A.",
+          "phaseNumber": 4,
+          "number": 38,
+          "variant": "A",
+          "name": "IV./38.A. IR Cross country II.",
+          "title": "IR Cross country II.",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrSpic": 120,
+            "crossCountry": 120
+          },
+          "flightMinutes": 120,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 100,
+          "phase": "Phase 4",
+          "code": "IV./39.A.",
+          "phaseNumber": 4,
+          "number": 39,
+          "variant": "A",
+          "name": "IV./39.A. IR Cross country III.",
+          "title": "IR Cross country III.",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrSpic": 120,
+            "crossCountry": 120
+          },
+          "flightMinutes": 120,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 101,
+          "phase": "Phase 4",
+          "code": "IV./40.A.",
+          "phaseNumber": 4,
+          "number": 40,
+          "variant": "A",
+          "name": "IV./40.A. IR Cross country IV.",
+          "title": "IR Cross country IV.",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrSpic": 210,
+            "crossCountry": 210
+          },
+          "flightMinutes": 210,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 102,
+          "phase": "Phase 4",
+          "code": "IV./41.A.",
+          "phaseNumber": 4,
+          "number": 41,
+          "variant": "A",
+          "name": "IV./41.A. IR Cross country V.",
+          "title": "IR Cross country V.",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrSpic": 180,
+            "crossCountry": 180
+          },
+          "flightMinutes": 180,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 103,
+          "phase": "Phase 4",
+          "code": "IV./42.A.",
+          "phaseNumber": 4,
+          "number": 42,
+          "variant": "A",
+          "name": "IV./42.A. IR Cross country VI.",
+          "title": "IR Cross country VI.",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrSpic": 120,
+            "crossCountry": 120
+          },
+          "flightMinutes": 120,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 104,
+          "phase": "Phase 4",
+          "code": "IV./43.A.",
+          "phaseNumber": 4,
+          "number": 43,
+          "variant": "A",
+          "name": "IV./43.A. IFR internal check flight III.",
+          "title": "IFR internal check flight III.",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrSpic": 120,
+            "crossCountry": 120
+          },
+          "flightMinutes": 120,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 105,
+          "phase": "Phase 4",
+          "code": "IV./44.A.",
+          "phaseNumber": 4,
+          "number": 44,
+          "variant": "A",
+          "name": "IV./44.A. ME classification (Normal) I.",
+          "title": "ME classification (Normal) I.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrDual": 60,
+            "multiEngine": 60
+          },
+          "flightMinutes": 60,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 106,
+          "phase": "Phase 4",
+          "code": "IV./45.A.",
+          "phaseNumber": 4,
+          "number": 45,
+          "variant": "A",
+          "name": "IV./45.A. ME classification (Normal) II.",
+          "title": "ME classification (Normal) II.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrDual": 90,
+            "multiEngine": 90
+          },
+          "flightMinutes": 90,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 107,
+          "phase": "Phase 4",
+          "code": "IV./46.A.",
+          "phaseNumber": 4,
+          "number": 46,
+          "variant": "A",
+          "name": "IV./46.A. ME classification (Asymmetric) I.",
+          "title": "ME classification (Asymmetric) I.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrDual": 60,
+            "multiEngine": 60
+          },
+          "flightMinutes": 60,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 108,
+          "phase": "Phase 4",
+          "code": "IV./47.A.",
+          "phaseNumber": 4,
+          "number": 47,
+          "variant": "A",
+          "name": "IV./47.A. ME classification (Asymmetric) II.",
+          "title": "ME classification (Asymmetric) II.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrDual": 60,
+            "multiEngine": 60
+          },
+          "flightMinutes": 60,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 109,
+          "phase": "Phase 4",
+          "code": "IV./48.A.",
+          "phaseNumber": 4,
+          "number": 48,
+          "variant": "A",
+          "name": "IV./48.A. ME classification (Asymmetric) III.",
+          "title": "ME classification (Asymmetric) III.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrDual": 90,
+            "multiEngine": 90
+          },
+          "flightMinutes": 90,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 110,
+          "phase": "Phase 4",
+          "code": "IV./49.A.",
+          "phaseNumber": 4,
+          "number": 49,
+          "variant": "A",
+          "name": "IV./49.A. Multi Engine Instrument Flight Procedures I.",
+          "title": "Multi Engine Instrument Flight Procedures I.",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrDual": 90,
+            "multiEngine": 90
+          },
+          "flightMinutes": 90,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 111,
+          "phase": "Phase 4",
+          "code": "IV./50.A.",
+          "phaseNumber": 4,
+          "number": 50,
+          "variant": "A",
+          "name": "IV./50.A. Multi Engine Instrument Flight Procedures II.",
+          "title": "Multi Engine Instrument Flight Procedures II.",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrDual": 90,
+            "multiEngine": 90
+          },
+          "flightMinutes": 90,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 112,
+          "phase": "Phase 4",
+          "code": "IV./51.A.",
+          "phaseNumber": 4,
+          "number": 51,
+          "variant": "A",
+          "name": "IV./51.A. Multi Engine Night Cross Country",
+          "title": "Multi Engine Night Cross Country",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrDual": 60,
+            "multiEngine": 60,
+            "night": 60,
+            "crossCountry": 60
+          },
+          "flightMinutes": 60,
+          "simulator": false,
+          "night": true
+        },
+        {
+          "order": 113,
+          "phase": "Phase 4",
+          "code": "IV./52.S.",
+          "phaseNumber": 4,
+          "number": 52,
+          "variant": "S",
+          "name": "IV./52.S. Multi Engine Instrument Flight Procedures III. (FNPT II.)",
+          "title": "Multi Engine Instrument Flight Procedures III. (FNPT II.)",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrSim": 120
+          },
+          "flightMinutes": 120,
+          "simulator": true,
+          "night": false
+        },
+        {
+          "order": 114,
+          "phase": "Phase 4",
+          "code": "IV./53.S.",
+          "phaseNumber": 4,
+          "number": 53,
+          "variant": "S",
+          "name": "IV./53.S. Complex IR flight I. (FNPT II.)",
+          "title": "Complex IR flight I. (FNPT II.)",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrSim": 120
+          },
+          "flightMinutes": 120,
+          "simulator": true,
+          "night": false
+        },
+        {
+          "order": 115,
+          "phase": "Phase 4",
+          "code": "IV./54.S.",
+          "phaseNumber": 4,
+          "number": 54,
+          "variant": "S",
+          "name": "IV./54.S. Complex IR flight II. (FNPT II.)",
+          "title": "Complex IR flight II. (FNPT II.)",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrSim": 120
+          },
+          "flightMinutes": 120,
+          "simulator": true,
+          "night": false
+        },
+        {
+          "order": 116,
+          "phase": "Phase 4",
+          "code": "IV./55.S.",
+          "phaseNumber": 4,
+          "number": 55,
+          "variant": "S",
+          "name": "IV./55.S. Complex IR flight III. - Exam release flight (FNPT II.)",
+          "title": "Complex IR flight III. - Exam release flight (FNPT II.)",
+          "category": "Flight lesson",
+          "minutes": {
+            "ifrSim": 120
+          },
+          "flightMinutes": 120,
+          "simulator": true,
+          "night": false
+        },
+        {
+          "order": 117,
+          "phase": "Phase 5",
+          "code": "V./1.",
+          "phaseNumber": 5,
+          "number": 1,
+          "variant": null,
+          "name": "V./1 Advanced UPRT I.",
+          "title": "Advanced UPRT I.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrDual": 70
+          },
+          "flightMinutes": 70,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 118,
+          "phase": "Phase 5",
+          "code": "V./2.",
+          "phaseNumber": 5,
+          "number": 2,
+          "variant": null,
+          "name": "V./2. Advanced UPRT II.",
+          "title": "Advanced UPRT II.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrDual": 70
+          },
+          "flightMinutes": 70,
+          "simulator": false,
+          "night": false
+        },
+        {
+          "order": 119,
+          "phase": "Phase 5",
+          "code": "V./3.",
+          "phaseNumber": 5,
+          "number": 3,
+          "variant": null,
+          "name": "V./3 Advanced UPRT III.",
+          "title": "Advanced UPRT III.",
+          "category": "Flight lesson",
+          "minutes": {
+            "vfrDual": 70
+          },
+          "flightMinutes": 70,
+          "simulator": false,
+          "night": false
+        }
+      ],
+      "stats": {
+        "tasks": 119,
+        "skippedCustom": 10,
+        "duplicates": 0,
+        "withoutCode": [],
+        "withoutTime": [],
+        "unknownColumns": []
+      }
+    }
+  ]
+}

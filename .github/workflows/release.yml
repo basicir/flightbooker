@@ -1,0 +1,29 @@
+# Push a dev ágra → fejlesztői kiadás (Foglalástervező DEV frissül).
+# Push a main ágra (pl. egy dev → main pull request összefésülése) → fő kiadás (mindenki frissül).
+name: Kiadás
+
+on:
+  push:
+    branches: [main, dev]
+    # Csak dokumentációt érintő változásra nem készül új kiadás.
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# Csatornánként egyszerre egy kiadás; a várakozók közül csak a legújabb fut le.
+concurrency:
+  group: release-${{ github.ref_name == 'main' && 'stable' || 'dev' }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.ref_name == 'main' || github.ref_name == 'dev'
+    uses: ./.github/workflows/build-release.yml
+    with:
+      channel: ${{ github.ref_name == 'main' && 'stable' || 'dev' }}
+      ref: ${{ github.sha }}
+    secrets: inherit
