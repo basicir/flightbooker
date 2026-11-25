@@ -4,6 +4,7 @@ import { FL_SESSION_TYPES, theoryTypeOf, type BookingRequest, type FlSessionType
 import { groundPrograms, subjectsOf, type TheoryCatalog } from '@core/model/theoryCatalog'
 import { useEffect, useState } from 'react'
 import { api } from '../bridge'
+import { FlField } from './flOnly'
 import { Button, Select, TextInput } from './ui'
 
 /**
@@ -118,49 +119,52 @@ export function TheoryFlFields(props: {
     )
 
   return (
-    <div className="row wrap theory-fl-fields" aria-label="FlightLogger-mezők">
+    <>
       {type === 'groundTraining' && (
-        <>
-          <span className="muted">Osztály (Class):</span>
+        <FlField label="Osztály (Class)">
           <Select
             ariaLabel="Osztály a FlightLoggerben"
             value={request.classId ?? ''}
             onChange={(classId) => props.onChange({ classId: classId || undefined })}
             options={[{ value: '', label: 'nincs' }, ...classes.map(([id, c]) => ({ value: id, label: c.name }))]}
           />
-        </>
+        </FlField>
       )}
-      <span className="muted">Program:</span>
-      {programField}
+      <FlField label="Program" missing={!fl.program}>
+        {programField}
+      </FlField>
       {type === 'groundTraining' && (
         <>
-          <span className="muted">Tárgy (Subject):</span>
-          {programs.length > 0 && !fl.programRevisionId && !fl.subject ? (
-            <span className="small muted">előbb a programot válaszd (a tárgyak attól függnek)</span>
-          ) : subjects.length > 0 ? (
-            <Select
-              ariaLabel="Tárgy a FlightLoggerben"
-              value={subjects.some((s) => s.id === fl.subjectId) ? (fl.subjectId ?? '') : ''}
-              onChange={(id) => {
-                const s = subjects.find((x) => x.id === id)
-                set({ subjectId: s?.id, subject: s?.name })
-              }}
-              options={[{ value: '', label: 'nincs megadva' }, ...subjects.map((s) => ({ value: s.id, label: s.name }))]}
+          <FlField label="Tárgy (Subject)" missing={!fl.subject}>
+            {programs.length > 0 && !fl.programRevisionId && !fl.subject ? (
+              <span className="small muted">előbb a programot válaszd (a tárgyak attól függnek)</span>
+            ) : subjects.length > 0 ? (
+              <Select
+                ariaLabel="Tárgy a FlightLoggerben"
+                value={subjects.some((s) => s.id === fl.subjectId) ? (fl.subjectId ?? '') : ''}
+                onChange={(id) => {
+                  const s = subjects.find((x) => x.id === id)
+                  set({ subjectId: s?.id, subject: s?.name })
+                }}
+                options={[{ value: '', label: 'nincs megadva' }, ...subjects.map((s) => ({ value: s.id, label: s.name }))]}
+              />
+            ) : (
+              <TextInput ariaLabel="Tárgy a FlightLoggerben" value={fl.subject ?? ''} placeholder="tárgy – töredék is elég, pl. „cross”" width={240} onChange={(v) => set({ subject: v, subjectId: undefined })} />
+            )}
+          </FlField>
+          <FlField label="Session type">
+            <Select<FlSessionType>
+              ariaLabel="Session type a FlightLoggerben"
+              value={fl.sessionType ?? 'Ground lesson'}
+              onChange={(v) => set({ sessionType: v === 'Ground lesson' ? undefined : v })}
+              options={FL_SESSION_TYPES.map((v) => ({ value: v, label: v }))}
             />
-          ) : (
-            <TextInput ariaLabel="Tárgy a FlightLoggerben" value={fl.subject ?? ''} placeholder="tárgy – töredék is elég, pl. „cross”" width={240} onChange={(v) => set({ subject: v, subjectId: undefined })} />
-          )}
-          <span className="muted">Session type:</span>
-          <Select<FlSessionType>
-            ariaLabel="Session type a FlightLoggerben"
-            value={fl.sessionType ?? 'Ground lesson'}
-            onChange={(v) => set({ sessionType: v === 'Ground lesson' ? undefined : v })}
-            options={FL_SESSION_TYPES.map((v) => ({ value: v, label: v }))}
-          />
-          <span className="muted">Session:</span>
-          <TextInput ariaLabel="Session a FlightLoggerben" value={fl.session ?? ''} placeholder="az óra címe" width={220} maxLength={300} onChange={(v) => set({ session: v })} />
+          </FlField>
+          <FlField label="Session (az óra címe)" missing={!fl.session}>
+            <TextInput ariaLabel="Session a FlightLoggerben" value={fl.session ?? ''} placeholder="az óra címe" width={260} maxLength={300} onChange={(v) => set({ session: v })} />
+          </FlField>
         </>
       )}
-    </div>
+    </>
   )
 }

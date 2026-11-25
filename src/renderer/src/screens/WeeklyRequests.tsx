@@ -10,7 +10,7 @@ import { RouteEditor } from '../components/routeEditor'
 import { TeamControl, TeamDialog, teamName } from '../components/teams'
 import { TimingEditor } from '../components/timingEditor'
 import { Badge, Button, Card, NumberInput, PageHeader, Segmented, TextInput } from '../components/ui'
-import { FlOnlySection } from '../components/flOnly'
+import { FlField, FlOnlySection } from '../components/flOnly'
 import { hoursMinutes, personName } from '../format'
 import { studentProgress, syllabusLabel } from '../progress'
 import { todayIn, useApp } from '../state'
@@ -644,10 +644,9 @@ function RequestRow(props: {
       </div>
       <div className="req-line req-details">
         <FlOnlySection summary={r.note ? `komment: „${shortName(r.note, 40)}”` : 'nincs komment'}>
-          <div className="row wrap">
-            <span className="muted">Komment:</span>
+          <FlField label="Komment">
             <TextInput ariaLabel="Komment a FlightLoggerbe" value={r.note ?? ''} placeholder="a foglalás megjegyzése (a növendék is látja)" width={380} maxLength={500} onChange={(v) => props.onUpdate({ note: v || undefined })} />
-          </div>
+          </FlField>
         </FlOnlySection>
       </div>
     </li>

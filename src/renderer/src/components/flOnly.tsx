@@ -1,9 +1,10 @@
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 
 /**
  * Az igény űrlapjának két része: a tervezéshez szükséges mezők kiemelve, a csak a FlightLogger-
- * foglalásba kerülő mezők (típus, program, komment …) összecsukva és halványan. Az összecsukott
- * rész fejléce mutatja, mi van megadva és mi hiányzik, így nyitás nélkül is látszik.
+ * foglalásba kerülő mezők (típus, program, komment …) egy lenyitható részben. A lenyitható rész
+ * fejléce egyértelműen kattintható (nyíl, „Kitöltés” felirat), és összecsukva is mutatja, mi van
+ * megadva és mi hiányzik.
  */
 
 export function PlanFields(props: { children: ReactNode; title?: string }) {
@@ -15,14 +16,47 @@ export function PlanFields(props: { children: ReactNode; title?: string }) {
   )
 }
 
-export function FlOnlySection(props: { summary?: ReactNode; missing?: readonly string[]; children: ReactNode }) {
+/**
+ * Egy mező a FlightLogger-részben: balra a címke, jobbra a mező (és a tipp). `missing`: a
+ * FlightLogger-import ezt az adatot várja, de nincs megadva – a címke mellett „kell” jelzés.
+ */
+export function FlField(props: { label: string; missing?: boolean; hint?: ReactNode; children: ReactNode }) {
   return (
-    <details className="fl-only">
+    <div className="fl-field">
+      <span className={`fl-field-label${props.missing ? ' missing' : ''}`}>
+        {props.label}
+        {props.missing && <span className="fl-field-required">kell</span>}
+      </span>
+      <div className="fl-field-control">
+        {props.children}
+        {props.hint ? <span className="small muted">{props.hint}</span> : null}
+      </div>
+    </div>
+  )
+}
+
+export function FlOnlySection(props: { summary?: ReactNode; missing?: readonly string[]; children: ReactNode }) {
+  const [open, setOpen] = useState(false)
+  const missing = props.missing ?? []
+  return (
+    <details className="fl-only" open={open} onToggle={(e) => setOpen(e.currentTarget.open)}>
       <summary>
-        <span className="fl-only-title">FlightLoggerbe</span>
-        <span className="fl-only-note">nem hat a tervre</span>
-        {props.summary ? <span className="fl-only-summary">{props.summary}</span> : null}
-        {props.missing && props.missing.length > 0 ? <span className="fl-only-missing">hiányzik: {props.missing.join(', ')}</span> : null}
+        <svg className="fl-only-chevron" viewBox="0 0 16 16" aria-hidden="true">
+          <path d="M6 3.5 10.5 8 6 12.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+        <span className="fl-only-head">
+          <span className="fl-only-heading">
+            <span className="fl-only-title">FlightLoggerbe</span>
+            <span className="fl-only-note">a FlightLogger-foglalás adatai – a tervet nem befolyásolják</span>
+          </span>
+          {!open && (props.summary || missing.length > 0) && (
+            <span className="fl-only-values">
+              {props.summary ? <span className="fl-only-summary">{props.summary}</span> : null}
+              {missing.length > 0 ? <span className="fl-only-missing">hiányzik: {missing.join(', ')}</span> : null}
+            </span>
+          )}
+        </span>
+        <span className="fl-only-action">{open ? 'Bezárás ▴' : missing.length > 0 ? 'Kitöltés ▾' : 'Szerkesztés ▾'}</span>
       </summary>
       <div className="fl-only-body">{props.children}</div>
     </details>

@@ -10,7 +10,7 @@ import { useApp } from '../state'
 import { WeekTag } from '../components/weekTag'
 import { PrioritySelect } from '../components/priority'
 import { CatalogStatus, TheoryFlFields, useTheoryCatalog } from '../components/theoryFlFields'
-import { FlOnlySection, PlanFields } from '../components/flOnly'
+import { FlField, FlOnlySection, PlanFields } from '../components/flOnly'
 
 /** Elméletek (6. fejezet 3. lépés, TRV-01–03, SZB-08): résztvevők, időpont, terem. */
 export function Theories() {
@@ -102,24 +102,27 @@ export function Theories() {
                 </div>
               </PlanFields>
               <FlOnlySection summary={theoryFlSummary(t, bundle)} missing={theoryFlMissing(t)}>
-                <div className="row wrap">
-                  <span className="muted">Típus:</span>
+                <FlField
+                  label="Típus"
+                  hint={
+                    theoryTypeOf(t) === 'extraTheory' && t.studentIds.length > 1
+                      ? 'A FlightLoggerben az extra elmélet egynövendékes: növendékenként külön foglalás lesz, ugyanarra az időre és terembe.'
+                      : theoryTypeOf(t) === 'meeting'
+                        ? 'A megbeszélésnek nincs oktató mezője: te is résztvevőként kerülsz rá.'
+                        : undefined
+                  }
+                >
                   <Select
                     ariaLabel="Elmélet típusa"
                     value={theoryTypeOf(t)}
                     onChange={(theoryType: TheoryType) => update(t.id, { theoryType })}
                     options={(Object.keys(THEORY_TYPE_LABELS) as TheoryType[]).map((value) => ({ value, label: THEORY_TYPE_LABELS[value] }))}
                   />
-                  {theoryTypeOf(t) === 'extraTheory' && t.studentIds.length > 1 && (
-                    <span className="small muted">A FlightLoggerben az extra elmélet egynövendékes: növendékenként külön foglalás lesz, ugyanarra az időre és terembe.</span>
-                  )}
-                  {theoryTypeOf(t) === 'meeting' && <span className="small muted">A megbeszélésnek nincs oktató mezője: te is résztvevőként kerülsz rá.</span>}
-                </div>
+                </FlField>
                 <TheoryFlFields request={t} bundle={bundle} catalog={catalogState.catalog} onChange={(patch) => update(t.id, patch)} />
-                <div className="row wrap">
-                  <span className="muted">Komment:</span>
+                <FlField label="Komment">
                   <TextInput ariaLabel="Komment a FlightLoggerbe" value={t.note ?? ''} placeholder="a foglalás megjegyzése (a résztvevők is látják)" width={380} maxLength={500} onChange={(v) => update(t.id, { note: v || undefined })} />
-                </div>
+                </FlField>
               </FlOnlySection>
             </div>
           </Card>
@@ -236,7 +239,7 @@ function ParticipantsEditor(props: { bundle: DataBundle | null; assignedIds: rea
 function theoryFlSummary(t: BookingRequest, bundle: DataBundle | null): string {
   const type = theoryTypeOf(t)
   const fl = t.flTheory ?? {}
-  const parts: string[] = [THEORY_TYPE_SHORT[type]]
+  const parts: string[] = [`Típus: ${THEORY_TYPE_SHORT[type]}`]
   if (type === 'groundTraining') {
     if (t.classId) parts.push(bundle?.directory.classes[t.classId]?.name ?? 'osztály')
     if (fl.program) parts.push(fl.program)
@@ -245,7 +248,7 @@ function theoryFlSummary(t: BookingRequest, bundle: DataBundle | null): string {
     if (fl.session) parts.push(`„${fl.session}”`)
   }
   if (type === 'extraTheory' && fl.program) parts.push(fl.program)
-  if (t.note) parts.push('komment')
+  if (t.note) parts.push('komment megadva')
   return parts.join(' · ')
 }
 

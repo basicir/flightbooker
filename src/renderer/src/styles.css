@@ -3712,31 +3712,76 @@ kbd {
   font-weight: 600;
 }
 .fl-only {
-  border: 1px dashed var(--border-strong);
+  border-left: 3px solid var(--border-strong);
   border-radius: var(--radius-sm);
-  color: var(--muted);
+  background: color-mix(in srgb, var(--fg) 3%, transparent);
   font-size: 13px;
   min-width: 0;
   flex: 1 1 100%;
 }
 .fl-only > summary {
   display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  cursor: pointer;
+  list-style: none;
+  border-radius: var(--radius-sm);
+}
+.fl-only > summary::-webkit-details-marker {
+  display: none;
+}
+.fl-only > summary:hover {
+  background: color-mix(in srgb, var(--fg) 6%, transparent);
+}
+.fl-only > summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+.fl-only-chevron {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  color: var(--fg);
+  opacity: 0.7;
+  transition: transform 0.15s ease;
+}
+.fl-only[open] .fl-only-chevron {
+  transform: rotate(90deg);
+}
+.fl-only-head {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.fl-only-heading {
+  display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   gap: 4px 10px;
-  padding: 5px 10px;
-  cursor: pointer;
-  list-style: revert;
 }
+/* Párban a „Tervezéshez” címkével, de semleges színnel. */
 .fl-only-title {
-  font-weight: 600;
-  color: var(--fg);
-  opacity: 0.75;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
 }
 .fl-only-note {
-  font-size: 11px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.fl-only-values {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  min-width: 0;
 }
 .fl-only-summary {
+  color: var(--fg);
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -3744,9 +3789,51 @@ kbd {
 .fl-only-missing {
   color: var(--warn);
   font-size: 12px;
+  font-weight: 600;
+}
+.fl-only-action {
+  flex: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  white-space: nowrap;
 }
 .fl-only-body {
   display: grid;
   gap: 8px;
-  padding: 4px 10px 10px;
+  padding: 4px 10px 12px 31px;
+}
+
+/* A FlightLogger-rész mezői: balra a címke, jobbra a mező; a hiányzó, de az importnak kellő adat jelölve */
+.fl-field {
+  display: grid;
+  grid-template-columns: 170px minmax(0, 1fr);
+  align-items: center;
+  gap: 4px 12px;
+}
+.fl-field-label {
+  color: var(--muted);
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.fl-field-label.missing {
+  color: var(--fg);
+}
+.fl-field-required {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--warn);
+}
+.fl-field-control {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  min-width: 0;
+}
+@media (max-width: 640px) {
+  .fl-field {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
