@@ -46,14 +46,13 @@ describe('kiadási fájlok', () => {
 })
 
 describe('csatornánkénti csomagok', () => {
-  it('a DEV csak macOS-re készül, a fő kiadás Windowsra is', () => {
-    expect(RELEASE_TARGETS.dev.map((t) => t.platform)).toEqual(['mac', 'mac'])
-    expect(RELEASE_TARGETS.stable.some((t) => t.platform === 'win')).toBe(true)
-    expect(requiredAssets('dev')).toEqual([
-      { platform: 'darwin', arch: 'arm64', kind: 'zip' },
-      { platform: 'darwin', arch: 'x64', kind: 'zip' },
-    ])
+  it('a DEV csak Apple Silicon Macre, zipként készül; a fő kiadás minden platformra, DMG-vel is', () => {
+    expect(RELEASE_TARGETS.dev).toEqual([{ platform: 'mac', arch: 'arm64', os: 'macos-latest' }])
+    expect(requiredAssets('dev')).toEqual([{ platform: 'darwin', arch: 'arm64', kind: 'zip' }])
+    expect(CHANNELS.dev.macFormats).toEqual(['zip'])
+    expect(RELEASE_TARGETS.stable.map((t) => `${t.platform}-${t.arch}`)).toEqual(['mac-arm64', 'mac-x64', 'win-x64'])
     expect(requiredAssets('stable')).toContainEqual({ platform: 'win32', arch: 'x64', kind: 'nsis' })
+    expect(CHANNELS.stable.macFormats).toEqual(['dmg', 'zip'])
   })
 
   it('a programnév (és így az adatmappa) egy helyről jön; a DEV ebből találja a fő változatot', () => {

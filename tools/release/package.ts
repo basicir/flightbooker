@@ -67,7 +67,7 @@ const config: Configuration = {
   directories: { output: `release/${channel}/${platform}-${arch}` },
   mac: {
     icon: c.icon,
-    target: ['dmg', 'zip'],
+    target: [...c.macFormats],
     artifactName: `${base}.\${ext}`,
     extendInfo: { CFBundleDisplayName: c.displayName },
   },
@@ -81,7 +81,7 @@ const config: Configuration = {
   publish: null,
 }
 
-const targets = platform === 'mac' ? Platform.MAC.createTarget(['dmg', 'zip'], Arch[arch]) : Platform.WINDOWS.createTarget(['nsis'], Arch[arch])
+const targets = platform === 'mac' ? Platform.MAC.createTarget([...c.macFormats], Arch[arch]) : Platform.WINDOWS.createTarget(['nsis'], Arch[arch])
 build({ targets, config, publish: 'never' }).then(
   (files) => {
     for (const file of files) process.stdout.write(`${file}\n`)

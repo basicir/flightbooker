@@ -13,7 +13,7 @@ részében vannak (`docs/koncepcio.md`); a Claude Docs-beli koncepcióba még á
 | Azonosító | `local.flightbooker.planner` | `local.flightbooker.planner.dev` |
 | Adatmappa | `…/Foglalástervező` | `…/Foglalástervező DEV` |
 | Ikon | `build/icon.png` | `build/icon-dev.png` (narancs, „DEV”) |
-| Platform | macOS (Apple Silicon, Intel), Windows | csak macOS |
+| Platform | macOS (Apple Silicon, Intel; DMG és zip), Windows | csak Apple Silicon Mac (zip) |
 | Ki kapja | minden felhasználó | a fejlesztő |
 
 A két program egymás mellett fut, külön beállításokkal és külön API-kulccsal: egy kísérleti
@@ -22,9 +22,9 @@ DEV-verzió nem rontja el a fő verzió adatait.
 ## A fejlesztő munkamenete
 
 1. Minden feladat végén a változás a `dev` ágra kerül (`git push origin dev`; a szabály a CLAUDE.md
-   „Munkamenet” részében). A GitHub Actions („Kiadás”) lefuttatja a típusellenőrzést, a lintet és a
-   teszteket, megépíti a macOS-csomagot (Apple Silicon és Intel; a DEV-hez Windows-csomag nem készül), és
-   közzéteszi a fejlesztői kiadást. Kb. 5 perc.
+   „Munkamenet” részében). A GitHub Actions („Kiadás”) megépíti az Apple Silicon Mac-csomagot (zip; a
+   DEV-hez Intel-, Windows-csomag és DMG nem készül), vele párhuzamosan lefuttatja a típusellenőrzést, a
+   lintet és a teszteket, és ha minden zöld, közzéteszi a fejlesztői kiadást. Kb. 2–3 perc.
 2. A **Foglalástervező DEV** a következő indításkor frissül rá.
 3. Ha megfelel: a DEV-ben **Beállítások → Frissítés → Kiadás: dev → main**. A gomb pontosan a futó
    DEV-verzió commitját adja ki: a `main`-t arra pörgeti (csak előre, összefésülés nélkül), és fő kiadást
@@ -34,7 +34,10 @@ DEV-verzió nem rontja el a fő verzió adatait.
    GitHub-token korlátja), ilyenkor a pull request kell.
 4. Minden **Foglalástervező** a következő indításkor frissül.
 
-Csak dokumentációt érintő push (`docs/**`, `*.md`) nem indít kiadást.
+Nem indít kiadást az a push, amely csak dokumentációt, teszteket vagy a kiadási folyamatot érinti
+(`docs/**`, `*.md`, `tests/**`, `.github/**`, `tools/release/**`): a program nem változik. Így a `main` a
+kiadási folyamat változásával is a `dev`-hez igazítható új felhasználói verzió nélkül. Ilyen változás
+kipróbálása: Actions → Kiadás → Run workflow (a `dev` ágon).
 
 **Verziók.** Kézi léptetés nincs. A fő kiadás a legutóbbi fő kiadás javítószáma +1 (az alsó határ
 a `package.json` verziója – fő- vagy alverzió-váltáshoz azt kell átírni, pl. `0.2.0`-ra). A
@@ -113,11 +116,11 @@ fejlesztői eszközei és narancs ikonja így csak a DEV-ben van.
 - `release.yml` – push a `main`/`dev` ágra → `build-release.yml` a megfelelő csatornával.
 - `promote.yml` – „Kiadás: dev → main”: a DEV gombja (a kipróbált commit, `commit` bemenet) vagy az
   Actions oldala (a `dev` ág vége) indítja; ha a `main` már tartalmazza, nem ad ki újra.
-- `build-release.yml` – közös: ellenőrzés és verzió (`tools/release/next-version.ts`, egyben
-  ellenőrzi, hogy a programba épített repónév egyezik a GitHub-repóval, és kiadja a csatorna
-  csomagolási mátrixát a `tools/release/channels.ts` `RELEASE_TARGETS`-éből) → csomagolás
-  (`tools/release/package.ts`, párhuzamosan; fő kiadás: macOS arm64, x64 és Windows, DEV: macOS arm64
-  és x64) → aláírt leírás
+- `build-release.yml` – közös: verzió (`tools/release/next-version.ts`, egyben ellenőrzi, hogy a
+  programba épített repónév egyezik a GitHub-repóval, és kiadja a csatorna csomagolási mátrixát a
+  `tools/release/channels.ts` `RELEASE_TARGETS`-éből) → csomagolás (`tools/release/package.ts`,
+  párhuzamosan; fő kiadás: macOS arm64 és x64 DMG-vel és zippel, Windows; DEV: macOS arm64 zip), vele
+  egy időben ellenőrzés (típusok, lint, tesztek) → ha mindkettő sikeres: aláírt leírás
   (`tools/release/manifest.ts`) → vázlatként feltöltött, a végén közzétett GitHub-kiadás → a
   10-nél régebbi fejlesztői kiadások törlése.
 - `ci.yml` – pull requestnél csak ellenőrzés.

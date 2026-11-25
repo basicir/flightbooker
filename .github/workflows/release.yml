@@ -5,10 +5,15 @@ name: Kiadás
 on:
   push:
     branches: [main, dev]
-    # Csak dokumentációt érintő változásra nem készül új kiadás.
+    # Nem készül új kiadás, ha a push csak dokumentációt, teszteket vagy a kiadási folyamatot érinti (a
+    # program nem változik). Így a main a kiadási folyamat változásával is a dev-hez igazítható anélkül,
+    # hogy a felhasználók új verziót kapnának. Ilyen változás kipróbálása: Actions → Kiadás → Run workflow.
     paths-ignore:
       - 'docs/**'
       - '**/*.md'
+      - 'tests/**'
+      - '.github/**'
+      - 'tools/release/**'
   workflow_dispatch:
 
 permissions:

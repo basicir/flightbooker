@@ -7,7 +7,7 @@ a foglalásokat mindig az oktató rögzíti.
 ## Telepítés
 
 A telepítők a [Releases](../../releases) oldalon vannak. A **Latest** jelölésű kiadás a fő
-változat; a „Pre-release” jelölésűek a fejlesztői (DEV) változathoz tartoznak (csak macOS).
+változat; a „Pre-release” jelölésűek a fejlesztői (DEV) változathoz tartoznak (csak Apple Silicon Mac, zip).
 
 **macOS**
 
@@ -50,6 +50,6 @@ npm run typecheck && npm run lint && npm test
 
 A követelmények a `docs/koncepcio.md`-ben, a kiadás és a frissítés működése a
 `docs/kiadas-es-frissites.md`-ben van. A fejlesztés a `dev` ágon folyik: minden push fejlesztői
-kiadást készít a **Foglalástervező DEV** programnak (csak macOS); a fő kiadás a DEV-ben a
+kiadást készít a **Foglalástervező DEV** programnak (csak Apple Silicon Mac); a fő kiadás a DEV-ben a
 **Beállítások → Frissítés → Kiadás: dev → main** gombbal (vagy a GitHub Actions azonos nevű
 munkafolyamatával) készül.

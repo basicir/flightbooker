@@ -1,6 +1,7 @@
-# Közös kiadási folyamat (FRS-05): ellenőrzés → csomagolás (fő kiadás: macOS arm64, x64 és Windows;
-# DEV: csak macOS – tools/release/channels.ts) → aláírt leírás → GitHub-kiadás. A release.yml (push a
-# main/dev ágra) és a promote.yml hívja.
+# Közös kiadási folyamat (FRS-05): verzió → csomagolás (fő kiadás: macOS arm64, x64 és Windows, DMG-vel;
+# DEV: csak macOS arm64, zip – tools/release/channels.ts), vele párhuzamosan ellenőrzés (típusok, lint,
+# tesztek) → aláírt leírás → GitHub-kiadás. Közzététel csak akkor van, ha az ellenőrzés és minden
+# csomagolás sikeres. A release.yml (push a main/dev ágra) és a promote.yml hívja.
 name: Kiadás (közös)
 
 on:
@@ -19,8 +20,9 @@ permissions:
   contents: write
 
 jobs:
+  # Gyors: csak a verziót és a csomagolási mátrixot számolja, hogy a csomagolás azonnal indulhasson.
   prepare:
-    name: Ellenőrzés és verzió
+    name: Verzió
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.version.outputs.version }}
@@ -36,12 +38,8 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
-      - name: Típusellenőrzés, lint, tesztek
-        run: |
-          npm run typecheck
-          npm run lint
-          npm test
+      # Csak a tsx kell; Electront nem tölt le.
+      - run: npm ci --ignore-scripts
       - name: Következő verzió
         id: version
         env:
@@ -51,6 +49,25 @@ jobs:
           git ls-remote --tags --refs origin 'v*' | sed 's#.*refs/tags/##' > "$RUNNER_TEMP/tags.txt"
           npx tsx tools/release/next-version.ts --channel "$CHANNEL" --tags-file "$RUNNER_TEMP/tags.txt" --repository "$REPOSITORY" >> "$GITHUB_OUTPUT"
           cat "$GITHUB_OUTPUT"
+
+  # A csomagolással párhuzamosan; a közzététel megvárja.
+  checks:
+    name: Ellenőrzés
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref }}
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Típusellenőrzés, lint, tesztek
+        run: |
+          npm run typecheck
+          npm run lint
+          npm test
 
   build:
     name: Csomagolás (${{ matrix.platform }}-${{ matrix.arch }})
@@ -89,7 +106,7 @@ jobs:
 
   publish:
     name: Közzététel
-    needs: [prepare, build]
+    needs: [prepare, checks, build]
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ github.token }}
@@ -128,7 +145,7 @@ jobs:
             fi
             echo
             if [ "$CHANNEL" = "dev" ]; then
-              echo "Első telepítés: a \`mac-arm64.dmg\` (Apple Silicon) vagy a \`mac-x64.dmg\` (Intel). A DEV csak macOS-re készül."
+              echo "Első telepítés: a \`mac-arm64.zip\` (Apple Silicon); kibontás után a programot az Alkalmazások mappába kell húzni. A DEV csak Apple Silicon Macre készül."
             else
               echo "Első telepítés: macOS-en a \`mac-arm64.dmg\` (Apple Silicon) vagy a \`mac-x64.dmg\` (Intel), Windowson a \`win-x64-setup.exe\`. Részletek a README-ben."
             fi

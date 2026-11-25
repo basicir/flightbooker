@@ -67,7 +67,7 @@ Open-Meteo előrejelzéséből heti foglalási tervezetet készít egy oktatóna
 - `src/core/update/`, `src/main/update/` – a program frissítése a GitHub-kiadásokból (koncepció 5.11,
   `docs/kiadas-es-frissites.md`): Ed25519-tel aláírt leírás, lenyomat-ellenőrzés, macOS-en csomagcsere,
   Windowson csendes NSIS. Két csatorna: `main` → Foglalástervező (macOS és Windows), `dev` → Foglalástervező DEV
-  (csak macOS).
+  (csak Apple Silicon Mac, zip).
 - `.github/workflows/`, `tools/release/` – kiadási folyamat: push a `dev` ágra → DEV-kiadás; az Actions
   „Kiadás: dev → main” gombja (vagy dev → main PR) → fő kiadás. A verziót a folyamat számolja. Az aláíró
   titkos kulcs csak a GitHub `UPDATE_SIGNING_KEY` titkában és a fejlesztő gépén van, sosem a repóban.
@@ -94,5 +94,8 @@ Open-Meteo előrejelzéséből heti foglalási tervezetet készít egy oktatóna
    kiadás. Ezt a felhasználó indítja: a Foglalástervező DEV Beállítások → Frissítés → „Kiadás: dev → main”
    gombjával (pontosan a kipróbált commitot adja ki), vagy a GitHub Actions „Kiadás: dev → main” munkafolyamatával.
    Claude a `main`-re magától nem pushol, és fő kiadást nem indít.
-4. Ha a `dev` a `.github/workflows` fájljait is módosítja, a gomb nem tudja kiadni (a GitHub-token korlátja):
-   ilyenkor dev → main pull request kell, a felhasználó jóváhagyásával. Erre a feladat végén szólni kell.
+4. Ha a `dev` a `.github/workflows` fájljait is módosítja, a gomb nem tudja kiadni (a GitHub-token korlátja).
+   Ilyenkor a felhasználó jóváhagyásával Claude a `main`-t előrepörgeti a `dev`-re (`git push origin
+   origin/dev:refs/heads/main`, csak fast-forward, összefésülési commit soha). Ha a különbség csak kiadási folyamat,
+   teszt vagy dokumentáció (`.github/**`, `tools/release/**`, `tests/**`, `docs/**`, `*.md`), ebből nem lesz új
+   programverzió (release.yml `paths-ignore`). Erre a feladat végén szólni kell.

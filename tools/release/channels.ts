@@ -14,11 +14,14 @@ export interface ChannelPackaging {
   /** A Finderben, a Dockban, a Start menüben és a parancsikonon látszó név; ebből az adatmappa neve. */
   readonly displayName: string
   readonly icon: string
+  /** A macOS-csomag formái: a frissítő a zipet használja, a DMG csak az első telepítéshez kell. */
+  readonly macFormats: readonly ('dmg' | 'zip')[]
 }
 
 export const CHANNELS: Readonly<Record<UpdateChannel, ChannelPackaging>> = {
-  stable: { appId: 'local.flightbooker.planner', productName: 'Foglalastervezo', displayName: APP_DISPLAY_NAME.stable, icon: 'build/icon.png' },
-  dev: { appId: 'local.flightbooker.planner.dev', productName: 'FoglalastervezoDev', displayName: APP_DISPLAY_NAME.dev, icon: 'build/icon-dev.png' },
+  stable: { appId: 'local.flightbooker.planner', productName: 'Foglalastervezo', displayName: APP_DISPLAY_NAME.stable, icon: 'build/icon.png', macFormats: ['dmg', 'zip'] },
+  // A DEV-hez nem készül DMG (gyorsabb kiadás): első telepítésnél a zip kibontva az Alkalmazások mappába kerül.
+  dev: { appId: 'local.flightbooker.planner.dev', productName: 'FoglalastervezoDev', displayName: APP_DISPLAY_NAME.dev, icon: 'build/icon-dev.png', macFormats: ['zip'] },
 }
 
 export type ReleasePlatform = 'mac' | 'win'
@@ -33,8 +36,9 @@ export interface ReleaseTarget {
 }
 
 /**
- * Csatornánként ezek a csomagok készülnek. A fejlesztői (DEV) változat csak a fejlesztő Macjére
- * kerül, ezért ahhoz nem készül Windows-telepítő (gyorsabb kiadás); a fő kiadás minden platformra.
+ * Csatornánként ezek a csomagok készülnek. A fejlesztői (DEV) változat csak a fejlesztő Apple
+ * Silicon Macjére kerül, ezért ahhoz csak egy csomag készül (gyorsabb kiadás); a fő kiadás macOS-re
+ * (Apple Silicon, Intel) és Windowsra.
  */
 export const RELEASE_TARGETS: Readonly<Record<UpdateChannel, readonly ReleaseTarget[]>> = {
   stable: [
@@ -42,10 +46,7 @@ export const RELEASE_TARGETS: Readonly<Record<UpdateChannel, readonly ReleaseTar
     { platform: 'mac', arch: 'x64', os: 'macos-latest' },
     { platform: 'win', arch: 'x64', os: 'windows-latest' },
   ],
-  dev: [
-    { platform: 'mac', arch: 'arm64', os: 'macos-latest' },
-    { platform: 'mac', arch: 'x64', os: 'macos-latest' },
-  ],
+  dev: [{ platform: 'mac', arch: 'arm64', os: 'macos-latest' }],
 }
 
 /** A frissítőnek kötelező fájlok: macOS-en a zip, Windowson az NSIS-telepítő (FRS-03). */
