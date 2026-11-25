@@ -3791,13 +3791,6 @@ kbd {
   font-size: 12px;
   font-weight: 600;
 }
-.fl-only-action {
-  flex: none;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--accent);
-  white-space: nowrap;
-}
 .fl-only-body {
   display: grid;
   gap: 8px;

@@ -3,7 +3,7 @@ import { useState, type ReactNode } from 'react'
 /**
  * Az igény űrlapjának két része: a tervezéshez szükséges mezők kiemelve („Tervezéshez”), a csak a
  * FlightLogger-foglalásba kerülő mezők (típus, program, komment …) egy lenyitható „Egyéb” részben. A lenyitható rész
- * fejléce egyértelműen kattintható (nyíl, „Kitöltés” felirat), és összecsukva is mutatja, mi van
+ * fejléce egyértelműen kattintható (nyíl, kiemelés), és összecsukva is mutatja, mi van
  * megadva és mi hiányzik.
  */
 
@@ -56,7 +56,6 @@ export function FlOnlySection(props: { summary?: ReactNode; missing?: readonly s
             </span>
           )}
         </span>
-        <span className="fl-only-action">{open ? 'Bezárás ▴' : missing.length > 0 ? 'Kitöltés ▾' : 'Szerkesztés ▾'}</span>
       </summary>
       <div className="fl-only-body">{props.children}</div>
     </details>
