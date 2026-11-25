@@ -178,7 +178,7 @@ export function WeeklyRequests() {
     <div className="page">
       <PageHeader
         title="Heti igények" week={<WeekTag />}
-        lead="Kattints egy növendékre: felkerül a hétre a soron következő feladatával. A feladat, az idők és az időpont igényenként átírhatók. A halasztott igények maguktól bekerülnek. A kiemelt idők kellenek a tervezéshez; a „FlightLoggerbe” rész (komment) csak a foglalásba kerül."
+        lead="Kattints egy növendékre: felkerül a hétre a soron következő feladatával. A feladat, az idők és az időpont igényenként átírhatók. A halasztott igények maguktól bekerülnek. A kiemelt idők kellenek a tervezéshez; az „Egyéb” rész (komment) csak a FlightLogger-foglalásba kerül."
         actions={
           <>
             <OpeningsButton />

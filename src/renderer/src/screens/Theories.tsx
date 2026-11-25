@@ -53,7 +53,7 @@ export function Theories() {
     <div className="page">
       <PageHeader
         title="Elméletek" week={<WeekTag />}
-        lead="Fix időpontot vagy időablakot adhatsz; ezek nélkül az elmélet rossz időre kerül, megfelelő teremmel. A „Tervezéshez” rész kell a tervhez; a „FlightLoggerbe” rész csak a foglalásba kerül (típus, program, tárgy, komment)."
+        lead="Fix időpontot vagy időablakot adhatsz; ezek nélkül az elmélet rossz időre kerül, megfelelő teremmel. A „Tervezéshez” rész kell a tervhez; az „Egyéb” rész csak a FlightLogger-foglalásba kerül (típus, program, tárgy, komment)."
         actions={
           <>
             <Button onClick={add}>+ Elmélet</Button>

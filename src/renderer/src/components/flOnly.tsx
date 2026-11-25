@@ -1,8 +1,8 @@
 import { useState, type ReactNode } from 'react'
 
 /**
- * Az igény űrlapjának két része: a tervezéshez szükséges mezők kiemelve, a csak a FlightLogger-
- * foglalásba kerülő mezők (típus, program, komment …) egy lenyitható részben. A lenyitható rész
+ * Az igény űrlapjának két része: a tervezéshez szükséges mezők kiemelve („Tervezéshez”), a csak a
+ * FlightLogger-foglalásba kerülő mezők (típus, program, komment …) egy lenyitható „Egyéb” részben. A lenyitható rész
  * fejléce egyértelműen kattintható (nyíl, „Kitöltés” felirat), és összecsukva is mutatja, mi van
  * megadva és mi hiányzik.
  */
@@ -46,7 +46,7 @@ export function FlOnlySection(props: { summary?: ReactNode; missing?: readonly s
         </svg>
         <span className="fl-only-head">
           <span className="fl-only-heading">
-            <span className="fl-only-title">FlightLoggerbe</span>
+            <span className="fl-only-title">Egyéb</span>
             <span className="fl-only-note">a FlightLogger-foglalás adatai – a tervet nem befolyásolják</span>
           </span>
           {!open && (props.summary || missing.length > 0) && (
