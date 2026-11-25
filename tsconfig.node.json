@@ -24,6 +24,7 @@
     "tests/**/*",
     "src/renderer/src/help/*.ts",
     "src/renderer/src/openingsSession.ts",
+    "src/renderer/src/recordingState.ts",
     "src/shared/**/*"
   ]
 }

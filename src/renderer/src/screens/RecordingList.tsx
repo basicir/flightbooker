@@ -14,6 +14,7 @@ import { studentProgress, syllabusLabel } from '../progress'
 import { useApp } from '../state'
 import { WeekTag } from '../components/weekTag'
 import { teamName } from '../components/teams'
+import { recordingStateOf, type RecordingState } from '../recordingState'
 
 /**
  * Rögzítési lista (9.6, TRV-14): napokra bontva, időrendben. Foglalásonként egy kártya, a
@@ -37,6 +38,10 @@ let importCopiedThisSession = false
 const markImportCopied = (): void => {
   importCopiedThisSession = true
 }
+
+/** A rögzített, de a FlightLoggerben azóta lemondott tétel (9.6): nincs mit átírni vagy újra felvinni. */
+const LAPSED_NOTE =
+  'Rögzítettnek jelölted, de a FlightLoggerben azóta lemondták, így nincs meglévő foglalás, amit át kellene írni. Fent, a „Javasolt változtatások” között döntsd el: újratervezés vagy halasztás.'
 
 /** A (még) hatás nélküli köztes állapotok jelzése (a párosítás az M5-ben jön). */
 const OTHER_STATUS: Partial<Record<RecordingStatus, string>> = { checked: 'ellenőrzött', different: 'eltérő' }
@@ -166,12 +171,10 @@ export function RecordingList() {
   const recordable = proposals.filter((p) => !p.standby)
   const cancelsOpen = result.plannedCancels.filter((c) => !c.done).length
   const total = recordable.length + result.recordedInFlightLogger.length + result.plannedCancels.length
-  /** Rögzített, de azóta más hosszú (a FlightLoggerben átírandó). */
-  const resizedSince = (p: Proposal): boolean => {
-    const saved = weekPlan.recordedSlots?.[p.requestId]
-    return !!saved && (toMs(saved.start) !== toMs(p.slot.start) || toMs(saved.end) !== toMs(p.slot.end))
-  }
-  const recordedCount = recordable.filter((p) => statusOf(p) === 'recorded' && !resizedSince(p)).length + result.recordedInFlightLogger.length + (result.plannedCancels.length - cancelsOpen)
+  // A rögzített, de a FlightLoggerben azóta lemondott tétel nem átírandó, hanem döntésre vár.
+  const cancelledInFl = new Set(result.cancelledInFlightLogger)
+  const stateOf = (p: Proposal): RecordingState => recordingStateOf(p, weekPlan, cancelledInFl)
+  const recordedCount = recordable.filter((p) => stateOf(p) === 'done').length + result.recordedInFlightLogger.length + (result.plannedCancels.length - cancelsOpen)
   const watchItems = app.watch?.items ?? []
 
   const copy = async (key: string, value: string): Promise<boolean> => {
@@ -325,8 +328,9 @@ export function RecordingList() {
     if (!first) return null
     const multi = unit.bookingType === 'multiStudent'
     const type = multi ? 'Többnövendékes repülés' : 'Egynövendékes repülés'
-    const resized = members.some((m) => statusOf(m) === 'recorded' && resizedSince(m))
-    const done = members.every((m) => statusOf(m) === 'recorded') && !resized
+    const lapsed = members.some((m) => stateOf(m) === 'cancelled')
+    const resized = !lapsed && members.some((m) => stateOf(m) === 'resized')
+    const done = members.every((m) => stateOf(m) === 'done')
     const warnings = members.flatMap((m) => m.warnings)
     const severe = warnings.some((w) => w.kind === 'limitExceeded' || w.kind === 'doubleBooking')
     const index = team.units.indexOf(unit) + 1
@@ -353,7 +357,9 @@ export function RecordingList() {
                 <Badge tone={severe ? 'danger' : 'warn'}>figyelmeztetés</Badge>
               </span>
             )}
-            {resized ? (
+            {lapsed ? (
+              <Badge tone="danger">a FlightLoggerben lemondták</Badge>
+            ) : resized ? (
               <>
                 <Badge tone="warn">a FlightLoggerben átírandó</Badge>
                 <Button small variant="primary" onClick={() => setAll('recorded')} title="A FlightLoggerben a foglalást átírtam a terv szerinti időkre">
@@ -380,7 +386,8 @@ export function RecordingList() {
         {resized && (
           <p className="small rec-note">A csapat ideje a rögzítés óta megváltozott: a FlightLoggerben a meglévő foglalást írd át (ne vegyél fel újat), a mezők lent másolhatók.</p>
         )}
-        {!done && (
+        {lapsed && <p className="small rec-note">{LAPSED_NOTE}</p>}
+        {!done && !lapsed && (
           <div className="rec-fields">
             <RecField label="Foglalástípus">{chip(`${k}-t`, type)}</RecField>
             {people.map(({ m, req }, i) => {
@@ -612,7 +619,7 @@ export function RecordingList() {
           {days.map((day) => {
             const dayRows = rows.filter((r) => localParts(toMs(r.start), timezone).date === day)
             const items = dayRows.flatMap((r) => (r.kind === 'proposal' ? [r.p] : r.kind === 'unit' || r.kind === 'unitChange' ? [...r.members] : []))
-            const open = items.filter((p) => !p.standby && (statusOf(p) !== 'recorded' || resizedSince(p))).length + dayRows.filter((r) => r.kind === 'cancel' && !r.c.done).length
+            const open = items.filter((p) => !p.standby && stateOf(p) !== 'done').length + dayRows.filter((r) => r.kind === 'cancel' && !r.c.done).length
             return (
               <section key={day} className="rec-day" aria-label={dayLabel(day)}>
                 <div className="rec-day-head">
@@ -629,10 +636,13 @@ export function RecordingList() {
                   const req = reqOf(p.requestId)
                   const k = keyOf(p)
                   const status = statusOf(p)
+                  const state = stateOf(p)
                   // A rögzítés óta a feladat (időtartam) változott: a FlightLoggerben is át kell írni (H02).
                   const savedSlot = weekPlan.recordedSlots?.[p.requestId]
-                  const resized = status === 'recorded' && resizedSince(p)
-                  const done = status === 'recorded' && !resized
+                  const resized = state === 'resized'
+                  const done = state === 'done'
+                  // A FlightLoggerben lemondták: nincs mit átírni, a döntés a javasolt változtatások között van.
+                  const lapsed = state === 'cancelled'
                   const students = req?.studentIds.map((id) => personName(bundle, id)).join(', ') ?? ''
                   const task = req?.lectureId ? (bundle.directory.lectures[req.lectureId]?.name ?? '') : ''
                   const type = req ? (req.kind === 'flight' ? 'Egynövendékes repülés' : requestKindLabel(req)) : ''
@@ -657,6 +667,8 @@ export function RecordingList() {
                           {OTHER_STATUS[status] && <Badge tone="info">{OTHER_STATUS[status]}</Badge>}
                           {p.standby ? (
                             <Badge tone="info">standby – nem kell rögzíteni</Badge>
+                          ) : lapsed ? (
+                            <Badge tone="danger">a FlightLoggerben lemondták</Badge>
                           ) : resized ? (
                             <>
                               <Badge tone="warn">a FlightLoggerben átírandó</Badge>
@@ -690,7 +702,8 @@ export function RecordingList() {
                           {timeOf(p.slot.start, timezone)}–{timeOf(p.slot.end, timezone)}. Írd át a meglévő foglalást (ne vegyél fel újat), a mezők lent másolhatók.
                         </p>
                       )}
-                      {!done && !p.standby && (
+                      {lapsed && <p className="small rec-note">{LAPSED_NOTE}</p>}
+                      {!done && !lapsed && !p.standby && (
                         <div className="rec-fields">
                           <RecField label="Növendék">
                             {chip(`${k}-s`, students)}

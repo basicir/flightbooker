@@ -200,7 +200,8 @@ export function watchWeek(input: PlanInput, base: PlanResult, options: WatchOpti
   const cancelled = new Set(base.cancelledInFlightLogger)
   for (const id of base.missingInFlightLogger) {
     const slot = recordedSlot.get(id)
-    if (slot && !dismissed(id, 'missing', slot.start)) items.push({ kind: 'missing', requestId: id, slot, ...(cancelled.has(id) ? { cancelled: true as const } : {}) })
+    // A lemondást a korábbi „Megvan, marad” sem rejti el: a rögzítési lista ide utal a döntésért.
+    if (slot && (cancelled.has(id) || !dismissed(id, 'missing', slot.start))) items.push({ kind: 'missing', requestId: id, slot, ...(cancelled.has(id) ? { cancelled: true as const } : {}) })
   }
   for (const s of base.deferredStillBooked) items.push({ kind: 'stillBooked', requestId: s.requestId, bookingId: s.bookingId, slot: s.slot })
 
